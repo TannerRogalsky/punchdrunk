@@ -3,31 +3,9 @@
   <script src="./js/moonshine.js"></script>
   <script src="./js/debug/debug.moonshine.js"></script>
   <script src="./js/debug/local.debug.moonshine.js" data-ui-url="/js/debug/ui"></script>
-  <script src="./luv.js"></script>
+  <script src="./js/love.js"></script>
+  <script src="./js/amore.js"></script>
 </head>
 <body>
-  <script>
-    var vm, env, luv;
-
-    // Forward print() messages to the console
-    shine.stdout.write = function () {
-      console.log.apply(console, arguments);
-    }
-    luv = Luv();
-
-    env = {
-      love: luv,
-      set_callbacks: function(load, update, draw) {
-        luv.load = load;
-        luv.update = update;
-        luv.draw = draw;
-
-        luv.run();
-      }
-    };
-
-    vm = new shine.VM(env);
-    vm.load('./lua/boot.lua.json');
-  </script>
 </body>
 </html>
