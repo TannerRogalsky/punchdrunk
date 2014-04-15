@@ -3,6 +3,19 @@
   var Color, Graphics, Timer,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
+  Color = (function() {
+    function Color(r, g, b, a) {
+      this.r = r;
+      this.g = g;
+      this.b = b;
+      this.a = a != null ? a : 255;
+      this.html_code = "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
+    }
+
+    return Color;
+
+  })();
+
   Graphics = (function() {
     function Graphics() {
       this.setBackgroundColor = __bind(this.setBackgroundColor, this);
@@ -67,7 +80,8 @@
       }
       this.current_color = new Color(r, g, b, a);
       this.ctx.fillStyle = this.current_color.html_code;
-      return this.ctx.strokeStyle = this.current_color.html_code;
+      this.ctx.strokeStyle = this.current_color.html_code;
+      return this.ctx.globalAlpha = this.current_color.a / 255;
     };
 
     Graphics.prototype.setBackgroundColor = function(r, g, b, a) {
@@ -84,16 +98,9 @@
   this.Love = (function() {
     function Love() {
       this.run = __bind(this.run, this);
-      this.set_callbacks = __bind(this.set_callbacks, this);
       this.graphics = new Graphics();
       this.timer = new Timer();
     }
-
-    Love.prototype.set_callbacks = function(load, update, draw) {
-      this.load = load;
-      this.update = update;
-      return this.draw = draw;
-    };
 
     Love.prototype.run = function() {
       var game_loop;
@@ -179,19 +186,6 @@
     };
 
     return Timer;
-
-  })();
-
-  Color = (function() {
-    function Color(r, g, b, a) {
-      this.r = r;
-      this.g = g;
-      this.b = b;
-      this.a = a != null ? a : 255;
-      this.html_code = "rgba(" + this.r + ", " + this.g + ", " + this.b + ", " + this.a + ")";
-    }
-
-    return Color;
 
   })();
 

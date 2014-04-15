@@ -45,6 +45,7 @@ class Graphics
     @current_color = new Color(r, g, b, a)
     @ctx.fillStyle = @current_color.html_code
     @ctx.strokeStyle = @current_color.html_code
+    @ctx.globalAlpha = @current_color.a / 255
 
   setBackgroundColor: (r, g, b, a = 255) =>
     @background_color = new Color(r, g, b, a)

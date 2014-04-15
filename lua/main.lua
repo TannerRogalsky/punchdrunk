@@ -13,6 +13,9 @@ function love.draw()
   love.graphics.setColor(255, 0, 0)
   love.graphics.rectangle("fill", 20, 20, 40, 50)
 
+  love.graphics.setColor(0, 0, 255, 100)
+  love.graphics.rectangle("fill", 40, 40, 40, 50)
+
   love.graphics.setColor(0, 255, 0)
   love.graphics.rectangle("line", line_box.x, line_box.y, 50, 40)
 

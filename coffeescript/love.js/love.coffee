@@ -3,11 +3,6 @@ class @Love
     @graphics = new Graphics()
     @timer = new Timer()
 
-  set_callbacks: (load, update, draw) =>
-    @load = load
-    @update = update
-    @draw = draw
-
   run: () =>
     @timer.step()
 
