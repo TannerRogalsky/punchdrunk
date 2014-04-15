@@ -26,6 +26,7 @@ class Timer
     if @deltaTime == 0 then 0 else 1 / @deltaTime
 
   getTime: () =>
+    @microTime
 
   sleep: () =>
 

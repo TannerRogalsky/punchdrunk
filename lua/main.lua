@@ -1,14 +1,23 @@
 function love.load()
-  print("load")
+  line_box = {
+    x = 40,
+    y = 40
+  }
 end
 
 function love.update(dt)
-  print("update:" .. dt)
+  line_box.y = line_box.y + 100 * dt
 end
 
 function love.draw()
-  print("draw")
-  -- love.graphics.setColor(255,225,255)
-  -- local fps = math.floor(love.timer.getFPS())
-  -- love.graphics.print("FPS: " + fps, sd.width - 40, 10)
+  love.graphics.setColor(255, 0, 0)
+  love.graphics.rectangle("fill", 20, 20, 40, 50)
+
+  love.graphics.setColor(0, 255, 0)
+  love.graphics.rectangle("line", line_box.x, line_box.y, 50, 40)
+
+  love.graphics.setColor(255, 255, 255)
+  local fps = math.floor(love.timer.getFPS())
+  local r = math.random
+  love.graphics.print("FPS: " .. fps, 10, 10)
 end
