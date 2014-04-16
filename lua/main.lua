@@ -3,6 +3,12 @@ function love.load()
     x = 40,
     y = 40
   }
+
+  canvas = love.graphics.newCanvas(300, 400)
+  print(canvas)
+  local w, h = canvas:getDimensions()
+  print(w)
+  print(h)
 end
 
 function love.update(dt)
@@ -10,6 +16,16 @@ function love.update(dt)
 end
 
 function love.draw()
+  local g = love.graphics
+
+
+  love.graphics.setCanvas(canvas)
+  love.graphics.clear()
+  g.setColor(255,0,0)
+  love.graphics.print("woo", 100, 100)
+  love.graphics.setCanvas()
+  love.graphics.draw(canvas, 0, 0)
+
   love.graphics.setColor(255, 0, 0)
   love.graphics.rectangle("fill", 20, 20, 40, 50)
 
