@@ -127,7 +127,6 @@
     Graphics.prototype.polygon = function() {
       var i, mode, points, x, y, _i, _ref, _ref1;
       mode = arguments[0], points = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      console.log(mode);
       this.context.beginPath();
       this.context.moveTo(points[0], points[1]);
       for (i = _i = 2, _ref = points.length; _i < _ref; i = _i += 2) {
