@@ -11,7 +11,14 @@ class Graphics
     @setBackgroundColor(0, 0, 0)
 
   # DRAWING
-  arc: () =>
+  arc: (mode, x, y, radius, startAngle, endAngle, segments) =>
+    @context.beginPath()
+    @context.moveTo(x, y)
+    @context.arc(x, y, radius, startAngle, endAngle)
+    @context.closePath()
+    switch mode
+      when "fill" then @context.fill()
+      when "line" then @context.stroke()
 
   circle: () =>
 
