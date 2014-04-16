@@ -57,6 +57,7 @@ class Graphics
 
   setCanvas: (canvas) =>
     if canvas == undefined or canvas == null
+      @default_canvas.copyContext(@canvas.context)
       @canvas = @default_canvas
       @context = @default_context
     else

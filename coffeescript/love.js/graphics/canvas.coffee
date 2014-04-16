@@ -30,5 +30,18 @@ class Canvas
 
   copyContext: (context) ->
     @context.fillStyle = context.fillStyle
-    @context.strokeStyle = context.strokeStyle
+    @context.font = context.font
     @context.globalAlpha = context.globalAlpha
+    @context.globalCompositeOperation = context.globalCompositeOperation
+    @context.lineCap = context.lineCap
+    @context.lineDashOffset = context.lineDashOffset
+    @context.lineJoin = context.lineJoin
+    @context.lineWidth = context.lineWidth
+    @context.miterLimit = context.miterLimit
+    @context.shadowBlur = context.shadowBlur
+    @context.shadowColor = context.shadowColor
+    @context.shadowOffsetX = context.shadowOffsetX
+    @context.shadowOffsetY = context.shadowOffsetY
+    @context.strokeStyle = context.strokeStyle
+    @context.textAlign = context.textAlign
+    @context.textBaseline = context.textBaseline
