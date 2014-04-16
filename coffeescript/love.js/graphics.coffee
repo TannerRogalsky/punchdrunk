@@ -1,6 +1,6 @@
 class Graphics
   constructor: () ->
-    @canvas = new Canvas(200, 200)
+    @canvas = new Canvas(500, 500)
     document.body.appendChild(@canvas.element)
     @context = @canvas.context
 
@@ -20,7 +20,13 @@ class Graphics
       when "fill" then @context.fill()
       when "line" then @context.stroke()
 
-  circle: () =>
+  circle: (mode, x, y, radius, segments) =>
+    @context.beginPath()
+    @context.arc(x, y, radius, 0, 2 * Math.PI)
+    @context.closePath()
+    switch mode
+      when "fill" then @context.fill()
+      when "line" then @context.stroke()
 
   clear: () =>
     @context.save()
@@ -32,15 +38,33 @@ class Graphics
   draw: (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) =>
     drawable.draw(@context, x, y, r, sx, sy, ox, oy, kx, ky)
 
-  line: () =>
+  line: (points...) =>
+    @context.beginPath()
+    @context.moveTo(points[0], points[1])
+    for i in [2...points.length] by 2
+      [x, y] = [points[i], points[i + 1]]
+      @context.lineTo(x, y)
+    @context.stroke()
 
-  point: () =>
+  point: (x, y) =>
+    @context.fillRect(x, y, 1, 1)
 
-  polygon: () =>
+  polygon: (mode, points...) =>
+    console.log mode
+    @context.beginPath()
+    @context.moveTo(points[0], points[1])
+    for i in [2...points.length] by 2
+      [x, y] = [points[i], points[i + 1]]
+      @context.lineTo(x, y)
+    @context.closePath()
+    switch mode
+      when "fill" then @context.fill()
+      when "line" then @context.stroke()
 
   print: (str, x, y) =>
     @context.fillText(str, x, y)
 
+  # TODO: later! This function is so crazy.
   printf: () =>
 
   rectangle: (mode, x, y, width, height) =>
@@ -74,5 +98,8 @@ class Graphics
 
   # WINDOW
   getWidth: () =>
+    @default_canvas.width
 
+  getWidth: () =>
+    @default_canvas.height
 
