@@ -50,7 +50,6 @@ class Graphics
     @context.fillRect(x, y, 1, 1)
 
   polygon: (mode, points...) =>
-    console.log mode
     @context.beginPath()
     @context.moveTo(points[0], points[1])
     for i in [2...points.length] by 2
