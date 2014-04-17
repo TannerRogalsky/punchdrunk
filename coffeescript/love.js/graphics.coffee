@@ -1,6 +1,6 @@
 class Graphics
-  constructor: () ->
-    @canvas = new Canvas(500, 500)
+  constructor: (@width = 800, @height = 600) ->
+    @canvas = new Canvas(@width, @height)
     document.body.appendChild(@canvas.element)
     @context = @canvas.context
 

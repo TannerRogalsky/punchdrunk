@@ -1,6 +1,6 @@
 class @Love
-  constructor: () ->
-    @graphics = new Graphics()
+  constructor: (window_conf) ->
+    @graphics = new Graphics(window_conf.width, window_conf.height)
     @timer = new Timer()
 
   run: () =>

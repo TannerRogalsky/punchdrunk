@@ -18,7 +18,9 @@
   })();
 
   Graphics = (function() {
-    function Graphics() {
+    function Graphics(width, height) {
+      this.width = width != null ? width : 800;
+      this.height = height != null ? height : 600;
       this.getWidth = __bind(this.getWidth, this);
       this.getWidth = __bind(this.getWidth, this);
       this.setCanvas = __bind(this.setCanvas, this);
@@ -37,7 +39,7 @@
       this.clear = __bind(this.clear, this);
       this.circle = __bind(this.circle, this);
       this.arc = __bind(this.arc, this);
-      this.canvas = new Canvas(500, 500);
+      this.canvas = new Canvas(this.width, this.height);
       document.body.appendChild(this.canvas.element);
       this.context = this.canvas.context;
       this.default_canvas = this.canvas;
@@ -271,9 +273,9 @@
   })();
 
   this.Love = (function() {
-    function Love() {
+    function Love(window_conf) {
       this.run = __bind(this.run, this);
-      this.graphics = new Graphics();
+      this.graphics = new Graphics(window_conf.width, window_conf.height);
       this.timer = new Timer();
     }
 
