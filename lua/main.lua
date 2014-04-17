@@ -6,6 +6,7 @@ function love.load()
 
   canvas = love.graphics.newCanvas(300, 400)
   enemyShip = love.graphics.newImage("enemyShip.png")
+  quad = love.graphics.newQuad(25, 10, 50, 50, enemyShip:getWidth(), enemyShip:getHeight())
   rotation = 0
 end
 
@@ -47,6 +48,7 @@ function love.draw()
 
   g.setColor(255, 255, 255)
   g.draw(enemyShip, 50, 100, rotation, 1, 1, enemyShip:getWidth() / 2, enemyShip:getHeight() / 2, .75, 0)
+  g.draw(enemyShip, quad, 150, 100)
 
   g.setColor(255, 255, 255)
   local fps = math.floor(love.timer.getFPS())

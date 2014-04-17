@@ -24,6 +24,7 @@
       this.setCanvas = __bind(this.setCanvas, this);
       this.setBackgroundColor = __bind(this.setBackgroundColor, this);
       this.setColor = __bind(this.setColor, this);
+      this.newQuad = __bind(this.newQuad, this);
       this.newImage = __bind(this.newImage, this);
       this.newCanvas = __bind(this.newCanvas, this);
       this.rectangle = __bind(this.rectangle, this);
@@ -78,44 +79,13 @@
       return this.context.restore();
     };
 
-    Graphics.prototype.draw = function(drawable, x, y, r, sx, sy, ox, oy, kx, ky) {
-      var halfHeight, halfWidth;
-      if (x == null) {
-        x = 0;
+    Graphics.prototype.draw = function(drawable, quad) {
+      switch (true) {
+        case !(quad instanceof Quad):
+          return this.drawDrawable.apply(this, arguments);
+        case quad instanceof Quad:
+          return this.drawWithQuad.apply(this, arguments);
       }
-      if (y == null) {
-        y = 0;
-      }
-      if (r == null) {
-        r = 0;
-      }
-      if (sx == null) {
-        sx = 1;
-      }
-      if (sy == null) {
-        sy = sx;
-      }
-      if (ox == null) {
-        ox = 0;
-      }
-      if (oy == null) {
-        oy = 0;
-      }
-      if (kx == null) {
-        kx = 0;
-      }
-      if (ky == null) {
-        ky = 0;
-      }
-      halfWidth = drawable.element.width / 2;
-      halfHeight = drawable.element.height / 2;
-      this.context.save();
-      this.context.translate(x + halfWidth - ox, y + halfHeight - oy);
-      this.context.rotate(r);
-      this.context.scale(sx, sy);
-      this.context.transform(1, ky, kx, 1, 0, 0);
-      drawable.draw(this.context, -halfWidth, -halfHeight);
-      return this.context.restore();
     };
 
     Graphics.prototype.line = function() {
@@ -175,6 +145,10 @@
       return new Image(path);
     };
 
+    Graphics.prototype.newQuad = function(x, y, width, height, sw, sh) {
+      return new Quad(x, y, width, height, sw, sh);
+    };
+
     Graphics.prototype.setColor = function(r, g, b, a) {
       if (a == null) {
         a = 255;
@@ -210,6 +184,86 @@
 
     Graphics.prototype.getWidth = function() {
       return this.default_canvas.height;
+    };
+
+    Graphics.prototype.drawDrawable = function(drawable, x, y, r, sx, sy, ox, oy, kx, ky) {
+      var halfHeight, halfWidth;
+      if (x == null) {
+        x = 0;
+      }
+      if (y == null) {
+        y = 0;
+      }
+      if (r == null) {
+        r = 0;
+      }
+      if (sx == null) {
+        sx = 1;
+      }
+      if (sy == null) {
+        sy = sx;
+      }
+      if (ox == null) {
+        ox = 0;
+      }
+      if (oy == null) {
+        oy = 0;
+      }
+      if (kx == null) {
+        kx = 0;
+      }
+      if (ky == null) {
+        ky = 0;
+      }
+      halfWidth = drawable.element.width / 2;
+      halfHeight = drawable.element.height / 2;
+      this.context.save();
+      this.context.translate(x + halfWidth - ox, y + halfHeight - oy);
+      this.context.rotate(r);
+      this.context.scale(sx, sy);
+      this.context.transform(1, ky, kx, 1, 0, 0);
+      this.context.drawImage(drawable.element, -halfWidth, -halfHeight);
+      return this.context.restore();
+    };
+
+    Graphics.prototype.drawWithQuad = function(drawable, quad, x, y, r, sx, sy, ox, oy, kx, ky) {
+      var halfHeight, halfWidth;
+      if (x == null) {
+        x = 0;
+      }
+      if (y == null) {
+        y = 0;
+      }
+      if (r == null) {
+        r = 0;
+      }
+      if (sx == null) {
+        sx = 1;
+      }
+      if (sy == null) {
+        sy = sx;
+      }
+      if (ox == null) {
+        ox = 0;
+      }
+      if (oy == null) {
+        oy = 0;
+      }
+      if (kx == null) {
+        kx = 0;
+      }
+      if (ky == null) {
+        ky = 0;
+      }
+      halfWidth = drawable.element.width / 2;
+      halfHeight = drawable.element.height / 2;
+      this.context.save();
+      this.context.translate(x + halfWidth - ox, y + halfHeight - oy);
+      this.context.rotate(r);
+      this.context.scale(sx, sy);
+      this.context.transform(1, ky, kx, 1, 0, 0);
+      this.context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, -halfWidth, -halfHeight, quad.width, quad.height);
+      return this.context.restore();
     };
 
     return Graphics;
@@ -363,10 +417,6 @@
 
     Canvas.prototype.setWrap = function(self) {};
 
-    Canvas.prototype.draw = function(context, x, y) {
-      return context.drawImage(this.element, x, y);
-    };
-
     Canvas.prototype.copyContext = function(context) {
       this.context.fillStyle = context.fillStyle;
       this.context.font = context.font;
@@ -435,16 +485,30 @@
 
     Image.prototype.setWrap = function(self) {};
 
-    Image.prototype.draw = function(context, x, y) {
-      return context.drawImage(this.element, x, y);
-    };
-
     return Image;
 
   })();
 
   Quad = (function() {
-    function Quad(x, y, width, height, sw, sh) {}
+    function Quad(x, y, width, height, sw, sh) {
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
+      this.sw = sw;
+      this.sh = sh;
+    }
+
+    Quad.prototype.getViewport = function(self) {
+      return [self.x, self.y, self.width, self.height];
+    };
+
+    Quad.prototype.setViewport = function(self, x, y, width, height) {
+      self.x = x;
+      self.y = y;
+      self.width = width;
+      return self.height = height;
+    };
 
     return Quad;
 

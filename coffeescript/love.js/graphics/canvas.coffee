@@ -41,9 +41,6 @@ class Canvas
   setWrap: (self) ->
 
   # PRIVATE
-  draw: (context, x, y) ->
-    context.drawImage(@element, x, y)
-
   copyContext: (context) ->
     @context.fillStyle = context.fillStyle
     @context.font = context.font
