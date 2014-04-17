@@ -4,19 +4,6 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
-  Color = (function() {
-    function Color(r, g, b, a) {
-      this.r = r;
-      this.g = g;
-      this.b = b;
-      this.a = a != null ? a : 255;
-      this.html_code = "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
-    }
-
-    return Color;
-
-  })();
-
   Graphics = (function() {
     function Graphics(width, height) {
       this.width = width != null ? width : 800;
@@ -513,6 +500,19 @@
     };
 
     return Quad;
+
+  })();
+
+  Color = (function() {
+    function Color(r, g, b, a) {
+      this.r = r;
+      this.g = g;
+      this.b = b;
+      this.a = a != null ? a : 255;
+      this.html_code = "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
+    }
+
+    return Color;
 
   })();
 
