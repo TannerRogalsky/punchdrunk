@@ -36,7 +36,16 @@ class Graphics
     @context.restore()
 
   draw: (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) =>
-    drawable.draw(@context, x, y, r, sx, sy, ox, oy, kx, ky)
+    halfWidth = drawable.element.width / 2
+    halfHeight = drawable.element.height / 2
+
+    @context.save()
+    @context.translate(x + halfWidth - ox, y + halfHeight - oy)
+    @context.rotate(r)
+    @context.scale(sx, sy)
+    @context.transform(1, ky, kx, 1, 0, 0) # shearing
+    drawable.draw(@context, -halfWidth, -halfHeight)
+    @context.restore()
 
   line: (points...) =>
     @context.beginPath()
@@ -74,6 +83,9 @@ class Graphics
   # OBJECT CREATION
   newCanvas: (width, height) =>
     new Canvas(width, height)
+
+  newImage: (path) =>
+    new Image(path)
 
   # STATE
   setColor: (r, g, b, a = 255) =>
