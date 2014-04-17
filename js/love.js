@@ -4,6 +4,169 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
+  Color = (function() {
+    function Color(r, g, b, a) {
+      this.r = r;
+      this.g = g;
+      this.b = b;
+      this.a = a != null ? a : 255;
+      this.html_code = "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
+    }
+
+    return Color;
+
+  })();
+
+  Canvas = (function() {
+    function Canvas(width, height) {
+      this.width = width;
+      this.height = height;
+      this.element = document.createElement('canvas');
+      this.element.setAttribute('width', this.width);
+      this.element.setAttribute('height', this.height);
+      this.context = this.element.getContext('2d');
+    }
+
+    Canvas.prototype.clear = function(self, r, g, b, a) {
+      var color;
+      if (r === null || r === void 0) {
+        color = Canvas.transparent;
+      } else {
+        color = new Color(r, g, b, a);
+      }
+      self.context.save();
+      self.context.setTransform(1, 0, 0, 1, 0, 0);
+      self.context.fillStyle = color.html_code;
+      self.context.globalAlpha = color.a / 255;
+      self.context.fillRect(0, 0, self.canvas.width, self.canvas.height);
+      return self.context.restore();
+    };
+
+    Canvas.prototype.getDimensions = function(self) {
+      return [self.width, self.height];
+    };
+
+    Canvas.prototype.getHeight = function(self) {
+      return self.height;
+    };
+
+    Canvas.prototype.getImageData = function(self) {
+      var image_data;
+      image_data = self.context.getImageData(0, 0, self.width, self.height);
+      return new ImageData(image_data);
+    };
+
+    Canvas.prototype.getPixel = function(self, x, y) {
+      var data;
+      data = self.context.getImageData(x, y, 1, 1).data;
+      return [data[0], data[1], data[2], data[3]];
+    };
+
+    Canvas.prototype.getWidth = function(self) {
+      return self.width;
+    };
+
+    Canvas.prototype.getWrap = function(self) {};
+
+    Canvas.prototype.setWrap = function(self) {};
+
+    Canvas.prototype.copyContext = function(context) {
+      this.context.fillStyle = context.fillStyle;
+      this.context.font = context.font;
+      this.context.globalAlpha = context.globalAlpha;
+      this.context.globalCompositeOperation = context.globalCompositeOperation;
+      this.context.lineCap = context.lineCap;
+      this.context.lineDashOffset = context.lineDashOffset;
+      this.context.lineJoin = context.lineJoin;
+      this.context.lineWidth = context.lineWidth;
+      this.context.miterLimit = context.miterLimit;
+      this.context.shadowBlur = context.shadowBlur;
+      this.context.shadowColor = context.shadowColor;
+      this.context.shadowOffsetX = context.shadowOffsetX;
+      this.context.shadowOffsetY = context.shadowOffsetY;
+      this.context.strokeStyle = context.strokeStyle;
+      this.context.textAlign = context.textAlign;
+      return this.context.textBaseline = context.textBaseline;
+    };
+
+    return Canvas;
+
+  })();
+
+  Canvas.transparent = new Color(0, 0, 0, 0);
+
+  Image = (function() {
+    function Image(path) {
+      this.element = document.createElement("img");
+      this.element.setAttribute("src", "lua/" + path);
+    }
+
+    Image.prototype.getData = function(self) {};
+
+    Image.prototype.getDimensions = function(self) {
+      return [self.element.width, self.element.height];
+    };
+
+    Image.prototype.getFilter = function(self) {};
+
+    Image.prototype.getHeight = function(self) {
+      return self.element.height;
+    };
+
+    Image.prototype.getMipmapFilter = function(self) {};
+
+    Image.prototype.getWidth = function(self) {
+      return self.element.width;
+    };
+
+    Image.prototype.getWrap = function(self) {};
+
+    Image.prototype.isCompressed = function(self) {};
+
+    Image.prototype.refresh = function(self) {};
+
+    Image.prototype.setFilter = function(self) {};
+
+    Image.prototype.setMipmapFilter = function(self) {};
+
+    Image.prototype.setWrap = function(self) {};
+
+    return Image;
+
+  })();
+
+  ImageData = (function() {
+    function ImageData() {}
+
+    return ImageData;
+
+  })();
+
+  Quad = (function() {
+    function Quad(x, y, width, height, sw, sh) {
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
+      this.sw = sw;
+      this.sh = sh;
+    }
+
+    Quad.prototype.getViewport = function(self) {
+      return [self.x, self.y, self.width, self.height];
+    };
+
+    Quad.prototype.setViewport = function(self, x, y, width, height) {
+      self.x = x;
+      self.y = y;
+      self.width = width;
+      return self.height = height;
+    };
+
+    return Quad;
+
+  })();
+
   Graphics = (function() {
     function Graphics(width, height) {
       this.width = width != null ? width : 800;
@@ -350,169 +513,6 @@
     };
 
     return Timer;
-
-  })();
-
-  Canvas = (function() {
-    function Canvas(width, height) {
-      this.width = width;
-      this.height = height;
-      this.element = document.createElement('canvas');
-      this.element.setAttribute('width', this.width);
-      this.element.setAttribute('height', this.height);
-      this.context = this.element.getContext('2d');
-    }
-
-    Canvas.prototype.clear = function(self, r, g, b, a) {
-      var color;
-      if (r === null || r === void 0) {
-        color = Canvas.transparent;
-      } else {
-        color = new Color(r, g, b, a);
-      }
-      self.context.save();
-      self.context.setTransform(1, 0, 0, 1, 0, 0);
-      self.context.fillStyle = color.html_code;
-      self.context.globalAlpha = color.a / 255;
-      self.context.fillRect(0, 0, self.canvas.width, self.canvas.height);
-      return self.context.restore();
-    };
-
-    Canvas.prototype.getDimensions = function(self) {
-      return [self.width, self.height];
-    };
-
-    Canvas.prototype.getHeight = function(self) {
-      return self.height;
-    };
-
-    Canvas.prototype.getImageData = function(self) {
-      var image_data;
-      image_data = self.context.getImageData(0, 0, self.width, self.height);
-      return new ImageData(image_data);
-    };
-
-    Canvas.prototype.getPixel = function(self, x, y) {
-      var data;
-      data = self.context.getImageData(x, y, 1, 1).data;
-      return [data[0], data[1], data[2], data[3]];
-    };
-
-    Canvas.prototype.getWidth = function(self) {
-      return self.width;
-    };
-
-    Canvas.prototype.getWrap = function(self) {};
-
-    Canvas.prototype.setWrap = function(self) {};
-
-    Canvas.prototype.copyContext = function(context) {
-      this.context.fillStyle = context.fillStyle;
-      this.context.font = context.font;
-      this.context.globalAlpha = context.globalAlpha;
-      this.context.globalCompositeOperation = context.globalCompositeOperation;
-      this.context.lineCap = context.lineCap;
-      this.context.lineDashOffset = context.lineDashOffset;
-      this.context.lineJoin = context.lineJoin;
-      this.context.lineWidth = context.lineWidth;
-      this.context.miterLimit = context.miterLimit;
-      this.context.shadowBlur = context.shadowBlur;
-      this.context.shadowColor = context.shadowColor;
-      this.context.shadowOffsetX = context.shadowOffsetX;
-      this.context.shadowOffsetY = context.shadowOffsetY;
-      this.context.strokeStyle = context.strokeStyle;
-      this.context.textAlign = context.textAlign;
-      return this.context.textBaseline = context.textBaseline;
-    };
-
-    return Canvas;
-
-  })();
-
-  Canvas.transparent = new Color(0, 0, 0, 0);
-
-  ImageData = (function() {
-    function ImageData() {}
-
-    return ImageData;
-
-  })();
-
-  Image = (function() {
-    function Image(path) {
-      this.element = document.createElement("img");
-      this.element.setAttribute("src", "lua/" + path);
-    }
-
-    Image.prototype.getData = function(self) {};
-
-    Image.prototype.getDimensions = function(self) {
-      return [self.element.width, self.element.height];
-    };
-
-    Image.prototype.getFilter = function(self) {};
-
-    Image.prototype.getHeight = function(self) {
-      return self.element.height;
-    };
-
-    Image.prototype.getMipmapFilter = function(self) {};
-
-    Image.prototype.getWidth = function(self) {
-      return self.element.width;
-    };
-
-    Image.prototype.getWrap = function(self) {};
-
-    Image.prototype.isCompressed = function(self) {};
-
-    Image.prototype.refresh = function(self) {};
-
-    Image.prototype.setFilter = function(self) {};
-
-    Image.prototype.setMipmapFilter = function(self) {};
-
-    Image.prototype.setWrap = function(self) {};
-
-    return Image;
-
-  })();
-
-  Quad = (function() {
-    function Quad(x, y, width, height, sw, sh) {
-      this.x = x;
-      this.y = y;
-      this.width = width;
-      this.height = height;
-      this.sw = sw;
-      this.sh = sh;
-    }
-
-    Quad.prototype.getViewport = function(self) {
-      return [self.x, self.y, self.width, self.height];
-    };
-
-    Quad.prototype.setViewport = function(self, x, y, width, height) {
-      self.x = x;
-      self.y = y;
-      self.width = width;
-      return self.height = height;
-    };
-
-    return Quad;
-
-  })();
-
-  Color = (function() {
-    function Color(r, g, b, a) {
-      this.r = r;
-      this.g = g;
-      this.b = b;
-      this.a = a != null ? a : 255;
-      this.html_code = "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
-    }
-
-    return Color;
 
   })();
 
