@@ -5,43 +5,43 @@ class Canvas
     @element.setAttribute('height', @height)
     @context = @element.getContext('2d')
 
-  clear: (r, g, b, a) =>
+  clear: (self, r, g, b, a) ->
     if r == null or r == undefined
       color = Canvas.transparent
     else
       color = new Color(r, g, b, a)
 
-    @context.save()
-    @context.setTransform(1,0,0,1,0,0)
-    @context.fillStyle = color.html_code
-    @context.globalAlpha = color.a / 255
-    @context.fillRect(0, 0, @canvas.width, @canvas.height)
-    @context.restore()
+    self.context.save()
+    self.context.setTransform(1,0,0,1,0,0)
+    self.context.fillStyle = color.html_code
+    self.context.globalAlpha = color.a / 255
+    self.context.fillRect(0, 0, self.canvas.width, self.canvas.height)
+    self.context.restore()
 
-  getDimensions: () =>
-    [@width, @height]
+  getDimensions: (self) ->
+    [self.width, self.height]
 
-  getHeight: () =>
-    @height
+  getHeight: (self) ->
+    self.height
 
-  getImageData: () =>
-    image_data = @context.getImageData(0, 0, @width, @height)
+  getImageData: (self) ->
+    image_data = self.context.getImageData(0, 0, self.width, self.height)
     new ImageData(image_data)
 
-  getPixel: (x, y) =>
-    data = @context.getImageData(x, y, 1, 1).data
+  getPixel: (self, x, y) ->
+    data = self.context.getImageData(x, y, 1, 1).data
     [data[0], data[1], data[2], data[3]]
 
-  getWidth: () =>
-    @width
+  getWidth: (self) ->
+    self.width
 
   # TODO: wrapping also applies to textures and quads
-  getWrap: () =>
+  getWrap: (self) ->
 
-  setWrap: () =>
+  setWrap: (self) ->
 
   # PRIVATE
-  draw: (context, x, y, r, sx, sy, ox, oy, kx, ky) ->
+  draw: (context, x, y) ->
     context.drawImage(@element, x, y)
 
   copyContext: (context) ->

@@ -5,14 +5,13 @@ function love.load()
   }
 
   canvas = love.graphics.newCanvas(300, 400)
-  print(canvas)
-  local w, h = canvas:getDimensions()
-  print(w)
-  print(h)
+  enemyShip = love.graphics.newImage("enemyShip.png")
+  rotation = 0
 end
 
 function love.update(dt)
   line_box.y = line_box.y + 100 * dt
+  rotation = rotation + 2 * dt
 end
 
 function love.draw()
@@ -45,6 +44,9 @@ function love.draw()
 
   g.setColor(0, 255, 0)
   g.rectangle("line", line_box.x, line_box.y, 50, 40)
+
+  g.setColor(255, 255, 255)
+  g.draw(enemyShip, 50, 100, rotation, 1, 1, enemyShip:getWidth() / 2, enemyShip:getHeight() / 2, .75, 0)
 
   g.setColor(255, 255, 255)
   local fps = math.floor(love.timer.getFPS())
