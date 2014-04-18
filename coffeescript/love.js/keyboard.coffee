@@ -15,6 +15,15 @@ class Keyboard
       key  = getKeyFromEvent(evt)
       keyboard.keysDown[key] = false
 
+  isDown: (key, others...) =>
+    if @keysDown[key]
+      return true
+    else
+      if others.length == 0
+        return false
+      else
+        return @isDown(others...)
+
   # ## key names
   #
   # This object contains the names used for each key code. Notice that this is not a
