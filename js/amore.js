@@ -7,7 +7,8 @@
   };
 
   conf = {
-    window: {}
+    window: {},
+    modules: {}
   };
 
   new shine.FileManager().load('./lua/conf.lua.json', function(_, file) {

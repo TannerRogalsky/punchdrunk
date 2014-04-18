@@ -3,7 +3,8 @@ shine.stdout.write = () ->
   console.log.apply(console, arguments)
 
 conf = {
-  window: {}
+  window: {},
+  modules: {}
 }
 
 new shine.FileManager().load './lua/conf.lua.json', (_, file) ->
