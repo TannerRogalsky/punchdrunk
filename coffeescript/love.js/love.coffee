@@ -19,3 +19,17 @@ class @Love
       @timer.nextFrame(game_loop)
 
     @timer.nextFrame(game_loop)
+
+  # default functions to be overwritten by main.lua
+  load: (args) ->
+  update: (dt) ->
+  mousepressed: (x, y, button) ->
+  mousereleased: (x, y, button) ->
+  keypressed: (key, unicode) ->
+  keyreleased: (key, unicode) ->
+  joystickpressed: (joystick, button) ->
+  joystickreleased: (joystick, button) ->
+  textinput: (text) ->
+  draw: () ->
+  focus: (has_focus) ->
+  quit: () ->
