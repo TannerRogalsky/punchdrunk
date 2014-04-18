@@ -37,8 +37,8 @@ class Graphics
 
   draw: (drawable, quad) =>
     switch true
-      when quad not instanceof Quad then @drawDrawable.apply(this, arguments)
-      when quad instanceof Quad then @drawWithQuad.apply(this, arguments)
+      when quad not instanceof Quad then drawDrawable.apply(this, arguments)
+      when quad instanceof Quad then drawWithQuad.apply(this, arguments)
 
   line: (points...) =>
     @context.beginPath()
@@ -111,7 +111,7 @@ class Graphics
     @default_canvas.height
 
   # PRIVATE
-  drawDrawable: (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
+  drawDrawable = (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
     halfWidth = drawable.element.width / 2
     halfHeight = drawable.element.height / 2
 
@@ -123,7 +123,7 @@ class Graphics
     @context.drawImage(drawable.element, -halfWidth, -halfHeight)
     @context.restore()
 
-  drawWithQuad: (drawable, quad, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
+  drawWithQuad = (drawable, quad, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
     halfWidth = drawable.element.width / 2
     halfHeight = drawable.element.height / 2
 
