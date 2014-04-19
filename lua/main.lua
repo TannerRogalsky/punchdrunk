@@ -6,6 +6,7 @@ function love.load()
 
   canvas = love.graphics.newCanvas(300, 400)
   enemyShip = love.graphics.newImage("enemyShip.png")
+  enemyShipPos = {x = 50, y = 100}
   quad = love.graphics.newQuad(25, 10, 50, 50, enemyShip:getWidth(), enemyShip:getHeight())
   rotation = 0
 end
@@ -13,6 +14,21 @@ end
 function love.update(dt)
   line_box.y = line_box.y + 100 * dt
   rotation = rotation + 2 * dt
+
+  local k = love.keyboard
+  local speed = 200
+  if k.isDown("up") then
+    enemyShipPos.y = enemyShipPos.y - speed * dt
+  end
+  if k.isDown("down") then
+    enemyShipPos.y = enemyShipPos.y + speed * dt
+  end
+  if k.isDown("left") then
+    enemyShipPos.x = enemyShipPos.x - speed * dt
+  end
+  if k.isDown("right") then
+    enemyShipPos.x = enemyShipPos.x + speed * dt
+  end
 end
 
 function love.draw()
@@ -47,11 +63,18 @@ function love.draw()
   g.rectangle("line", line_box.x, line_box.y, 50, 40)
 
   g.setColor(255, 255, 255)
-  g.draw(enemyShip, 50, 100, rotation, 1, 1, enemyShip:getWidth() / 2, enemyShip:getHeight() / 2, .75, 0)
+  g.draw(enemyShip, enemyShipPos.x, enemyShipPos.y, rotation, 1, 1, enemyShip:getWidth() / 2, enemyShip:getHeight() / 2, .75, 0)
   g.draw(enemyShip, quad, 150, 100, math.pi, 2, 2)
 
   g.setColor(255, 255, 255)
   local fps = math.floor(love.timer.getFPS())
   local r = math.random
   g.print("FPS: " .. fps, 10, 10)
+end
+
+function love.keypressed(key, unicode)
+  -- print("keypressed", key, unicode)
+end
+function love.keyreleased(key, unicode)
+  -- print("keyreleased", key, unicode)
 end

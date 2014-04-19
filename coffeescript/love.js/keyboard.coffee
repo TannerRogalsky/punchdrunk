@@ -1,19 +1,24 @@
 class Keyboard
-  constructor: () ->
-    document.addEventListener "keydown", (evt) ->
+  constructor: (eventQueue) ->
+    @keysDown = {}
+
+    document.addEventListener "keydown", (evt) =>
       evt.preventDefault()
       evt.stopPropagation()
 
       key  = getKeyFromEvent(evt)
-      keyboard.keysDown[key] = true
-      # keyboard.onPressed(key, evt.which)
+      @keysDown[key] = true
 
-    document.addEventListener "keyup", (evt) ->
+      eventQueue.push("keypressed", key, evt.which)
+
+    document.addEventListener "keyup", (evt) =>
       evt.preventDefault()
       evt.stopPropagation()
 
       key  = getKeyFromEvent(evt)
-      keyboard.keysDown[key] = false
+      @keysDown[key] = false
+
+      eventQueue.push("keyreleased", key, evt.which)
 
   isDown: (key, others...) =>
     if @keysDown[key]
@@ -70,7 +75,7 @@ class Keyboard
 
   getKeyFromEvent = (event) ->
     code = event.which;
-    if event.keyLocation and event.keyLocation > 1
+    if event.location and event.location > 1
       key = rightKeys[code]
     else if event.shiftKey
       key = shiftedKeys[code] or keys[code]
