@@ -1,7 +1,9 @@
 class @Love
-  constructor: () ->
-    @graphics = new Graphics()
+  constructor: (window_conf) ->
+    @graphics = new Graphics(window_conf.width, window_conf.height)
     @timer = new Timer()
+    @event = new EventQueue()
+    @keyboard = new Keyboard(@event)
 
   run: () =>
     @timer.step()
@@ -9,6 +11,10 @@ class @Love
     @load.call()
 
     game_loop = =>
+      for e in @event.internalQueue
+        @[e.eventType].call(null, e.arg1, e.arg2, e.arg3, e.arg4)
+      @event.clear()
+
       @timer.step()
 
       @update.call(null, @timer.getDelta())
@@ -19,3 +25,17 @@ class @Love
       @timer.nextFrame(game_loop)
 
     @timer.nextFrame(game_loop)
+
+  # default functions to be overwritten by main.lua
+  load: (args) ->
+  update: (dt) ->
+  mousepressed: (x, y, button) ->
+  mousereleased: (x, y, button) ->
+  keypressed: (key, unicode) ->
+  keyreleased: (key, unicode) ->
+  joystickpressed: (joystick, button) ->
+  joystickreleased: (joystick, button) ->
+  textinput: (text) ->
+  draw: () ->
+  focus: (has_focus) ->
+  quit: () ->

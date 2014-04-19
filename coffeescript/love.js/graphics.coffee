@@ -1,6 +1,6 @@
 class Graphics
-  constructor: () ->
-    @canvas = new Canvas(500, 500)
+  constructor: (@width = 800, @height = 600) ->
+    @canvas = new Canvas(@width, @height)
     document.body.appendChild(@canvas.element)
     @context = @canvas.context
 
@@ -35,17 +35,10 @@ class Graphics
     @context.fillRect(0, 0, @canvas.width, @canvas.height)
     @context.restore()
 
-  draw: (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) =>
-    halfWidth = drawable.element.width / 2
-    halfHeight = drawable.element.height / 2
-
-    @context.save()
-    @context.translate(x + halfWidth - ox, y + halfHeight - oy)
-    @context.rotate(r)
-    @context.scale(sx, sy)
-    @context.transform(1, ky, kx, 1, 0, 0) # shearing
-    drawable.draw(@context, -halfWidth, -halfHeight)
-    @context.restore()
+  draw: (drawable, quad) =>
+    switch true
+      when quad not instanceof Quad then drawDrawable.apply(this, arguments)
+      when quad instanceof Quad then drawWithQuad.apply(this, arguments)
 
   line: (points...) =>
     @context.beginPath()
@@ -87,6 +80,9 @@ class Graphics
   newImage: (path) =>
     new Image(path)
 
+  newQuad: (x, y, width, height, sw, sh) =>
+    new Quad(x, y, width, height, sw, sh)
+
   # STATE
   setColor: (r, g, b, a = 255) =>
     @current_color = new Color(r, g, b, a)
@@ -113,4 +109,29 @@ class Graphics
 
   getWidth: () =>
     @default_canvas.height
+
+  # PRIVATE
+  drawDrawable = (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
+    halfWidth = drawable.element.width / 2
+    halfHeight = drawable.element.height / 2
+
+    @context.save()
+    @context.translate(x + halfWidth - ox, y + halfHeight - oy)
+    @context.rotate(r)
+    @context.scale(sx, sy)
+    @context.transform(1, ky, kx, 1, 0, 0) # shearing
+    @context.drawImage(drawable.element, -halfWidth, -halfHeight)
+    @context.restore()
+
+  drawWithQuad = (drawable, quad, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
+    halfWidth = drawable.element.width / 2
+    halfHeight = drawable.element.height / 2
+
+    @context.save()
+    @context.translate(x + halfWidth - ox, y + halfHeight - oy)
+    @context.rotate(r)
+    @context.scale(sx, sy)
+    @context.transform(1, ky, kx, 1, 0, 0) # shearing
+    @context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, -halfWidth, -halfHeight, quad.width, quad.height)
+    @context.restore()
 

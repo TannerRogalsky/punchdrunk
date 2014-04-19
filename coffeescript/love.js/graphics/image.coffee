@@ -31,5 +31,3 @@ class Image
   setWrap: (self) ->
 
   # PRIVATE
-  draw: (context, x, y) ->
-    context.drawImage(@element, x, y)
