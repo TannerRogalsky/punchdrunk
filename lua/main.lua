@@ -64,7 +64,7 @@ function love.draw()
 
   g.setColor(255, 255, 255)
   g.draw(enemyShip, enemyShipPos.x, enemyShipPos.y, rotation, 1, 1, enemyShip:getWidth() / 2, enemyShip:getHeight() / 2, .75, 0)
-  g.draw(enemyShip, quad, 150, 100, math.pi, 2, 2)
+  g.draw(enemyShip, quad, 150, 100)--, math.pi, 2, 2)
 
   g.setColor(255, 255, 255)
   local fps = math.floor(love.timer.getFPS())

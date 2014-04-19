@@ -6,9 +6,12 @@ class Graphics
 
     @default_canvas = @canvas
     @default_context = @context
+    @default_font = new Font("Vera", 12)
 
     @setColor(255, 255, 255)
     @setBackgroundColor(0, 0, 0)
+    @setFont(@default_font)
+    @context.textBaseline = "top"
 
   # DRAWING
   arc: (mode, x, y, radius, startAngle, endAngle, segments) =>
@@ -102,6 +105,12 @@ class Graphics
       canvas.copyContext(@canvas.context)
       @canvas = canvas
       @context = canvas.context
+
+  setFont: (font) =>
+    if font
+      @context.font = font.html_code
+    else
+      @context.font = @default_font.html_code
 
   # WINDOW
   getWidth: () =>
