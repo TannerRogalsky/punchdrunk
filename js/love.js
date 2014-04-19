@@ -551,6 +551,59 @@
 
   })();
 
+  EventQueue = (function() {
+    var Event;
+
+    function EventQueue() {
+      this.wait = __bind(this.wait, this);
+      this.quit = __bind(this.quit, this);
+      this.push = __bind(this.push, this);
+      this.pump = __bind(this.pump, this);
+      this.poll = __bind(this.poll, this);
+      this.clear = __bind(this.clear, this);
+      this.internalQueue = [];
+    }
+
+    EventQueue.prototype.clear = function() {
+      return this.internalQueue = [];
+    };
+
+    EventQueue.prototype.poll = function() {};
+
+    EventQueue.prototype.pump = function() {};
+
+    EventQueue.prototype.push = function() {
+      var args, eventType, newEvent;
+      eventType = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      newEvent = (function(func, args, ctor) {
+        ctor.prototype = func.prototype;
+        var child = new ctor, result = func.apply(child, args);
+        return Object(result) === result ? result : child;
+      })(Event, [eventType].concat(__slice.call(args)), function(){});
+      return this.internalQueue.push(newEvent);
+    };
+
+    EventQueue.prototype.quit = function() {};
+
+    EventQueue.prototype.wait = function() {};
+
+    Event = (function() {
+      function Event(eventType, arg1, arg2, arg3, arg4) {
+        this.eventType = eventType;
+        this.arg1 = arg1;
+        this.arg2 = arg2;
+        this.arg3 = arg3;
+        this.arg4 = arg4;
+      }
+
+      return Event;
+
+    })();
+
+    return EventQueue;
+
+  })();
+
   Keyboard = (function() {
     var getKeyFromEvent, keys, rightKeys, shiftedKeys;
 
@@ -717,59 +770,6 @@
     };
 
     return Keyboard;
-
-  })();
-
-  EventQueue = (function() {
-    var Event;
-
-    function EventQueue() {
-      this.wait = __bind(this.wait, this);
-      this.quit = __bind(this.quit, this);
-      this.push = __bind(this.push, this);
-      this.pump = __bind(this.pump, this);
-      this.poll = __bind(this.poll, this);
-      this.clear = __bind(this.clear, this);
-      this.internalQueue = [];
-    }
-
-    EventQueue.prototype.clear = function() {
-      return this.internalQueue = [];
-    };
-
-    EventQueue.prototype.poll = function() {};
-
-    EventQueue.prototype.pump = function() {};
-
-    EventQueue.prototype.push = function() {
-      var args, eventType, newEvent;
-      eventType = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      newEvent = (function(func, args, ctor) {
-        ctor.prototype = func.prototype;
-        var child = new ctor, result = func.apply(child, args);
-        return Object(result) === result ? result : child;
-      })(Event, [eventType].concat(__slice.call(args)), function(){});
-      return this.internalQueue.push(newEvent);
-    };
-
-    EventQueue.prototype.quit = function() {};
-
-    EventQueue.prototype.wait = function() {};
-
-    Event = (function() {
-      function Event(eventType, arg1, arg2, arg3, arg4) {
-        this.eventType = eventType;
-        this.arg1 = arg1;
-        this.arg2 = arg2;
-        this.arg3 = arg3;
-        this.arg4 = arg4;
-      }
-
-      return Event;
-
-    })();
-
-    return EventQueue;
 
   })();
 
