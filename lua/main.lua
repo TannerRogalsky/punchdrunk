@@ -321,7 +321,7 @@ function loadResources()
 	-- fontimg:setFilter("nearest","nearest")
 	-- imgfont = love.graphics.newImageFont(fontimg," abcdefghijklmnopqrstuvwxyz0123456789.!'-:*")
 	-- imgfont:setLineHeight(2)
-	imgfont = love.graphics.newFont("Vera", 12)
+	imgfont = love.graphics.newFont()
 
 	-- Load sound effects
 	-- auCoffee = love.audio.newSource("sfx/coffee.wav","static")
