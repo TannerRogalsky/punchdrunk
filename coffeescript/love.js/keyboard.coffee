@@ -37,7 +37,7 @@ class Keyboard
   keys = {
     8: "backspace",
     9: "tab",
-    13: "enter",
+    13: "return",
     16: "shift",
     17: "ctrl",
     18: "alt",

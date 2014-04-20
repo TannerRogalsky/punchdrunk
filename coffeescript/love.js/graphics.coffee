@@ -6,9 +6,13 @@ class Graphics
 
     @default_canvas = @canvas
     @default_context = @context
+    @default_font = new Font("Vera", 12)
 
     @setColor(255, 255, 255)
     @setBackgroundColor(0, 0, 0)
+    @setFont(@default_font)
+    @context.textBaseline = "top"
+    # @context.imageSmoothingEnabled = false
 
   # DRAWING
   arc: (mode, x, y, radius, startAngle, endAngle, segments) =>
@@ -62,11 +66,19 @@ class Graphics
       when "fill" then @context.fill()
       when "line" then @context.stroke()
 
-  print: (str, x, y) =>
-    @context.fillText(str, x, y)
+  print: (text, x, y) =>
+    @context.fillText(text, x, y)
 
-  # TODO: later! This function is so crazy.
-  printf: () =>
+  # TODO: word wrap? UGH
+  printf: (text, x, y, limit, align = "left") =>
+    @context.save()
+    @context.translate(x + limit / 2, y)
+    switch align
+      when "center" then @context.textAlign = "center"
+      when "left" then @context.textAlign = "left"
+      when "right" then @context.textAlign = "right"
+    @context.fillText(text, 0, 0)
+    @context.restore()
 
   rectangle: (mode, x, y, width, height) =>
     switch mode
@@ -77,21 +89,32 @@ class Graphics
   newCanvas: (width, height) =>
     new Canvas(width, height)
 
+  newFont: (filename, size = 12) =>
+    new Font(filename, size)
+
   newImage: (path) =>
     new Image(path)
+
 
   newQuad: (x, y, width, height, sw, sh) =>
     new Quad(x, y, width, height, sw, sh)
 
   # STATE
   setColor: (r, g, b, a = 255) =>
-    @current_color = new Color(r, g, b, a)
+    if typeof(r) == "number"
+      @current_color = new Color(r, g, b, a)
+    else # we were passed a sequence
+      @current_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
     @context.fillStyle = @current_color.html_code
     @context.strokeStyle = @current_color.html_code
     @context.globalAlpha = @current_color.a / 255
 
+
   setBackgroundColor: (r, g, b, a = 255) =>
-    @background_color = new Color(r, g, b, a)
+    if typeof(r) == "number"
+      @background_color = new Color(r, g, b, a)
+    else # we were passed a sequence
+      @background_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
 
   setCanvas: (canvas) =>
     if canvas == undefined or canvas == null
@@ -102,6 +125,34 @@ class Graphics
       canvas.copyContext(@canvas.context)
       @canvas = canvas
       @context = canvas.context
+
+  setFont: (font) =>
+    if font
+      @context.font = font.html_code
+    else
+      @context.font = @default_font.html_code
+
+  # COORDINATE SYSTEM
+  origin: () =>
+    @context.setTransform(1,0,0,1,0,0)
+
+  pop: () =>
+    @context.restore()
+
+  push: () =>
+    @context.save()
+
+  rotate: (r) =>
+    @context.rotate(r)
+
+  scale: (sx, sy = sx) =>
+    @context.scale(sx, sy)
+
+  shear: (kx, ky) =>
+    @context.transform(1, ky, kx, 1, 0, 0)
+
+  translate: (dx, dy) =>
+    @context.translate(dx, dy)
 
   # WINDOW
   getWidth: () =>
@@ -116,11 +167,12 @@ class Graphics
     halfHeight = drawable.element.height / 2
 
     @context.save()
-    @context.translate(x + halfWidth - ox, y + halfHeight - oy)
+    @context.translate(x, y)
     @context.rotate(r)
     @context.scale(sx, sy)
     @context.transform(1, ky, kx, 1, 0, 0) # shearing
-    @context.drawImage(drawable.element, -halfWidth, -halfHeight)
+    @context.translate(-ox, -oy)
+    @context.drawImage(drawable.element, 0, 0)
     @context.restore()
 
   drawWithQuad = (drawable, quad, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
@@ -128,10 +180,11 @@ class Graphics
     halfHeight = drawable.element.height / 2
 
     @context.save()
-    @context.translate(x + halfWidth - ox, y + halfHeight - oy)
+    @context.translate(x, y)
     @context.rotate(r)
     @context.scale(sx, sy)
     @context.transform(1, ky, kx, 1, 0, 0) # shearing
-    @context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, -halfWidth, -halfHeight, quad.width, quad.height)
+    @context.translate(-ox, -oy)
+    @context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, 0, 0, quad.width, quad.height)
     @context.restore()
 
