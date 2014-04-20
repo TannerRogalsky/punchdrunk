@@ -17,6 +17,153 @@
 
   })();
 
+  EventQueue = (function() {
+    var Event;
+
+    function EventQueue() {
+      this.wait = __bind(this.wait, this);
+      this.quit = __bind(this.quit, this);
+      this.push = __bind(this.push, this);
+      this.pump = __bind(this.pump, this);
+      this.poll = __bind(this.poll, this);
+      this.clear = __bind(this.clear, this);
+      this.internalQueue = [];
+    }
+
+    EventQueue.prototype.clear = function() {
+      return this.internalQueue = [];
+    };
+
+    EventQueue.prototype.poll = function() {};
+
+    EventQueue.prototype.pump = function() {};
+
+    EventQueue.prototype.push = function() {
+      var args, eventType, newEvent;
+      eventType = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      newEvent = (function(func, args, ctor) {
+        ctor.prototype = func.prototype;
+        var child = new ctor, result = func.apply(child, args);
+        return Object(result) === result ? result : child;
+      })(Event, [eventType].concat(__slice.call(args)), function(){});
+      return this.internalQueue.push(newEvent);
+    };
+
+    EventQueue.prototype.quit = function() {};
+
+    EventQueue.prototype.wait = function() {};
+
+    Event = (function() {
+      function Event(eventType, arg1, arg2, arg3, arg4) {
+        this.eventType = eventType;
+        this.arg1 = arg1;
+        this.arg2 = arg2;
+        this.arg3 = arg3;
+        this.arg4 = arg4;
+      }
+
+      return Event;
+
+    })();
+
+    return EventQueue;
+
+  })();
+
+  FileSystem = (function() {
+    function FileSystem() {
+      this.write = __bind(this.write, this);
+      this.unmount = __bind(this.unmount, this);
+      this.setSource = __bind(this.setSource, this);
+      this.setIdentity = __bind(this.setIdentity, this);
+      this.remove = __bind(this.remove, this);
+      this.read = __bind(this.read, this);
+      this.newFileData = __bind(this.newFileData, this);
+      this.newFile = __bind(this.newFile, this);
+      this.mount = __bind(this.mount, this);
+      this.load = __bind(this.load, this);
+      this.lines = __bind(this.lines, this);
+      this.isFused = __bind(this.isFused, this);
+      this.isFile = __bind(this.isFile, this);
+      this.isDirectory = __bind(this.isDirectory, this);
+      this.init = __bind(this.init, this);
+      this.getWorkingDirectory = __bind(this.getWorkingDirectory, this);
+      this.getUserDirectory = __bind(this.getUserDirectory, this);
+      this.getSize = __bind(this.getSize, this);
+      this.getSaveDirectory = __bind(this.getSaveDirectory, this);
+      this.getLastModified = __bind(this.getLastModified, this);
+      this.getIdentity = __bind(this.getIdentity, this);
+      this.getDirectoryItems = __bind(this.getDirectoryItems, this);
+      this.getAppdataDirectory = __bind(this.getAppdataDirectory, this);
+      this.exists = __bind(this.exists, this);
+      this.createDirectory = __bind(this.createDirectory, this);
+      this.append = __bind(this.append, this);
+    }
+
+    FileSystem.prototype.append = function() {};
+
+    FileSystem.prototype.createDirectory = function() {};
+
+    FileSystem.prototype.exists = function(filename) {
+      return localStorage.getItem(filename) !== null;
+    };
+
+    FileSystem.prototype.getAppdataDirectory = function() {};
+
+    FileSystem.prototype.getDirectoryItems = function() {};
+
+    FileSystem.prototype.getIdentity = function() {};
+
+    FileSystem.prototype.getLastModified = function() {};
+
+    FileSystem.prototype.getSaveDirectory = function() {};
+
+    FileSystem.prototype.getSize = function() {};
+
+    FileSystem.prototype.getUserDirectory = function() {};
+
+    FileSystem.prototype.getWorkingDirectory = function() {};
+
+    FileSystem.prototype.init = function() {};
+
+    FileSystem.prototype.isDirectory = function() {};
+
+    FileSystem.prototype.isFile = function() {};
+
+    FileSystem.prototype.isFused = function() {};
+
+    FileSystem.prototype.lines = function() {};
+
+    FileSystem.prototype.load = function() {};
+
+    FileSystem.prototype.mount = function() {};
+
+    FileSystem.prototype.newFile = function() {};
+
+    FileSystem.prototype.newFileData = function() {};
+
+    FileSystem.prototype.read = function(filename) {
+      return localStorage.getItem(filename);
+    };
+
+    FileSystem.prototype.remove = function(filename) {
+      return localStorage.removeItem(filename);
+    };
+
+    FileSystem.prototype.setIdentity = function() {};
+
+    FileSystem.prototype.setSource = function() {};
+
+    FileSystem.prototype.unmount = function() {};
+
+    FileSystem.prototype.write = function(filename, data) {
+      return localStorage.setItem(filename, data);
+    };
+
+    return FileSystem;
+
+  })();
+
   Canvas = (function() {
     function Canvas(width, height) {
       this.element = document.createElement('canvas');
@@ -98,6 +245,39 @@
   })();
 
   Canvas.transparent = new Color(0, 0, 0, 0);
+
+  Font = (function() {
+    function Font(filename, size) {
+      this.filename = filename;
+      this.size = size;
+      this.html_code = "" + this.size + "px " + this.filename;
+    }
+
+    Font.prototype.getAscent = function(self) {};
+
+    Font.prototype.getBaseline = function(self) {};
+
+    Font.prototype.getDescent = function(self) {};
+
+    Font.prototype.getFilter = function(self) {};
+
+    Font.prototype.getHeight = function(self) {};
+
+    Font.prototype.getLineHeight = function(self) {};
+
+    Font.prototype.getWidth = function(self) {};
+
+    Font.prototype.getWrap = function(self) {};
+
+    Font.prototype.hasGlyphs = function(self) {};
+
+    Font.prototype.setFilter = function(self) {};
+
+    Font.prototype.setLineHeight = function(self) {};
+
+    return Font;
+
+  })();
 
   Image = (function() {
     function Image(path) {
@@ -514,189 +694,6 @@
 
   })();
 
-  this.Love = (function() {
-    function Love(window_conf) {
-      this.run = __bind(this.run, this);
-      this.graphics = new Graphics(window_conf.width, window_conf.height);
-      this.window = new Window(this.graphics);
-      this.timer = new Timer();
-      this.event = new EventQueue();
-      this.keyboard = new Keyboard(this.event);
-      this.filesystem = new FileSystem();
-    }
-
-    Love.prototype.run = function() {
-      var game_loop;
-      this.timer.step();
-      this.load.call();
-      game_loop = (function(_this) {
-        return function() {
-          var e, _i, _len, _ref;
-          _ref = _this.event.internalQueue;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            e = _ref[_i];
-            _this[e.eventType].call(null, e.arg1, e.arg2, e.arg3, e.arg4);
-          }
-          _this.event.clear();
-          _this.timer.step();
-          _this.update.call(null, _this.timer.getDelta());
-          _this.graphics.origin();
-          _this.graphics.clear();
-          _this.draw.call();
-          return _this.timer.nextFrame(game_loop);
-        };
-      })(this);
-      return this.timer.nextFrame(game_loop);
-    };
-
-    Love.prototype.load = function(args) {};
-
-    Love.prototype.update = function(dt) {};
-
-    Love.prototype.mousepressed = function(x, y, button) {};
-
-    Love.prototype.mousereleased = function(x, y, button) {};
-
-    Love.prototype.keypressed = function(key, unicode) {};
-
-    Love.prototype.keyreleased = function(key, unicode) {};
-
-    Love.prototype.joystickpressed = function(joystick, button) {};
-
-    Love.prototype.joystickreleased = function(joystick, button) {};
-
-    Love.prototype.textinput = function(text) {};
-
-    Love.prototype.draw = function() {};
-
-    Love.prototype.focus = function(has_focus) {};
-
-    Love.prototype.quit = function() {};
-
-    return Love;
-
-  })();
-
-  Timer = (function() {
-    var lastTime, performance, requestAnimationFrame;
-
-    function Timer() {
-      this.step = __bind(this.step, this);
-      this.sleep = __bind(this.sleep, this);
-      this.getTime = __bind(this.getTime, this);
-      this.getFPS = __bind(this.getFPS, this);
-      this.getDelta = __bind(this.getDelta, this);
-      this.nextFrame = __bind(this.nextFrame, this);
-      this.microTime = performance.now();
-      this.deltaTime = 0;
-      this.deltaTimeLimit = 0.25;
-      this.events = {};
-      this.maxEventId = 0;
-    }
-
-    Timer.prototype.nextFrame = function(callback) {
-      return requestAnimationFrame(callback);
-    };
-
-    Timer.prototype.getDelta = function() {
-      return this.deltaTime;
-    };
-
-    Timer.prototype.getFPS = function() {
-      if (this.deltaTime === 0) {
-        return 0;
-      } else {
-        return 1 / this.deltaTime;
-      }
-    };
-
-    Timer.prototype.getTime = function() {
-      return this.microTime;
-    };
-
-    Timer.prototype.sleep = function() {};
-
-    Timer.prototype.step = function() {
-      var dt;
-      dt = (performance.now() - this.microTime) / 1000;
-      this.deltaTime = Math.max(0, Math.min(this.deltaTimeLimit, dt));
-      return this.microTime += dt * 1000;
-    };
-
-    performance = window.performance || Date;
-
-    performance.now = performance.now || performance.msNow || performance.mozNow || performance.webkitNow || Date.now;
-
-    lastTime = 0;
-
-    requestAnimationFrame = window.requestAnimationFrame || window.msRequestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame || function(callback) {
-      var currTime, delay, timeToCall;
-      currTime = performance.now();
-      timeToCall = Math.max(0, 16 - (currTime - lastTime));
-      delay = function() {
-        return callback(currTime + timeToCall);
-      };
-      lastTime = currTime + timeToCall;
-      return setTimeout(delay, timeToCall);
-    };
-
-    return Timer;
-
-  })();
-
-  EventQueue = (function() {
-    var Event;
-
-    function EventQueue() {
-      this.wait = __bind(this.wait, this);
-      this.quit = __bind(this.quit, this);
-      this.push = __bind(this.push, this);
-      this.pump = __bind(this.pump, this);
-      this.poll = __bind(this.poll, this);
-      this.clear = __bind(this.clear, this);
-      this.internalQueue = [];
-    }
-
-    EventQueue.prototype.clear = function() {
-      return this.internalQueue = [];
-    };
-
-    EventQueue.prototype.poll = function() {};
-
-    EventQueue.prototype.pump = function() {};
-
-    EventQueue.prototype.push = function() {
-      var args, eventType, newEvent;
-      eventType = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      newEvent = (function(func, args, ctor) {
-        ctor.prototype = func.prototype;
-        var child = new ctor, result = func.apply(child, args);
-        return Object(result) === result ? result : child;
-      })(Event, [eventType].concat(__slice.call(args)), function(){});
-      return this.internalQueue.push(newEvent);
-    };
-
-    EventQueue.prototype.quit = function() {};
-
-    EventQueue.prototype.wait = function() {};
-
-    Event = (function() {
-      function Event(eventType, arg1, arg2, arg3, arg4) {
-        this.eventType = eventType;
-        this.arg1 = arg1;
-        this.arg2 = arg2;
-        this.arg3 = arg3;
-        this.arg4 = arg4;
-      }
-
-      return Event;
-
-    })();
-
-    return EventQueue;
-
-  })();
-
   Keyboard = (function() {
     var getKeyFromEvent, keys, rightKeys, shiftedKeys;
 
@@ -855,8 +852,8 @@
       }
       if (typeof key === "undefined") {
         key = String.fromCharCode(code);
-        if (event.shiftKey) {
-          key = key.toUpperCase();
+        if (!event.shiftKey) {
+          key = key.toLowerCase();
         }
       }
       return key;
@@ -866,130 +863,133 @@
 
   })();
 
-  Font = (function() {
-    function Font(filename, size) {
-      this.filename = filename;
-      this.size = size;
-      this.html_code = "" + this.size + "px " + this.filename;
+  this.Love = (function() {
+    function Love(window_conf) {
+      this.run = __bind(this.run, this);
+      this.graphics = new Graphics(window_conf.width, window_conf.height);
+      this.window = new Window(this.graphics);
+      this.timer = new Timer();
+      this.event = new EventQueue();
+      this.keyboard = new Keyboard(this.event);
+      this.filesystem = new FileSystem();
     }
 
-    Font.prototype.getAscent = function(self) {};
+    Love.prototype.run = function() {
+      var game_loop;
+      this.timer.step();
+      this.load.call();
+      game_loop = (function(_this) {
+        return function() {
+          var e, _i, _len, _ref;
+          _ref = _this.event.internalQueue;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            e = _ref[_i];
+            _this[e.eventType].call(null, e.arg1, e.arg2, e.arg3, e.arg4);
+          }
+          _this.event.clear();
+          _this.timer.step();
+          _this.update.call(null, _this.timer.getDelta());
+          _this.graphics.origin();
+          _this.graphics.clear();
+          _this.draw.call();
+          return _this.timer.nextFrame(game_loop);
+        };
+      })(this);
+      return this.timer.nextFrame(game_loop);
+    };
 
-    Font.prototype.getBaseline = function(self) {};
+    Love.prototype.load = function(args) {};
 
-    Font.prototype.getDescent = function(self) {};
+    Love.prototype.update = function(dt) {};
 
-    Font.prototype.getFilter = function(self) {};
+    Love.prototype.mousepressed = function(x, y, button) {};
 
-    Font.prototype.getHeight = function(self) {};
+    Love.prototype.mousereleased = function(x, y, button) {};
 
-    Font.prototype.getLineHeight = function(self) {};
+    Love.prototype.keypressed = function(key, unicode) {};
 
-    Font.prototype.getWidth = function(self) {};
+    Love.prototype.keyreleased = function(key, unicode) {};
 
-    Font.prototype.getWrap = function(self) {};
+    Love.prototype.joystickpressed = function(joystick, button) {};
 
-    Font.prototype.hasGlyphs = function(self) {};
+    Love.prototype.joystickreleased = function(joystick, button) {};
 
-    Font.prototype.setFilter = function(self) {};
+    Love.prototype.textinput = function(text) {};
 
-    Font.prototype.setLineHeight = function(self) {};
+    Love.prototype.draw = function() {};
 
-    return Font;
+    Love.prototype.focus = function(has_focus) {};
+
+    Love.prototype.quit = function() {};
+
+    return Love;
 
   })();
 
-  FileSystem = (function() {
-    function FileSystem() {
-      this.write = __bind(this.write, this);
-      this.unmount = __bind(this.unmount, this);
-      this.setSource = __bind(this.setSource, this);
-      this.setIdentity = __bind(this.setIdentity, this);
-      this.remove = __bind(this.remove, this);
-      this.read = __bind(this.read, this);
-      this.newFileData = __bind(this.newFileData, this);
-      this.newFile = __bind(this.newFile, this);
-      this.mount = __bind(this.mount, this);
-      this.load = __bind(this.load, this);
-      this.lines = __bind(this.lines, this);
-      this.isFused = __bind(this.isFused, this);
-      this.isFile = __bind(this.isFile, this);
-      this.isDirectory = __bind(this.isDirectory, this);
-      this.init = __bind(this.init, this);
-      this.getWorkingDirectory = __bind(this.getWorkingDirectory, this);
-      this.getUserDirectory = __bind(this.getUserDirectory, this);
-      this.getSize = __bind(this.getSize, this);
-      this.getSaveDirectory = __bind(this.getSaveDirectory, this);
-      this.getLastModified = __bind(this.getLastModified, this);
-      this.getIdentity = __bind(this.getIdentity, this);
-      this.getDirectoryItems = __bind(this.getDirectoryItems, this);
-      this.getAppdataDirectory = __bind(this.getAppdataDirectory, this);
-      this.exists = __bind(this.exists, this);
-      this.createDirectory = __bind(this.createDirectory, this);
-      this.append = __bind(this.append, this);
+  Timer = (function() {
+    var lastTime, performance, requestAnimationFrame;
+
+    function Timer() {
+      this.step = __bind(this.step, this);
+      this.sleep = __bind(this.sleep, this);
+      this.getTime = __bind(this.getTime, this);
+      this.getFPS = __bind(this.getFPS, this);
+      this.getDelta = __bind(this.getDelta, this);
+      this.nextFrame = __bind(this.nextFrame, this);
+      this.microTime = performance.now();
+      this.deltaTime = 0;
+      this.deltaTimeLimit = 0.25;
+      this.events = {};
+      this.maxEventId = 0;
     }
 
-    FileSystem.prototype.append = function() {};
-
-    FileSystem.prototype.createDirectory = function() {};
-
-    FileSystem.prototype.exists = function(filename) {
-      return localStorage.getItem(filename) !== null;
+    Timer.prototype.nextFrame = function(callback) {
+      return requestAnimationFrame(callback);
     };
 
-    FileSystem.prototype.getAppdataDirectory = function() {};
-
-    FileSystem.prototype.getDirectoryItems = function() {};
-
-    FileSystem.prototype.getIdentity = function() {};
-
-    FileSystem.prototype.getLastModified = function() {};
-
-    FileSystem.prototype.getSaveDirectory = function() {};
-
-    FileSystem.prototype.getSize = function() {};
-
-    FileSystem.prototype.getUserDirectory = function() {};
-
-    FileSystem.prototype.getWorkingDirectory = function() {};
-
-    FileSystem.prototype.init = function() {};
-
-    FileSystem.prototype.isDirectory = function() {};
-
-    FileSystem.prototype.isFile = function() {};
-
-    FileSystem.prototype.isFused = function() {};
-
-    FileSystem.prototype.lines = function() {};
-
-    FileSystem.prototype.load = function() {};
-
-    FileSystem.prototype.mount = function() {};
-
-    FileSystem.prototype.newFile = function() {};
-
-    FileSystem.prototype.newFileData = function() {};
-
-    FileSystem.prototype.read = function(filename) {
-      return localStorage.getItem(filename);
+    Timer.prototype.getDelta = function() {
+      return this.deltaTime;
     };
 
-    FileSystem.prototype.remove = function(filename) {
-      return localStorage.removeItem(filename);
+    Timer.prototype.getFPS = function() {
+      if (this.deltaTime === 0) {
+        return 0;
+      } else {
+        return 1 / this.deltaTime;
+      }
     };
 
-    FileSystem.prototype.setIdentity = function() {};
-
-    FileSystem.prototype.setSource = function() {};
-
-    FileSystem.prototype.unmount = function() {};
-
-    FileSystem.prototype.write = function(filename, data) {
-      return localStorage.setItem(filename, data);
+    Timer.prototype.getTime = function() {
+      return this.microTime;
     };
 
-    return FileSystem;
+    Timer.prototype.sleep = function() {};
+
+    Timer.prototype.step = function() {
+      var dt;
+      dt = (performance.now() - this.microTime) / 1000;
+      this.deltaTime = Math.max(0, Math.min(this.deltaTimeLimit, dt));
+      return this.microTime += dt * 1000;
+    };
+
+    performance = window.performance || Date;
+
+    performance.now = performance.now || performance.msNow || performance.mozNow || performance.webkitNow || Date.now;
+
+    lastTime = 0;
+
+    requestAnimationFrame = window.requestAnimationFrame || window.msRequestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame || function(callback) {
+      var currTime, delay, timeToCall;
+      currTime = performance.now();
+      timeToCall = Math.max(0, 16 - (currTime - lastTime));
+      delay = function() {
+        return callback(currTime + timeToCall);
+      };
+      lastTime = currTime + timeToCall;
+      return setTimeout(delay, timeToCall);
+    };
+
+    return Timer;
 
   })();
 
