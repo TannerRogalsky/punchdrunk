@@ -1,4 +1,17 @@
 function love.conf(t)
-  -- t.window.width = 1024
-  -- t.window.height = 768
+    t.title = "In Your Face City Trains"
+    t.author = "Simon Larsen"
+	t.identity = "iyfct"
+	t.window.width = 900
+	t.window.height = 300
+    t.modules.joystick = false
+    t.modules.audio = true
+    t.modules.keyboard = true
+    t.modules.event = true
+    t.modules.image = true
+    t.modules.graphics = true
+    t.modules.timer = true
+    t.modules.mouse = false
+    t.modules.sound = true
+    t.modules.physics = false
 end

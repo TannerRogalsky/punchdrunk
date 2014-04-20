@@ -1,90 +1,368 @@
+require("lua.table-save")
+require("lua.player")
+require("lua.cloud")
+require("lua.train")
+require("lua.tunnel")
+require("lua.gorge")
+require("lua.bird")
+require("lua.terrain")
+require("lua.menu")
+
+WIDTH = 300
+HEIGHT = 100
+SCALE = 3
+
+bgcolor = {236,243,201,255}
+darkcolor = {2,9,4,255}
+
+TRACK_SPEED = 150
+
+SPEED_INCREASE = 0.04
+START_SPEED = 1.7
+MAX_SPEED = 2.5
+
+pause = false
+mute = false
+gamestate = 1
+selection = 0
+submenu = 0
+
+highscore = {0,0,0}
+difficulty = 1
+difficulty_settings = {{1.5,0.03,2.5},{1.7,0.04,2.5},{2.25,0.06,3.1}}
+
+use_music = true
+
 function love.load()
-  line_box = {
-    x = 40,
-    y = 40
-  }
+	math.randomseed(os.time())
+	love.graphics.drawq = love.graphics.draw
+	love.graphics.setBackgroundColor(bgcolor)
 
-  canvas = love.graphics.newCanvas(300, 400)
-  enemyShip = love.graphics.newImage("enemyShip.png")
-  enemyShipPos = {x = 50, y = 100}
-  quad = love.graphics.newQuad(25, 0, 50, 50, enemyShip:getWidth(), enemyShip:getHeight())
-  rotation = 0
+	loadHighscore()
+	loadResources()
+	love.graphics.setFont(imgfont)
 
-  sprites = love.graphics.newImage("spritesheet.png")
-  sprite_quad = love.graphics.newQuad(2 + 21 + 2, 2 + 21 + 2, 21, 21, sprites:getWidth(), sprites:getHeight())
+	pl = Player.create()
+	updateScale()
+	restart()
+end
+
+function restart()
+	pl:reset()
+	clouds = {}
+	next_cloud = 0
+	birds = {}
+	next_bird = 1
+	track_frame = 0
+	scrn_shake = 0
+
+	START_SPEED = difficulty_settings[difficulty][1]
+	SPEED_INCREASE = difficulty_settings[difficulty][2]
+	MAX_SPEED = difficulty_settings[difficulty][3]
+	global_speed = START_SPEED
+
+	train = Train.create()
+	train.alive = false
+	tunnel = Tunnel.create()
+	tunnel.alive = false
+	gorge = Gorge.create()
+	gorge.alive = false
+
+	score = 0
+	coffee = 0
 end
 
 function love.update(dt)
-  line_box.y = line_box.y + 100 * dt
-  rotation = rotation + 2 * dt
+	if gamestate == 0 then
+		updateGame(dt)
+	elseif gamestate == 1 then
+		updateMenu(dt)
+	end
+end
 
-  local k = love.keyboard
-  local speed = 200
-  if k.isDown("up") then
-    enemyShipPos.y = enemyShipPos.y - speed * dt
-  end
-  if k.isDown("down") then
-    enemyShipPos.y = enemyShipPos.y + speed * dt
-  end
-  if k.isDown("left") then
-    enemyShipPos.x = enemyShipPos.x - speed * dt
-  end
-  if k.isDown("right") then
-    enemyShipPos.x = enemyShipPos.x + speed * dt
-  end
+function updateGame(dt)
+	if pause == true then
+		return
+	end
+	-- Update screenshake thingy
+	if scrn_shake > 0 then
+		scrn_shake = scrn_shake - dt
+	end
+
+	-- Update player
+	pl:update(dt)
+
+	-- Update clouds
+	spawnClouds(dt)
+	for i,cl in ipairs(clouds) do
+		cl:update(dt)
+		if cl.x < -32 then
+			table.remove(clouds,i)
+		end
+	end
+
+	-- Update trains
+	train:update(dt)
+
+	-- Update tunnel
+	tunnel:update(dt)
+
+	-- Update gorge
+	gorge:update(dt)
+
+	-- Update birds
+	spawnBirds(dt)
+	for i,b in ipairs(birds) do
+		b:update(dt)
+		if b.alive == false then
+			table.remove(birds,i)
+		end
+	end
+
+	-- Check collisions
+	if pl.alive == true then
+		pl:collideWithTrain()
+		pl:collideWithTunnel()
+		pl:collideWithBirds()
+		pl:collideWithGorge()
+	end
+
+	-- Move railway tracks
+	updateTracks(dt)
+
+	-- Update terrain (skyscrapers etc.)
+	updateTerrain(dt)
+
+	-- Increase speed and score
+	--if pl.status == 0 or pl.status == 3 then
+	if pl.alive == true then
+		global_speed = global_speed + SPEED_INCREASE*dt
+		if global_speed > MAX_SPEED then global_speed = MAX_SPEED end
+		score = score + 20*dt
+	end
+
+	-- Respawn train or tunnel
+	if train.alive == false then
+		if tunnel.alive == false then
+			if gorge.alive == false then
+				local banana = math.random(1,5)
+				if banana == 1 then -- spawn tunnel
+					tunnel = Tunnel.create()
+				elseif banana == 2 and global_speed > 1.7 then
+					gorge = Gorge.create()
+				else
+					train = Train.createRandom()
+				end
+			end
+		else
+			if tunnel.x > WIDTH then
+				train = Train.create(2)
+				train.x = tunnel.x + math.random(1,250) - (tunnel.x - WIDTH)
+			end
+		end
+	end
 end
 
 function love.draw()
-  local g = love.graphics
-
-  g.setCanvas(canvas)
-  g.clear()
-  g.setColor(255,0,0)
-  g.print("woo", 100, 100)
-
-  g.arc("fill", 100, 100, 50, -math.pi, -math.pi / 2)
-
-  g.setCanvas()
-  g.draw(canvas, 50, 50)
-
-  g.setColor(255, 0, 0)
-  g.rectangle("fill", 0, 0, 40, 50)
-
-  g.setColor(0, 0, 255, 100)
-  g.rectangle("fill", 40, 40, 40, 50)
-
-  g.setColor(0, 255, 0)
-  g.circle("fill", 100, 100, 25)
-
-  g.setColor(255, 0, 0)
-  love.graphics.line(200,50, 400,50, 500,300, 100,300)
-
-  g.setColor(0, 0, 255)
-  love.graphics.polygon('fill', 100, 100, 200, 100, 150, 200)
-
-  g.setColor(0, 255, 0)
-  g.rectangle("line", line_box.x, line_box.y, 50, 40)
-
-  g.setColor(255, 255, 255)
-  g.draw(enemyShip, enemyShipPos.x, enemyShipPos.y, rotation, 1, 1, enemyShip:getWidth() / 2, enemyShip:getHeight() / 2, .75, 0)
-  g.draw(enemyShip, quad, 400, 300, math.pi, 2, 2, enemyShip:getWidth() / 2, enemyShip:getHeight() / 2, .75, 0)
-  g.draw(enemyShip, quad, 400, 300, 0, 2, 2, enemyShip:getWidth() / 2, enemyShip:getHeight() / 2, .75, 0)
-  g.draw(enemyShip, 400, 100)
-  g.draw(enemyShip, 400, 100, math.pi)
-  g.draw(enemyShip, quad, 150, 100)
-  g.draw(enemyShip, quad, 150, 100, math.pi)
-  g.rectangle("fill", 0, 250, 21 * 4, 21 * 4)
-  g.draw(sprites, sprite_quad, 0, 250, 0, 4, 4)
-
-  g.setColor(255, 255, 255)
-  local fps = math.floor(love.timer.getFPS())
-  local r = math.random
-  g.print("FPS: " .. fps, 10, 10)
+	love.graphics.scale(SCALE,SCALE)
+	love.graphics.setColor(255,255,255,255)
+	if gamestate == 0 then
+		drawGame()
+	elseif gamestate == 1 then
+		drawMenu()
+	end
 end
 
-function love.keypressed(key, unicode)
-  -- print("keypressed", key, unicode)
+function drawGame()
+	-- Shake camera if hit
+	if scrn_shake > 0 then
+		love.graphics.translate(5*(math.random()-0.5),5*(math.random()-0.5))
+	end
+
+	-- Draw terrain (skyscrapers etc.)
+	drawTerrain()
+
+	-- Draw clouds
+	for i,cl in ipairs(clouds) do
+		cl:draw()
+	end
+
+	-- Draw back of tunnel
+	tunnel:drawBack()
+
+	-- Draw railroad tracks
+	drawTracks()
+
+	-- Draw gorge
+	gorge:draw()
+
+	-- Draw train
+	train:draw()
+
+	-- Draw player
+	love.graphics.setColor(255,255,255,255)
+	pl:draw()
+
+	-- Draw front of tunnel
+	tunnel:drawFront()
+
+	-- Draw birds
+	for i,b in ipairs(birds) do
+		b:draw(v)
+	end
+
+	-- Draw score
+	love.graphics.setColor(darkcolor)
+	love.graphics.print(math.floor(score),8,8)
+
+	-- Draw game over message
+	if pl.alive == false then
+		love.graphics.printf("you didn't make it to work\npress r to retry",0,30,WIDTH,"center")
+		love.graphics.printf("your score: ".. score .. " - highscore: " .. highscore[difficulty],0,65,WIDTH,"center")
+	end
+
+	-- Draw pause message
+	if pause == true then
+		love.graphics.printf("paused\npress p to continue",0,50,WIDTH,"center")
+	end
+
+	-- Draw coffee meter
+	local cquad = love.graphics.newQuad(48+math.floor(coffee)*9,64,9,9,128,128)
+	if coffee < 5 or pl.frame < 4 then
+		love.graphics.drawq(imgSprites,cquad,284,7)
+	end
 end
-function love.keyreleased(key, unicode)
-  -- print("keyreleased", key, unicode)
+
+function love.keypressed(key,unicode)
+	if key == ' ' then -- will be space most of the time
+		return         -- avoid unnecessary checks
+	elseif key == 'r' then
+		restart()
+	elseif key == 'up' then
+		selection = selection-1
+	elseif key == 'down' then
+		selection = selection+1
+
+	elseif key == 'return' then
+		if gamestate == 1 then
+			if submenu == 0 then -- splash screen
+				submenu = 2 -- Jumps straight to difficulty.
+				-- auSelect:stop() auSelect:play()
+			elseif submenu == 2 then  -- difficulty selection
+				difficulty = selection+1
+				-- auSelect:stop() auSelect:play()
+				gamestate = 0
+				restart()
+			end
+		end
+
+	elseif key == 'escape' then
+		if gamestate == 0 then -- ingame
+			gamestate = 1
+			submenu = 2
+			selection = 0
+		elseif gamestate == 1 then
+			if submenu == 0 then
+				love.event.quit()
+			elseif submenu == 2 then
+				submenu = 0
+			end
+		end
+		-- auSelect:stop() auSelect:play()
+	elseif key == 'p' then
+		if gamestate == 0 and pl.alive == true then
+			pause = not pause
+		end
+	elseif key == 'm' then
+		if mute == false then
+			mute = true
+			love.audio.setVolume(0.0)
+		else
+			mute = false
+			love.audio.setVolume(1.0)
+		end
+	elseif key == '1' then
+		SCALE = 1
+		updateScale()
+	elseif key == '2' then
+		SCALE = 2
+		updateScale()
+	elseif key == '3' then
+		SCALE = 3
+		updateScale()
+	elseif key == '4' then
+		SCALE = 4
+		updateScale()
+	end
 end
+
+function updateScale()
+	SCRNWIDTH = WIDTH*SCALE
+	SCRNHEIGHT = HEIGHT*SCALE
+	love.window.setMode(SCRNWIDTH,SCRNHEIGHT)
+end
+
+function loadResources()
+	-- Load images
+	imgSprites = love.graphics.newImage("gfx/sprites.png")
+	imgSprites:setFilter("nearest","nearest")
+
+	imgTrains = love.graphics.newImage("gfx/trains.png")
+	imgTrains:setFilter("nearest","nearest")
+
+	imgTerrain = love.graphics.newImage("gfx/terrain.png")
+	imgTerrain:setFilter("nearest","nearest")
+
+	imgSplash = love.graphics.newImage("gfx/splash.png")
+	imgSplash:setFilter("nearest","nearest")
+
+	-- fontimg = love.graphics.newImage("gfx/imgfont.png")
+	-- fontimg:setFilter("nearest","nearest")
+	-- imgfont = love.graphics.newImageFont(fontimg," abcdefghijklmnopqrstuvwxyz0123456789.!'-:*")
+	-- imgfont:setLineHeight(2)
+	imgfont = love.graphics.newFont("Vera", 12)
+
+	-- Load sound effects
+	-- auCoffee = love.audio.newSource("sfx/coffee.wav","static")
+	-- auHit = love.audio.newSource("sfx/hit.wav","static")
+	-- auSelect = love.audio.newSource("sfx/select.wav","static")
+	-- if use_music == true then
+	-- 	auBGM = love.audio.newSource("sfx/bgm.ogg","stream")
+	-- 	auBGM:setLooping(true)
+	-- 	auBGM:setVolume(0.6)
+	-- 	auBGM:play()
+	-- end
+end
+
+function loadHighscore()
+	if love.filesystem.exists("highscore") then
+		local data = love.filesystem.read("highscore")
+		if data ~=nil then
+			local datatable = table.load(data)
+			if #datatable == #highscore then
+				highscore = datatable
+			end
+		end
+	end
+end
+
+function saveHighscore()
+	local datatable = table.save(highscore)
+	love.filesystem.write("highscore",datatable)
+end
+
+function love.quit()
+	saveHighscore()
+end
+
+function love.focus(f)
+	if not f and gamestate == 0 and pl.alive == true then
+		pause = true
+	end
+end
+
+--[[
+  Gamestates:
+  0 ingame
+  1 menu
+--]]
