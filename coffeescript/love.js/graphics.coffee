@@ -81,21 +81,32 @@ class Graphics
   newCanvas: (width, height) =>
     new Canvas(width, height)
 
+  newFont: (filename, size = 12) =>
+    new Font(filename, size)
+
   newImage: (path) =>
     new Image(path)
+
 
   newQuad: (x, y, width, height, sw, sh) =>
     new Quad(x, y, width, height, sw, sh)
 
   # STATE
   setColor: (r, g, b, a = 255) =>
-    @current_color = new Color(r, g, b, a)
+    if typeof(r) == "number"
+      @current_color = new Color(r, g, b, a)
+    else # we were passed a sequence
+      @current_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
     @context.fillStyle = @current_color.html_code
     @context.strokeStyle = @current_color.html_code
     @context.globalAlpha = @current_color.a / 255
 
+
   setBackgroundColor: (r, g, b, a = 255) =>
-    @background_color = new Color(r, g, b, a)
+    if typeof(r) == "number"
+      @background_color = new Color(r, g, b, a)
+    else # we were passed a sequence
+      @background_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
 
   setCanvas: (canvas) =>
     if canvas == undefined or canvas == null
@@ -112,6 +123,28 @@ class Graphics
       @context.font = font.html_code
     else
       @context.font = @default_font.html_code
+
+  # COORDINATE SYSTEM
+  origin: () =>
+    @context.setTransform(1,0,0,1,0,0)
+
+  pop: () =>
+    @context.restore()
+
+  push: () =>
+    @context.save()
+
+  rotate: (r) =>
+    @context.rotate(r)
+
+  scale: (sx, sy = sx) =>
+    @context.scale(sx, sy)
+
+  shear: (kx, ky) =>
+    @context.transform(1, ky, kx, 1, 0, 0)
+
+  translate: (dx, dy) =>
+    @context.translate(dx, dy)
 
   # WINDOW
   getWidth: () =>
