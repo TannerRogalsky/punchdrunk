@@ -872,6 +872,11 @@
       this.event = new EventQueue();
       this.keyboard = new Keyboard(this.event);
       this.filesystem = new FileSystem();
+      window.addEventListener("beforeunload", (function(_this) {
+        return function() {
+          return _this.quit.call();
+        };
+      })(this));
     }
 
     Love.prototype.run = function() {

@@ -7,6 +7,9 @@ class @Love
     @keyboard = new Keyboard(@event)
     @filesystem = new FileSystem()
 
+    window.addEventListener "beforeunload", () =>
+      @quit.call()
+
   run: () =>
     @timer.step()
 
