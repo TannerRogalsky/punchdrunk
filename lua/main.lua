@@ -38,7 +38,8 @@ function love.load()
 	love.graphics.drawq = love.graphics.draw
 	love.graphics.setBackgroundColor(bgcolor)
 
-	loadHighscore()
+	-- loadstring isn't working right now so loadhighscore is disabled
+	-- loadHighscore()
 	loadResources()
 	love.graphics.setFont(imgfont)
 
