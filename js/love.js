@@ -384,11 +384,12 @@
       halfWidth = drawable.element.width / 2;
       halfHeight = drawable.element.height / 2;
       this.context.save();
-      this.context.translate(x + halfWidth - ox, y + halfHeight - oy);
+      this.context.translate(x, y);
       this.context.rotate(r);
       this.context.scale(sx, sy);
       this.context.transform(1, ky, kx, 1, 0, 0);
-      this.context.drawImage(drawable.element, -halfWidth, -halfHeight);
+      this.context.translate(-ox, -oy);
+      this.context.drawImage(drawable.element, 0, 0);
       return this.context.restore();
     };
 
@@ -424,11 +425,12 @@
       halfWidth = drawable.element.width / 2;
       halfHeight = drawable.element.height / 2;
       this.context.save();
-      this.context.translate(x + halfWidth - ox, y + halfHeight - oy);
+      this.context.translate(x, y);
       this.context.rotate(r);
       this.context.scale(sx, sy);
       this.context.transform(1, ky, kx, 1, 0, 0);
-      this.context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, -halfWidth, -halfHeight, quad.width, quad.height);
+      this.context.translate(-ox, -oy);
+      this.context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, 0, 0, quad.width, quad.height);
       return this.context.restore();
     };
 

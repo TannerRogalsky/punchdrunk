@@ -12,6 +12,7 @@ class Graphics
     @setBackgroundColor(0, 0, 0)
     @setFont(@default_font)
     @context.textBaseline = "top"
+    # @context.imageSmoothingEnabled = false
 
   # DRAWING
   arc: (mode, x, y, radius, startAngle, endAngle, segments) =>
@@ -125,11 +126,12 @@ class Graphics
     halfHeight = drawable.element.height / 2
 
     @context.save()
-    @context.translate(x + halfWidth - ox, y + halfHeight - oy)
+    @context.translate(x, y)
     @context.rotate(r)
     @context.scale(sx, sy)
     @context.transform(1, ky, kx, 1, 0, 0) # shearing
-    @context.drawImage(drawable.element, -halfWidth, -halfHeight)
+    @context.translate(-ox, -oy)
+    @context.drawImage(drawable.element, 0, 0)
     @context.restore()
 
   drawWithQuad = (drawable, quad, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
@@ -137,10 +139,11 @@ class Graphics
     halfHeight = drawable.element.height / 2
 
     @context.save()
-    @context.translate(x + halfWidth - ox, y + halfHeight - oy)
+    @context.translate(x, y)
     @context.rotate(r)
     @context.scale(sx, sy)
     @context.transform(1, ky, kx, 1, 0, 0) # shearing
-    @context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, -halfWidth, -halfHeight, quad.width, quad.height)
+    @context.translate(-ox, -oy)
+    @context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, 0, 0, quad.width, quad.height)
     @context.restore()
 
