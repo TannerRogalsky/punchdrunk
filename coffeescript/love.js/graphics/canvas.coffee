@@ -1,8 +1,7 @@
 class Canvas
-  constructor: (@width, @height) ->
+  constructor: (width, height) ->
     @element = document.createElement('canvas')
-    @element.setAttribute('width', @width)
-    @element.setAttribute('height', @height)
+    this.setDimensions(@width, @height)
     @context = @element.getContext('2d')
 
   clear: (self, r, g, b, a) ->
@@ -58,5 +57,9 @@ class Canvas
     @context.strokeStyle = context.strokeStyle
     @context.textAlign = context.textAlign
     @context.textBaseline = context.textBaseline
+
+  setDimensions: (@width, @height) ->
+    @element.setAttribute('width', @width)
+    @element.setAttribute('height', @height)
 
 Canvas.transparent = new Color(0, 0, 0, 0)
