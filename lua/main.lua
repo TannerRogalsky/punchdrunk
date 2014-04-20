@@ -236,7 +236,7 @@ end
 function love.keypressed(key,unicode)
 	if key == ' ' then -- will be space most of the time
 		return         -- avoid unnecessary checks
-	elseif key == 'r' or key == "R" then
+	elseif key == 'r' then
 		restart()
 	elseif key == 'up' then
 		selection = selection-1
