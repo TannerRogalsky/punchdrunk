@@ -6,6 +6,7 @@ class @Love
     @event = new EventQueue()
     @keyboard = new Keyboard(@event)
     @filesystem = new FileSystem()
+    @audio = new Audio()
 
     window.addEventListener "beforeunload", () =>
       @quit.call()
