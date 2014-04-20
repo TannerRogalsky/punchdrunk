@@ -292,11 +292,29 @@
       }
     };
 
-    Graphics.prototype.print = function(str, x, y) {
-      return this.context.fillText(str, x, y);
+    Graphics.prototype.print = function(text, x, y) {
+      return this.context.fillText(text, x, y);
     };
 
-    Graphics.prototype.printf = function() {};
+    Graphics.prototype.printf = function(text, x, y, limit, align) {
+      if (align == null) {
+        align = "left";
+      }
+      this.context.save();
+      this.context.translate(x + limit / 2, y);
+      switch (align) {
+        case "center":
+          this.context.textAlign = "center";
+          break;
+        case "left":
+          this.context.textAlign = "left";
+          break;
+        case "right":
+          this.context.textAlign = "right";
+      }
+      this.context.fillText(text, 0, 0);
+      return this.context.restore();
+    };
 
     Graphics.prototype.rectangle = function(mode, x, y, width, height) {
       switch (mode) {

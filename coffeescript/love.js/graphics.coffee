@@ -66,11 +66,19 @@ class Graphics
       when "fill" then @context.fill()
       when "line" then @context.stroke()
 
-  print: (str, x, y) =>
-    @context.fillText(str, x, y)
+  print: (text, x, y) =>
+    @context.fillText(text, x, y)
 
-  # TODO: later! This function is so crazy.
-  printf: () =>
+  # TODO: word wrap? UGH
+  printf: (text, x, y, limit, align = "left") =>
+    @context.save()
+    @context.translate(x + limit / 2, y)
+    switch align
+      when "center" then @context.textAlign = "center"
+      when "left" then @context.textAlign = "left"
+      when "right" then @context.textAlign = "right"
+    @context.fillText(text, 0, 0)
+    @context.restore()
 
   rectangle: (mode, x, y, width, height) =>
     switch mode
