@@ -1,6 +1,7 @@
 class @Love
   constructor: (window_conf) ->
     @graphics = new Graphics(window_conf.width, window_conf.height)
+    @window = new Window(@graphics)
     @timer = new Timer()
     @event = new EventQueue()
     @keyboard = new Keyboard(@event)
@@ -20,6 +21,7 @@ class @Love
 
       @update.call(null, @timer.getDelta())
 
+      @graphics.origin()
       @graphics.clear()
       @draw.call()
 
