@@ -7,7 +7,7 @@ function love.load()
   canvas = love.graphics.newCanvas(300, 400)
   enemyShip = love.graphics.newImage("enemyShip.png")
   enemyShipPos = {x = 50, y = 100}
-  quad = love.graphics.newQuad(25, 10, 50, 50, enemyShip:getWidth(), enemyShip:getHeight())
+  quad = love.graphics.newQuad(25, 0, 50, 50, enemyShip:getWidth(), enemyShip:getHeight())
   rotation = 0
 
   sprites = love.graphics.newImage("spritesheet.png")

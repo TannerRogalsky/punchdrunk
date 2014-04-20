@@ -4,6 +4,7 @@ class @Love
     @timer = new Timer()
     @event = new EventQueue()
     @keyboard = new Keyboard(@event)
+    @filesystem = new FileSystem()
 
   run: () =>
     @timer.step()
