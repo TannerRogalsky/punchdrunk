@@ -1,88 +1,47 @@
 class Graphics
   constructor: (@width = 800, @height = 600) ->
-    @canvas = new Canvas(@width, @height)
+    @canvas = new Canvas2D(@width, @height)
     document.body.appendChild(@canvas.element)
-    @context = @canvas.context
 
     @default_canvas = @canvas
-    @default_context = @context
     @default_font = new Font("Vera", 12)
 
     @setColor(255, 255, 255)
     @setBackgroundColor(0, 0, 0)
     @setFont(@default_font)
-    @context.textBaseline = "top"
 
   # DRAWING
   arc: (mode, x, y, radius, startAngle, endAngle, segments) =>
-    @context.beginPath()
-    @context.moveTo(x, y)
-    @context.arc(x, y, radius, startAngle, endAngle)
-    @context.closePath()
-    switch mode
-      when "fill" then @context.fill()
-      when "line" then @context.stroke()
+    @canvas.arc(mode, x, y, radius, startAngle, endAngle, segments)
 
   circle: (mode, x, y, radius, segments) =>
-    @context.beginPath()
-    @context.arc(x, y, radius, 0, 2 * Math.PI)
-    @context.closePath()
-    switch mode
-      when "fill" then @context.fill()
-      when "line" then @context.stroke()
+    @canvas.circle(mode, x, y, radius, segments)
 
   clear: () =>
-    @context.save()
-    @context.setTransform(1,0,0,1,0,0)
-    @context.fillStyle = @background_color.html_code
-    @context.fillRect(0, 0, @canvas.width, @canvas.height)
-    @context.restore()
+    c = @background_color
+    @canvas.clear(@canvas, c.r, c.g, c.b, c.a)
 
-  draw: (drawable, quad) =>
-    switch true
-      when quad not instanceof Quad then drawDrawable.apply(this, arguments)
-      when quad instanceof Quad then drawWithQuad.apply(this, arguments)
+  draw: (args...) =>
+    @canvas.draw(args...)
 
   line: (points...) =>
-    @context.beginPath()
-    @context.moveTo(points[0], points[1])
-    for i in [2...points.length] by 2
-      [x, y] = [points[i], points[i + 1]]
-      @context.lineTo(x, y)
-    @context.stroke()
+    @canvas.line(points...)
 
   point: (x, y) =>
-    @context.fillRect(x, y, 1, 1)
+    @canvas.point(x, y)
 
   polygon: (mode, points...) =>
-    @context.beginPath()
-    @context.moveTo(points[0], points[1])
-    for i in [2...points.length] by 2
-      [x, y] = [points[i], points[i + 1]]
-      @context.lineTo(x, y)
-    @context.closePath()
-    switch mode
-      when "fill" then @context.fill()
-      when "line" then @context.stroke()
+    @canvas.polygon(mode, points)
 
   print: (text, x, y) =>
-    @context.fillText(text, x, y)
+    @canvas.print(text, x, y)
 
   # TODO: word wrap? UGH
   printf: (text, x, y, limit, align = "left") =>
-    @context.save()
-    @context.translate(x + limit / 2, y)
-    switch align
-      when "center" then @context.textAlign = "center"
-      when "left" then @context.textAlign = "left"
-      when "right" then @context.textAlign = "right"
-    @context.fillText(text, 0, 0)
-    @context.restore()
+    @canvas.printf(text, x, y, limit, align = "left")
 
   rectangle: (mode, x, y, width, height) =>
-    switch mode
-      when "fill" then @context.fillRect(x, y, width, height)
-      when "line" then @context.strokeRect(x, y, width, height)
+    @canvas.rectangle(mode, x, y, width, height)
 
   # OBJECT CREATION
   newCanvas: (width, height) =>
@@ -99,15 +58,9 @@ class Graphics
     new Quad(x, y, width, height, sw, sh)
 
   # STATE
-  setColor: (r, g, b, a = 255) =>
-    if typeof(r) == "number"
-      @current_color = new Color(r, g, b, a)
-    else # we were passed a sequence
-      @current_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
-    @context.fillStyle = @current_color.html_code
-    @context.strokeStyle = @current_color.html_code
-    @context.globalAlpha = @current_color.a / 255
 
+  setColor: (r, g, b, a = 255) =>
+    @canvas.setColor(r, g, b, a)
 
   setBackgroundColor: (r, g, b, a = 255) =>
     if typeof(r) == "number"
@@ -119,39 +72,34 @@ class Graphics
     if canvas == undefined or canvas == null
       @default_canvas.copyContext(@canvas.context)
       @canvas = @default_canvas
-      @context = @default_context
     else
       canvas.copyContext(@canvas.context)
       @canvas = canvas
-      @context = canvas.context
 
   setFont: (font) =>
-    if font
-      @context.font = font.html_code
-    else
-      @context.font = @default_font.html_code
+    @canvas.setFont(font)
 
   # COORDINATE SYSTEM
   origin: () =>
-    @context.setTransform(1,0,0,1,0,0)
+    @canvas.origin()
 
   pop: () =>
-    @context.restore()
+    @canvas.pop()
 
   push: () =>
-    @context.save()
+    @canvas.push()
 
   rotate: (r) =>
-    @context.rotate(r)
+    @canvas.rotate(r)
 
   scale: (sx, sy = sx) =>
-    @context.scale(sx, sy)
+    @canvas.scale(sx, sy)
 
   shear: (kx, ky) =>
-    @context.transform(1, ky, kx, 1, 0, 0)
+    @canvas.shear(kx, ky)
 
   translate: (dx, dy) =>
-    @context.translate(dx, dy)
+    @canvas.translate(dx, dy)
 
   # WINDOW
   getWidth: () =>
@@ -159,31 +107,3 @@ class Graphics
 
   getHeight: () =>
     @default_canvas.height
-
-  # PRIVATE
-  drawDrawable = (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
-    halfWidth = drawable.element.width / 2
-    halfHeight = drawable.element.height / 2
-
-    @context.save()
-    @context.translate(x, y)
-    @context.rotate(r)
-    @context.scale(sx, sy)
-    @context.transform(1, ky, kx, 1, 0, 0) # shearing
-    @context.translate(-ox, -oy)
-    @context.drawImage(drawable.element, 0, 0)
-    @context.restore()
-
-  drawWithQuad = (drawable, quad, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
-    halfWidth = drawable.element.width / 2
-    halfHeight = drawable.element.height / 2
-
-    @context.save()
-    @context.translate(x, y)
-    @context.rotate(r)
-    @context.scale(sx, sy)
-    @context.transform(1, ky, kx, 1, 0, 0) # shearing
-    @context.translate(-ox, -oy)
-    @context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, 0, 0, quad.width, quad.height)
-    @context.restore()
-
