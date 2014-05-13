@@ -158,7 +158,7 @@ class Graphics
   getWidth: () =>
     @default_canvas.width
 
-  getWidth: () =>
+  getHeight: () =>
     @default_canvas.height
 
   # PRIVATE
