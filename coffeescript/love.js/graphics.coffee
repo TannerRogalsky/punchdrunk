@@ -12,7 +12,6 @@ class Graphics
     @setBackgroundColor(0, 0, 0)
     @setFont(@default_font)
     @context.textBaseline = "top"
-    # @context.imageSmoothingEnabled = false
 
   # DRAWING
   arc: (mode, x, y, radius, startAngle, endAngle, segments) =>
