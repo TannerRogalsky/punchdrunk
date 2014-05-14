@@ -163,6 +163,7 @@ class Canvas2D
     @element.setAttribute('width', @width)
     @element.setAttribute('height', @height)
 
+  # INTERNAL
   drawDrawable = (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
     halfWidth = drawable.element.width / 2
     halfHeight = drawable.element.height / 2
