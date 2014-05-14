@@ -1,12 +1,12 @@
-require("lua.table-save")
-require("lua.player")
-require("lua.cloud")
-require("lua.train")
-require("lua.tunnel")
-require("lua.gorge")
-require("lua.bird")
-require("lua.terrain")
-require("lua.menu")
+require("table-save")
+require("player")
+require("cloud")
+require("train")
+require("tunnel")
+require("gorge")
+require("bird")
+require("terrain")
+require("menu")
 
 WIDTH = 300
 HEIGHT = 100
