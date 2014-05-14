@@ -26,5 +26,3 @@
   });
 
 }).call(this);
-
-//# sourceMappingURL=amore.map
