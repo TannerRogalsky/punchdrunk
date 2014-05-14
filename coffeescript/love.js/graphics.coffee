@@ -38,7 +38,7 @@ class Graphics
 
   # TODO: word wrap? UGH
   printf: (text, x, y, limit, align = "left") =>
-    @canvas.printf(text, x, y, limit, align = "left")
+    @canvas.printf(text, x, y, limit, align)
 
   rectangle: (mode, x, y, width, height) =>
     @canvas.rectangle(mode, x, y, width, height)
