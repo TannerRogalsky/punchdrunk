@@ -661,7 +661,7 @@ Font = (function() {
 Image = (function() {
   function Image(path) {
     this.element = document.createElement("img");
-    this.element.setAttribute("src", path);
+    this.element.setAttribute("src", "lua/" + path);
   }
 
   Image.prototype.getData = function(self) {};
