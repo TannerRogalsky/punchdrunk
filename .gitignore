@@ -1,2 +1,3 @@
 *.lua.json
 js/*.map
+node_modules
