@@ -1,0 +1,31 @@
+{
+  "name": "punchdrunk",
+  "version": "0.0.1",
+  "author": "Tanner Rogalsky",
+  "description": "An attempt to replicate the Love API in JavaScript",
+  "homepage": "https://github.com/TannerRogalsky/punchdrunk",
+  "bugs": "https://github.com/TannerRogalsky/punchdrunk/issues",
+  "scripts": {
+    "test": "mocha-phantomjs test/page.html"
+  },
+  "main": "./amore.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TannerRogalsky/punchdrunk"
+  },
+  "keywords": [
+    "game",
+    "html5"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "coffee-script": "1.7.x",
+    "moonshine": "0.0.11",
+    "grunt": "0.4.x",
+    "grunt-shell": "0.7.x",
+    "grunt-contrib-watch": "~0.2.x",
+    "grunt-contrib-coffee": "0.10.x",
+    "grunt-contrib-connect": "v0.7.x"
+  },
+  "license": "MIT"
+}

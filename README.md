@@ -1,12 +1,12 @@
-moonshine-love2d
+punchdrunk.js
 ================
 
-An attempt to replicate the Love2D API in the browser using moonshine.
+An attempt to replicate the Love2D API in the browser using Moonshine.
 
 # Get This Running
 
-- install Moonshine: http://moonshinejs.org/
-- compile the lua file to json/bytecode format `cd lua; moonshine distil *.lua`
-  - I've also been using entr to do this automatically: `find . -name '*.lua' | entr moonshine distil *.lua`
-- run an http server: `python -c 'import SimpleHTTPServer; SimpleHTTPServer.test()'`
-- open the url created by your http server
+1. Install [node.js](http://nodejs.org/)
+2. Install the grunt: `npm install grunt-cli -g`
+3. Install the project dependencies: `npm install`
+4. `grunt compile` will compile everything once.
+5. `grunt` will watch and compile the source as well as run a simple web server on port 8000.
