@@ -1,7 +1,7 @@
 class Image
   constructor: (path) ->
     @element = document.createElement("img")
-    @element.setAttribute("src", path)
+    @element.setAttribute("src", "lua/" + path)
 
   getData: (self) ->
 
