@@ -6,7 +6,7 @@ class Canvas2D
 
   clear: (self, r, g, b, a) ->
     if r == null or r == undefined
-      color = Canvas.transparent
+      color = Canvas2D.transparent
     else
       color = new Color(r, g, b, a)
 
