@@ -18,8 +18,8 @@ class Graphics
     @canvas.circle(mode, x, y, radius, segments)
 
   clear: () =>
-    c = @background_color
-    @canvas.clear(@canvas, c.r, c.g, c.b, c.a)
+    [r, g, b, a] = @getBackgroundColor()
+    @canvas.clear(@canvas, r, g, b, a)
 
   draw: (args...) =>
     @canvas.draw(args...)
@@ -53,20 +53,56 @@ class Graphics
   newImage: (path) =>
     new Image(path)
 
+  newImageFont: =>
+
+  newMesh: () =>
+  newParticleSystem: () =>
 
   newQuad: (x, y, width, height, sw, sh) =>
     new Quad(x, y, width, height, sw, sh)
 
-  # STATE
+  newScreenshot: =>
+  newShader: () =>
+  newSpriteBatch: () =>
 
-  setColor: (r, g, b, a = 255) =>
-    @canvas.setColor(r, g, b, a)
+  setNewFont: (filename, size) =>
+    font = @newFont(filename, size)
+    @setFont(font)
+
+  # STATE
+  getBackgroundColor: () =>
+    @canvas.getBackgroundColor()
+
+  getBlendMode: () =>
+  getCanvas: () =>
+    @canvas
+
+  getColor: () =>
+    @canvas.getColor()
+
+  getColorMask: () =>
+  getDefaultFilter: () =>
+  getFont: () =>
+  getLineJoin: () =>
+  getLineStyle: () =>
+  getLineWidth: () =>
+  getMaxImageSize: () =>
+  getMaxPointSize: () =>
+  getPointSize: () =>
+  getPointStyle: () =>
+  getRendererInfo: () =>
+  getScissor: () =>
+  getShader: () =>
+  getSystemLimit: () =>
+
+  isSupported: () =>
+  isWireframe: () =>
+  reset: () =>
 
   setBackgroundColor: (r, g, b, a = 255) =>
-    if typeof(r) == "number"
-      @background_color = new Color(r, g, b, a)
-    else # we were passed a sequence
-      @background_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
+    @canvas.setBackgroundColor(r, g, b, a)
+
+  setBlendMode: () =>
 
   setCanvas: (canvas) =>
     if canvas == undefined or canvas == null
@@ -76,8 +112,24 @@ class Graphics
       canvas.copyContext(@canvas.context)
       @canvas = canvas
 
+  setColor: (r, g, b, a = 255) =>
+    @canvas.setColor(r, g, b, a)
+
   setFont: (font) =>
     @canvas.setFont(font)
+
+  setColorMask: () =>
+  setDefaultFilter: () =>
+  setInvertedStencil: () =>
+  setLineJoin: () =>
+  setLineStyle: () =>
+  setLineWidth: () =>
+  setPointSize: () =>
+  setPointStyle: () =>
+  setScissor: () =>
+  setShader: () =>
+  setStencil: () =>
+  setWireframe: () =>
 
   # COORDINATE SYSTEM
   origin: () =>
@@ -102,8 +154,11 @@ class Graphics
     @canvas.translate(dx, dy)
 
   # WINDOW
-  getWidth: () =>
-    @default_canvas.width
+  getDimensions: () =>
+    [@getWidth(), @getHeight()]
 
   getHeight: () =>
-    @default_canvas.height
+    @default_canvas.getHeight()
+
+  getWidth: () =>
+    @default_canvas.getWidth()

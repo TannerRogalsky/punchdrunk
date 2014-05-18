@@ -105,6 +105,41 @@ class Canvas2D
       when "fill" then @context.fillRect(x, y, width, height)
       when "line" then @context.strokeRect(x, y, width, height)
 
+  getBackgroundColor: () =>
+    c = @background_color
+    [c.r, c.g, c.b, c.a]
+
+  getBlendMode: () =>
+
+  getColor: () =>
+    c = @current_color
+    [c.r, c.g, c.b, c.a]
+
+  getColorMask: () =>
+  getDefaultFilter: () =>
+  getFont: () =>
+  getLineJoin: () =>
+  getLineStyle: () =>
+  getLineWidth: () =>
+  getMaxImageSize: () =>
+  getMaxPointSize: () =>
+  getPointSize: () =>
+  getPointStyle: () =>
+  getRendererInfo: () =>
+  getScissor: () =>
+  getShader: () =>
+  getSystemLimit: () =>
+
+  isSupported: () =>
+  isWireframe: () =>
+  reset: () =>
+
+  setBackgroundColor: (r, g, b, a) ->
+    if typeof(r) == "number"
+      @background_color = new Color(r, g, b, a)
+    else # we were passed a sequence
+      @background_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
+
   setColor: (r, g, b, a = 255) ->
     if typeof(r) == "number"
       @current_color = new Color(r, g, b, a)
@@ -119,6 +154,19 @@ class Canvas2D
       @context.font = font.html_code
     else
       @context.font = @default_font.html_code
+
+  setColorMask: () =>
+  setDefaultFilter: () =>
+  setInvertedStencil: () =>
+  setLineJoin: () =>
+  setLineStyle: () =>
+  setLineWidth: () =>
+  setPointSize: () =>
+  setPointStyle: () =>
+  setScissor: () =>
+  setShader: () =>
+  setStencil: () =>
+  setWireframe: () =>
 
   origin: () ->
     @context.setTransform(1,0,0,1,0,0)
