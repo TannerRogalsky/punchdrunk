@@ -35,5 +35,5 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-shell')
   grunt.loadNpmTasks('grunt-contrib-connect')
 
-  grunt.registerTask 'default', ['connect:server', 'watch']
+  grunt.registerTask 'default', ['coffee', 'shell:distil', 'connect:server', 'watch']
   grunt.registerTask 'compile', ['coffee', 'shell:distil']
