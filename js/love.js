@@ -228,8 +228,9 @@
     function Graphics(width, height) {
       this.width = width != null ? width : 800;
       this.height = height != null ? height : 600;
-      this.getHeight = __bind(this.getHeight, this);
       this.getWidth = __bind(this.getWidth, this);
+      this.getHeight = __bind(this.getHeight, this);
+      this.getDimensions = __bind(this.getDimensions, this);
       this.translate = __bind(this.translate, this);
       this.shear = __bind(this.shear, this);
       this.scale = __bind(this.scale, this);
@@ -237,11 +238,52 @@
       this.push = __bind(this.push, this);
       this.pop = __bind(this.pop, this);
       this.origin = __bind(this.origin, this);
+      this.setWireframe = __bind(this.setWireframe, this);
+      this.setStencil = __bind(this.setStencil, this);
+      this.setShader = __bind(this.setShader, this);
+      this.setScissor = __bind(this.setScissor, this);
+      this.setPointStyle = __bind(this.setPointStyle, this);
+      this.setPointSize = __bind(this.setPointSize, this);
+      this.setLineWidth = __bind(this.setLineWidth, this);
+      this.setLineStyle = __bind(this.setLineStyle, this);
+      this.setLineJoin = __bind(this.setLineJoin, this);
+      this.setInvertedStencil = __bind(this.setInvertedStencil, this);
+      this.setDefaultFilter = __bind(this.setDefaultFilter, this);
+      this.setColorMask = __bind(this.setColorMask, this);
       this.setFont = __bind(this.setFont, this);
-      this.setCanvas = __bind(this.setCanvas, this);
-      this.setBackgroundColor = __bind(this.setBackgroundColor, this);
       this.setColor = __bind(this.setColor, this);
+      this.setCanvas = __bind(this.setCanvas, this);
+      this.setBlendMode = __bind(this.setBlendMode, this);
+      this.setBackgroundColor = __bind(this.setBackgroundColor, this);
+      this.reset = __bind(this.reset, this);
+      this.isWireframe = __bind(this.isWireframe, this);
+      this.isSupported = __bind(this.isSupported, this);
+      this.getSystemLimit = __bind(this.getSystemLimit, this);
+      this.getShader = __bind(this.getShader, this);
+      this.getScissor = __bind(this.getScissor, this);
+      this.getRendererInfo = __bind(this.getRendererInfo, this);
+      this.getPointStyle = __bind(this.getPointStyle, this);
+      this.getPointSize = __bind(this.getPointSize, this);
+      this.getMaxPointSize = __bind(this.getMaxPointSize, this);
+      this.getMaxImageSize = __bind(this.getMaxImageSize, this);
+      this.getLineWidth = __bind(this.getLineWidth, this);
+      this.getLineStyle = __bind(this.getLineStyle, this);
+      this.getLineJoin = __bind(this.getLineJoin, this);
+      this.getFont = __bind(this.getFont, this);
+      this.getDefaultFilter = __bind(this.getDefaultFilter, this);
+      this.getColorMask = __bind(this.getColorMask, this);
+      this.getColor = __bind(this.getColor, this);
+      this.getCanvas = __bind(this.getCanvas, this);
+      this.getBlendMode = __bind(this.getBlendMode, this);
+      this.getBackgroundColor = __bind(this.getBackgroundColor, this);
+      this.setNewFont = __bind(this.setNewFont, this);
+      this.newSpriteBatch = __bind(this.newSpriteBatch, this);
+      this.newShader = __bind(this.newShader, this);
+      this.newScreenshot = __bind(this.newScreenshot, this);
       this.newQuad = __bind(this.newQuad, this);
+      this.newParticleSystem = __bind(this.newParticleSystem, this);
+      this.newMesh = __bind(this.newMesh, this);
+      this.newImageFont = __bind(this.newImageFont, this);
       this.newImage = __bind(this.newImage, this);
       this.newFont = __bind(this.newFont, this);
       this.newCanvas = __bind(this.newCanvas, this);
@@ -273,9 +315,9 @@
     };
 
     Graphics.prototype.clear = function() {
-      var c;
-      c = this.background_color;
-      return this.canvas.clear(this.canvas, c.r, c.g, c.b, c.a);
+      var a, b, g, r, _ref;
+      _ref = this.getBackgroundColor(), r = _ref[0], g = _ref[1], b = _ref[2], a = _ref[3];
+      return this.canvas.clear(this.canvas, r, g, b, a);
     };
 
     Graphics.prototype.draw = function() {
@@ -330,26 +372,120 @@
       return new Image(path);
     };
 
+    Graphics.prototype.newImageFont = function() {};
+
+    Graphics.prototype.newMesh = function() {};
+
+    Graphics.prototype.newParticleSystem = function() {};
+
     Graphics.prototype.newQuad = function(x, y, width, height, sw, sh) {
       return new Quad(x, y, width, height, sw, sh);
     };
 
-    Graphics.prototype.setColor = function(r, g, b, a) {
-      if (a == null) {
-        a = 255;
-      }
-      return this.canvas.setColor(r, g, b, a);
+    Graphics.prototype.newScreenshot = function() {};
+
+    Graphics.prototype.newShader = function() {};
+
+    Graphics.prototype.newSpriteBatch = function() {};
+
+    Graphics.prototype.setNewFont = function(filename, size) {
+      var font;
+      font = this.newFont(filename, size);
+      return this.setFont(font);
+    };
+
+    Graphics.prototype.getBackgroundColor = function() {
+      return this.canvas.getBackgroundColor();
+    };
+
+    Graphics.prototype.getBlendMode = function() {
+      return this.canvas.getBlendMode();
+    };
+
+    Graphics.prototype.getCanvas = function() {
+      return this.canvas;
+    };
+
+    Graphics.prototype.getColor = function() {
+      return this.canvas.getColor();
+    };
+
+    Graphics.prototype.getColorMask = function() {
+      return this.canvas.getColorMask();
+    };
+
+    Graphics.prototype.getDefaultFilter = function() {
+      return this.canvas.getDefaultFilter();
+    };
+
+    Graphics.prototype.getFont = function() {
+      return this.canvas.getFont();
+    };
+
+    Graphics.prototype.getLineJoin = function() {
+      return this.canvas.getLineJoin();
+    };
+
+    Graphics.prototype.getLineStyle = function() {
+      return this.canvas.getLineStyle();
+    };
+
+    Graphics.prototype.getLineWidth = function() {
+      return this.canvas.getLineWidth();
+    };
+
+    Graphics.prototype.getMaxImageSize = function() {
+      return this.canvas.getMaxImageSize();
+    };
+
+    Graphics.prototype.getMaxPointSize = function() {
+      return this.canvas.getMaxPointSize();
+    };
+
+    Graphics.prototype.getPointSize = function() {
+      return this.canvas.getPointSize();
+    };
+
+    Graphics.prototype.getPointStyle = function() {
+      return this.canvas.getPointStyle();
+    };
+
+    Graphics.prototype.getRendererInfo = function() {
+      return this.canvas.getRendererInfo();
+    };
+
+    Graphics.prototype.getScissor = function() {
+      return this.canvas.getScissor();
+    };
+
+    Graphics.prototype.getShader = function() {
+      return this.canvas.getShader();
+    };
+
+    Graphics.prototype.getSystemLimit = function() {
+      return this.canvas.getSystemLimit();
+    };
+
+    Graphics.prototype.isSupported = function() {};
+
+    Graphics.prototype.isWireframe = function() {
+      return this.canvas.isWireframe();
+    };
+
+    Graphics.prototype.reset = function() {
+      this.setCanvas();
+      return this.origin();
     };
 
     Graphics.prototype.setBackgroundColor = function(r, g, b, a) {
       if (a == null) {
         a = 255;
       }
-      if (typeof r === "number") {
-        return this.background_color = new Color(r, g, b, a);
-      } else {
-        return this.background_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4));
-      }
+      return this.canvas.setBackgroundColor(r, g, b, a);
+    };
+
+    Graphics.prototype.setBlendMode = function(mode) {
+      return this.canvas.setBlendMode(mode);
     };
 
     Graphics.prototype.setCanvas = function(canvas) {
@@ -362,8 +498,63 @@
       }
     };
 
+    Graphics.prototype.setColor = function(r, g, b, a) {
+      if (a == null) {
+        a = 255;
+      }
+      return this.canvas.setColor(r, g, b, a);
+    };
+
     Graphics.prototype.setFont = function(font) {
       return this.canvas.setFont(font);
+    };
+
+    Graphics.prototype.setColorMask = function(r, g, b, a) {
+      return this.canvas.setColorMask(r, g, b, a);
+    };
+
+    Graphics.prototype.setDefaultFilter = function(min, mag, anisotropy) {
+      return this.canvas.setDefaultFilter(min, mag, anisotropy);
+    };
+
+    Graphics.prototype.setInvertedStencil = function(callback) {
+      return this.canvas.setInvertedStencil(callback);
+    };
+
+    Graphics.prototype.setLineJoin = function(join) {
+      return this.canvas.setLineJoin(join);
+    };
+
+    Graphics.prototype.setLineStyle = function(style) {
+      return this.canvas.setLineStyle(style);
+    };
+
+    Graphics.prototype.setLineWidth = function(width) {
+      return this.canvas.setLineWidth(width);
+    };
+
+    Graphics.prototype.setPointSize = function(size) {
+      return this.canvas.setPointSize(size);
+    };
+
+    Graphics.prototype.setPointStyle = function(style) {
+      return this.canvas.setPointStyle(style);
+    };
+
+    Graphics.prototype.setScissor = function(x, y, width, height) {
+      return this.canvas.setScissor(x, y, width, height);
+    };
+
+    Graphics.prototype.setShader = function(shader) {
+      return this.canvas.setShader(shader);
+    };
+
+    Graphics.prototype.setStencil = function(callback) {
+      return this.canvas.setStencil(callback);
+    };
+
+    Graphics.prototype.setWireframe = function(enable) {
+      return this.canvas.setWireframe(enable);
     };
 
     Graphics.prototype.origin = function() {
@@ -397,12 +588,16 @@
       return this.canvas.translate(dx, dy);
     };
 
-    Graphics.prototype.getWidth = function() {
-      return this.default_canvas.width;
+    Graphics.prototype.getDimensions = function() {
+      return [this.getWidth(), this.getHeight()];
     };
 
     Graphics.prototype.getHeight = function() {
-      return this.default_canvas.height;
+      return this.default_canvas.getHeight();
+    };
+
+    Graphics.prototype.getWidth = function() {
+      return this.default_canvas.getWidth();
     };
 
     return Graphics;
@@ -631,15 +826,7 @@
 
     Love.prototype.keyreleased = function(key, unicode) {};
 
-    Love.prototype.joystickpressed = function(joystick, button) {};
-
-    Love.prototype.joystickreleased = function(joystick, button) {};
-
-    Love.prototype.textinput = function(text) {};
-
     Love.prototype.draw = function() {};
-
-    Love.prototype.focus = function(has_focus) {};
 
     Love.prototype.quit = function() {};
 
@@ -869,12 +1056,13 @@
       this.element = document.createElement('canvas');
       this.setDimensions(width, height);
       this.context = this.element.getContext('2d');
+      this.current_transform = Matrix.I(3);
     }
 
     Canvas2D.prototype.clear = function(self, r, g, b, a) {
       var color;
       if (r === null || r === void 0) {
-        color = Canvas.transparent;
+        color = Canvas2D.transparent;
       } else {
         color = new Color(r, g, b, a);
       }
@@ -887,7 +1075,7 @@
     };
 
     Canvas2D.prototype.getDimensions = function(self) {
-      return [self.width, self.height];
+      return [this.getWidth(self), this.getHeight(self)];
     };
 
     Canvas2D.prototype.getHeight = function(self) {
@@ -1016,6 +1204,62 @@
       }
     };
 
+    Canvas2D.prototype.getBackgroundColor = function() {
+      var c;
+      c = this.background_color;
+      return [c.r, c.g, c.b, c.a];
+    };
+
+    Canvas2D.prototype.getBlendMode = function() {};
+
+    Canvas2D.prototype.getColor = function() {
+      var c;
+      c = this.current_color;
+      return [c.r, c.g, c.b, c.a];
+    };
+
+    Canvas2D.prototype.getColorMask = function() {};
+
+    Canvas2D.prototype.getDefaultFilter = function() {};
+
+    Canvas2D.prototype.getFont = function() {
+      return this.current_font;
+    };
+
+    Canvas2D.prototype.getLineJoin = function() {};
+
+    Canvas2D.prototype.getLineStyle = function() {};
+
+    Canvas2D.prototype.getLineWidth = function() {};
+
+    Canvas2D.prototype.getMaxImageSize = function() {};
+
+    Canvas2D.prototype.getMaxPointSize = function() {};
+
+    Canvas2D.prototype.getPointSize = function() {};
+
+    Canvas2D.prototype.getPointStyle = function() {};
+
+    Canvas2D.prototype.getRendererInfo = function() {};
+
+    Canvas2D.prototype.getScissor = function() {};
+
+    Canvas2D.prototype.getShader = function() {};
+
+    Canvas2D.prototype.getSystemLimit = function() {};
+
+    Canvas2D.prototype.isSupported = function() {};
+
+    Canvas2D.prototype.isWireframe = function() {};
+
+    Canvas2D.prototype.setBackgroundColor = function(r, g, b, a) {
+      if (typeof r === "number") {
+        return this.background_color = new Color(r, g, b, a);
+      } else {
+        return this.background_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4));
+      }
+    };
+
     Canvas2D.prototype.setColor = function(r, g, b, a) {
       if (a == null) {
         a = 255;
@@ -1031,12 +1275,37 @@
     };
 
     Canvas2D.prototype.setFont = function(font) {
+      this.current_font = font;
       if (font) {
         return this.context.font = font.html_code;
       } else {
         return this.context.font = this.default_font.html_code;
       }
     };
+
+    Canvas2D.prototype.setColorMask = function() {};
+
+    Canvas2D.prototype.setDefaultFilter = function() {};
+
+    Canvas2D.prototype.setInvertedStencil = function() {};
+
+    Canvas2D.prototype.setLineJoin = function() {};
+
+    Canvas2D.prototype.setLineStyle = function() {};
+
+    Canvas2D.prototype.setLineWidth = function() {};
+
+    Canvas2D.prototype.setPointSize = function() {};
+
+    Canvas2D.prototype.setPointStyle = function() {};
+
+    Canvas2D.prototype.setScissor = function(x, y, width, height) {};
+
+    Canvas2D.prototype.setShader = function() {};
+
+    Canvas2D.prototype.setStencil = function(callback) {};
+
+    Canvas2D.prototype.setWireframe = function() {};
 
     Canvas2D.prototype.origin = function() {
       return this.context.setTransform(1, 0, 0, 1, 0, 0);

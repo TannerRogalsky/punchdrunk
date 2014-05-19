@@ -2,21 +2,22 @@ module.exports = (grunt) ->
 
   grunt.initConfig
     coffee:
-      options:
-        join: true
-      files:
-        'js/love.js': [
-          'coffeescript/love.js/*.coffee',
-          'coffeescript/love.js/audio/*.coffee',
-          'coffeescript/love.js/graphics/*.coffee',
-        ]
-        'js/amore.js': [
-          'coffeescript/amore.coffee'
-        ]
+      app:
+        options:
+          join: true
+        files:
+          'js/love.js': [
+            'coffeescript/love.js/*.coffee',
+            'coffeescript/love.js/audio/*.coffee',
+            'coffeescript/love.js/graphics/*.coffee',
+          ]
+          'js/amore.js': [
+            'coffeescript/amore.coffee'
+          ]
     watch:
       coffeescript:
         files: ['coffeescript/**/*.coffee', 'coffeescript/*.coffee']
-        tasks: ['coffee']
+        tasks: ['coffee:app']
       moonshine:
         files: ['lua/*.lua']
         tasks: ['shell:distil']
@@ -34,5 +35,5 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-shell')
   grunt.loadNpmTasks('grunt-contrib-connect')
 
-  grunt.registerTask 'default', ['connect:server', 'watch']
+  grunt.registerTask 'default', ['coffee', 'shell:distil', 'connect:server', 'watch']
   grunt.registerTask 'compile', ['coffee', 'shell:distil']

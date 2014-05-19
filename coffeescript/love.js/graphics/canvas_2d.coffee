@@ -4,9 +4,11 @@ class Canvas2D
     this.setDimensions(width, height)
     @context = @element.getContext('2d')
 
+    @current_transform = Matrix.I(3)
+
   clear: (self, r, g, b, a) ->
     if r == null or r == undefined
-      color = Canvas.transparent
+      color = Canvas2D.transparent
     else
       color = new Color(r, g, b, a)
 
@@ -18,7 +20,7 @@ class Canvas2D
     self.context.restore()
 
   getDimensions: (self) ->
-    [self.width, self.height]
+    [@getWidth(self), @getHeight(self)]
 
   getHeight: (self) ->
     self.height
@@ -105,6 +107,41 @@ class Canvas2D
       when "fill" then @context.fillRect(x, y, width, height)
       when "line" then @context.strokeRect(x, y, width, height)
 
+  getBackgroundColor: () ->
+    c = @background_color
+    [c.r, c.g, c.b, c.a]
+
+  getBlendMode: () ->
+
+  getColor: () ->
+    c = @current_color
+    [c.r, c.g, c.b, c.a]
+
+  getColorMask: () ->
+  getDefaultFilter: () ->
+  getFont: () ->
+    @current_font
+
+  getLineJoin: () ->
+  getLineStyle: () ->
+  getLineWidth: () ->
+  getMaxImageSize: () ->
+  getMaxPointSize: () ->
+  getPointSize: () ->
+  getPointStyle: () ->
+  getRendererInfo: () ->
+  getScissor: () ->
+  getShader: () ->
+  getSystemLimit: () ->
+  isSupported: () ->
+  isWireframe: () ->
+
+  setBackgroundColor: (r, g, b, a) ->
+    if typeof(r) == "number"
+      @background_color = new Color(r, g, b, a)
+    else # we were passed a sequence
+      @background_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
+
   setColor: (r, g, b, a = 255) ->
     if typeof(r) == "number"
       @current_color = new Color(r, g, b, a)
@@ -115,10 +152,24 @@ class Canvas2D
     @context.globalAlpha = @current_color.a / 255
 
   setFont: (font) ->
+    @current_font = font
     if font
       @context.font = font.html_code
     else
       @context.font = @default_font.html_code
+
+  setColorMask: () ->
+  setDefaultFilter: () ->
+  setInvertedStencil: () ->
+  setLineJoin: () ->
+  setLineStyle: () ->
+  setLineWidth: () ->
+  setPointSize: () ->
+  setPointStyle: () ->
+  setScissor: (x, y, width, height) ->
+  setShader: () ->
+  setStencil: (callback) ->
+  setWireframe: () ->
 
   origin: () ->
     @context.setTransform(1,0,0,1,0,0)

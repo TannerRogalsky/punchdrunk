@@ -40,9 +40,5 @@ class @Love
   mousereleased: (x, y, button) ->
   keypressed: (key, unicode) ->
   keyreleased: (key, unicode) ->
-  joystickpressed: (joystick, button) ->
-  joystickreleased: (joystick, button) ->
-  textinput: (text) ->
   draw: () ->
-  focus: (has_focus) ->
   quit: () ->

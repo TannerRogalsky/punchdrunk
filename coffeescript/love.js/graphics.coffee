@@ -18,8 +18,8 @@ class Graphics
     @canvas.circle(mode, x, y, radius, segments)
 
   clear: () =>
-    c = @background_color
-    @canvas.clear(@canvas, c.r, c.g, c.b, c.a)
+    [r, g, b, a] = @getBackgroundColor()
+    @canvas.clear(@canvas, r, g, b, a)
 
   draw: (args...) =>
     @canvas.draw(args...)
@@ -53,20 +53,91 @@ class Graphics
   newImage: (path) =>
     new Image(path)
 
+  newImageFont: =>
+
+  newMesh: () =>
+  newParticleSystem: () =>
 
   newQuad: (x, y, width, height, sw, sh) =>
     new Quad(x, y, width, height, sw, sh)
 
-  # STATE
+  newScreenshot: =>
+  newShader: () =>
+  newSpriteBatch: () =>
 
-  setColor: (r, g, b, a = 255) =>
-    @canvas.setColor(r, g, b, a)
+  setNewFont: (filename, size) =>
+    font = @newFont(filename, size)
+    @setFont(font)
+
+  # STATE
+  getBackgroundColor: () =>
+    @canvas.getBackgroundColor()
+
+  getBlendMode: () =>
+    @canvas.getBlendMode()
+
+  getCanvas: () =>
+    @canvas
+
+  getColor: () =>
+    @canvas.getColor()
+
+  getColorMask: () =>
+    @canvas.getColorMask()
+
+  getDefaultFilter: () =>
+    @canvas.getDefaultFilter()
+
+  getFont: () =>
+    @canvas.getFont()
+
+  getLineJoin: () =>
+    @canvas.getLineJoin()
+
+  getLineStyle: () =>
+    @canvas.getLineStyle()
+
+  getLineWidth: () =>
+    @canvas.getLineWidth()
+
+  getMaxImageSize: () =>
+    @canvas.getMaxImageSize()
+
+  getMaxPointSize: () =>
+    @canvas.getMaxPointSize()
+
+  getPointSize: () =>
+    @canvas.getPointSize()
+
+  getPointStyle: () =>
+    @canvas.getPointStyle()
+
+  getRendererInfo: () =>
+    @canvas.getRendererInfo()
+
+  getScissor: () =>
+    @canvas.getScissor()
+
+  getShader: () =>
+    @canvas.getShader()
+
+  getSystemLimit: () =>
+    @canvas.getSystemLimit()
+
+  isSupported: () =>
+
+  isWireframe: () =>
+    @canvas.isWireframe()
+
+  reset: () =>
+    @setCanvas()
+    @origin()
 
   setBackgroundColor: (r, g, b, a = 255) =>
-    if typeof(r) == "number"
-      @background_color = new Color(r, g, b, a)
-    else # we were passed a sequence
-      @background_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
+    @canvas.setBackgroundColor(r, g, b, a)
+
+  setBlendMode: (mode) =>
+    @canvas.setBlendMode(mode)
 
   setCanvas: (canvas) =>
     if canvas == undefined or canvas == null
@@ -76,8 +147,47 @@ class Graphics
       canvas.copyContext(@canvas.context)
       @canvas = canvas
 
+  setColor: (r, g, b, a = 255) =>
+    @canvas.setColor(r, g, b, a)
+
   setFont: (font) =>
     @canvas.setFont(font)
+
+  setColorMask: (r, g, b, a) =>
+    @canvas.setColorMask(r, g, b, a)
+
+  setDefaultFilter: (min, mag, anisotropy) =>
+    @canvas.setDefaultFilter(min, mag, anisotropy)
+
+  setInvertedStencil: (callback) =>
+    @canvas.setInvertedStencil(callback)
+
+  setLineJoin: (join) =>
+    @canvas.setLineJoin(join)
+
+  setLineStyle: (style) =>
+    @canvas.setLineStyle(style)
+
+  setLineWidth: (width) =>
+    @canvas.setLineWidth(width)
+
+  setPointSize: (size) =>
+    @canvas.setPointSize(size)
+
+  setPointStyle: (style) =>
+    @canvas.setPointStyle(style)
+
+  setScissor: (x, y, width, height) =>
+    @canvas.setScissor(x, y, width, height)
+
+  setShader: (shader) =>
+    @canvas.setShader(shader)
+
+  setStencil: (callback) =>
+    @canvas.setStencil(callback)
+
+  setWireframe: (enable) =>
+    @canvas.setWireframe(enable)
 
   # COORDINATE SYSTEM
   origin: () =>
@@ -102,8 +212,11 @@ class Graphics
     @canvas.translate(dx, dy)
 
   # WINDOW
-  getWidth: () =>
-    @default_canvas.width
+  getDimensions: () =>
+    [@getWidth(), @getHeight()]
 
   getHeight: () =>
-    @default_canvas.height
+    @default_canvas.getHeight()
+
+  getWidth: () =>
+    @default_canvas.getWidth()
