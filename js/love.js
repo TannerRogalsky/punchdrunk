@@ -1,5 +1,5 @@
 (function() {
-  var Audio, Canvas2D, Color, EventQueue, FileSystem, Font, Graphics, Image, ImageData, Keyboard, Quad, Source, System, Timer, Window,
+  var Audio, Canvas2D, Color, EventQueue, FileSystem, Font, Graphics, Image, ImageData, Keyboard, Mouse, Quad, Source, System, Timer, Window,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
@@ -791,6 +791,7 @@
       this.timer = new Timer();
       this.event = new EventQueue();
       this.keyboard = new Keyboard(this.event);
+      this.mouse = new Mouse(this.event, this.graphics.default_canvas.element);
       this.filesystem = new FileSystem();
       this.audio = new Audio();
       this.system = new System();
@@ -844,6 +845,161 @@
     return Love;
 
   })();
+
+  Mouse = (function() {
+    var getButtonFromEvent, getWheelButtonFromEvent, mouseButtonNames;
+
+    function Mouse(eventQueue, canvas) {
+      this.setY = __bind(this.setY, this);
+      this.setX = __bind(this.setX, this);
+      this.setVisible = __bind(this.setVisible, this);
+      this.setPosition = __bind(this.setPosition, this);
+      this.setGrabbed = __bind(this.setGrabbed, this);
+      this.setCursor = __bind(this.setCursor, this);
+      this.newCursor = __bind(this.newCursor, this);
+      this.isVisible = __bind(this.isVisible, this);
+      this.isGrabbed = __bind(this.isGrabbed, this);
+      this.isDown = __bind(this.isDown, this);
+      this.getY = __bind(this.getY, this);
+      this.getX = __bind(this.getX, this);
+      this.getSystemCursor = __bind(this.getSystemCursor, this);
+      this.getPosition = __bind(this.getPosition, this);
+      this.getCursor = __bind(this.getCursor, this);
+      var handlePress, handleRelease, handleWheel;
+      this.x = 0;
+      this.y = 0;
+      this.buttonsDown = {};
+      this.wheelTimeOuts = {};
+      handlePress = (function(_this) {
+        return function(button) {
+          _this.buttonsDown[button] = true;
+          return eventQueue.push("mousepressed", _this.x, _this.y, button);
+        };
+      })(this);
+      handleRelease = (function(_this) {
+        return function(button) {
+          _this.buttonsDown[button] = false;
+          return eventQueue.push("mousereleased", _this.x, _this.y, button);
+        };
+      })(this);
+      handleWheel = (function(_this) {
+        return function(evt) {
+          var button;
+          evt.preventDefault();
+          button = getWheelButtonFromEvent(evt);
+          clearTimeout(mouse.wheelTimeOuts[button]);
+          mouse.wheelTimeOuts[button] = setTimeout(function() {
+            return handleRelease(button);
+          }, Mouse.WHEEL_TIMEOUT * 1000);
+          return handlePress(button);
+        };
+      })(this);
+      canvas.addEventListener('mousemove', (function(_this) {
+        return function(evt) {
+          _this.x = evt.offsetX;
+          return _this.y = evt.offsetY;
+        };
+      })(this));
+      canvas.addEventListener('mousedown', (function(_this) {
+        return function(evt) {
+          return handlePress(getButtonFromEvent(evt));
+        };
+      })(this));
+      canvas.addEventListener('mouseup', (function(_this) {
+        return function(evt) {
+          return handleRelease(getButtonFromEvent(evt));
+        };
+      })(this));
+      canvas.addEventListener('DOMMouseScroll', handleWheel);
+      canvas.addEventListener('mousewheel', handleWheel);
+    }
+
+    Mouse.prototype.getCursor = function() {
+      return null;
+    };
+
+    Mouse.prototype.getPosition = function() {
+      return [this.x, this.y];
+    };
+
+    Mouse.prototype.getSystemCursor = function() {
+      return null;
+    };
+
+    Mouse.prototype.getX = function() {
+      return this.x;
+    };
+
+    Mouse.prototype.getY = function() {
+      return this.y;
+    };
+
+    Mouse.prototype.isDown = function() {
+      var button, others;
+      button = arguments[0], others = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      if (this.buttonsDown[button]) {
+        return true;
+      } else {
+        if (others.length === 0) {
+          return false;
+        } else {
+          return this.isDown.apply(this, others);
+        }
+      }
+    };
+
+    Mouse.prototype.isGrabbed = function() {
+      return false;
+    };
+
+    Mouse.prototype.isVisible = function() {
+      return true;
+    };
+
+    Mouse.prototype.newCursor = function() {
+      return null;
+    };
+
+    Mouse.prototype.setCursor = function(cursor) {};
+
+    Mouse.prototype.setGrabbed = function(grab) {};
+
+    Mouse.prototype.setPosition = function(x, y) {
+      this.setX(x);
+      return this.setY(y);
+    };
+
+    Mouse.prototype.setVisible = function(visible) {};
+
+    Mouse.prototype.setX = function(x) {};
+
+    Mouse.prototype.setY = function(y) {};
+
+    mouseButtonNames = {
+      1: "l",
+      2: "m",
+      3: "r"
+    };
+
+    getButtonFromEvent = function(evt) {
+      return mouseButtonNames[evt.which];
+    };
+
+    getWheelButtonFromEvent = function(evt) {
+      var delta;
+      delta = Math.max(-1, Math.min(1, evt.wheelDelta || -evt.detail));
+      if (delta === 1) {
+        return 'wu';
+      } else {
+        return 'wd';
+      }
+    };
+
+    return Mouse;
+
+  })();
+
+  Mouse.WHEEL_TIMEOUT = 0.02;
 
   System = (function() {
     function System() {
