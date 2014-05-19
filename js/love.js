@@ -1,5 +1,5 @@
 (function() {
-  var Audio, Canvas2D, Color, EventQueue, FileSystem, Font, Graphics, Image, ImageData, Keyboard, Quad, Source, Timer, Window,
+  var Audio, Canvas2D, Color, EventQueue, FileSystem, Font, Graphics, Image, ImageData, Keyboard, Quad, Source, System, Timer, Window,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
@@ -793,6 +793,7 @@
       this.keyboard = new Keyboard(this.event);
       this.filesystem = new FileSystem();
       this.audio = new Audio();
+      this.system = new System();
       window.addEventListener("beforeunload", (function(_this) {
         return function() {
           return _this.quit.call();
@@ -841,6 +842,49 @@
     Love.prototype.quit = function() {};
 
     return Love;
+
+  })();
+
+  System = (function() {
+    function System() {
+      this.setClipboardText = __bind(this.setClipboardText, this);
+      this.openURL = __bind(this.openURL, this);
+      this.getProcessorCount = __bind(this.getProcessorCount, this);
+      this.getPowerInfo = __bind(this.getPowerInfo, this);
+      this.getOS = __bind(this.getOS, this);
+      this.getClipboardText = __bind(this.getClipboardText, this);
+    }
+
+    System.prototype.getClipboardText = function() {};
+
+    System.prototype.getOS = function() {
+      return window.navigator.appVersion;
+    };
+
+    System.prototype.getPowerInfo = function() {
+      var battery, percent, seconds, state;
+      battery = window.navigator.battery;
+      if (battery) {
+        state = battery.charging ? "charging" : "unknown";
+        percent = battery.level * 100;
+        seconds = battery.dischargingTime;
+        return [state, percent, seconds];
+      } else {
+        return ["unknown", null, null];
+      }
+    };
+
+    System.prototype.getProcessorCount = function() {
+      return window.navigator.hardwareConcurrency || 1;
+    };
+
+    System.prototype.openURL = function(url) {
+      return window.open(url);
+    };
+
+    System.prototype.setClipboardText = function(text) {};
+
+    return System;
 
   })();
 
