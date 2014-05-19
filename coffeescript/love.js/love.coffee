@@ -6,6 +6,10 @@ class @Love
     @event = new EventQueue()
     @keyboard = new Keyboard(@event)
     @filesystem = new FileSystem()
+    @audio = new Audio()
+
+    window.addEventListener "beforeunload", () =>
+      @quit.call()
 
   run: () =>
     @timer.step()
@@ -36,9 +40,5 @@ class @Love
   mousereleased: (x, y, button) ->
   keypressed: (key, unicode) ->
   keyreleased: (key, unicode) ->
-  joystickpressed: (joystick, button) ->
-  joystickreleased: (joystick, button) ->
-  textinput: (text) ->
   draw: () ->
-  focus: (has_focus) ->
   quit: () ->

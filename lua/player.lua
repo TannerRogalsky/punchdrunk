@@ -70,7 +70,7 @@ function Player:update(dt)
 		self.y = self.y + 150*dt
 		if self.y > HEIGHT+10 then
 			scrn_shake = 0.25
-			-- auHit:stop() auHit:play()
+			auHit:stop() auHit:play()
 			self.status = 1
 		end
 
@@ -111,7 +111,7 @@ function Player:kill(status)
 
 	if status ~= 4 then
 		scrn_shake = 0.25
-		-- auHit:stop() auHit:play()
+		auHit:stop() auHit:play()
 	end
 
 	if coffee >= 5 then
@@ -171,7 +171,7 @@ function Player:collideWithTrain()
 			train.hasCoffee = false
 			coffee = coffee + 1
 			if coffee > 5 then coffee = 5 end
-			-- auCoffee:stop() auCoffee:play()
+			auCoffee:stop() auCoffee:play()
 		end
 	end
 end

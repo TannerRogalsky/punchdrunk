@@ -84,7 +84,7 @@ class Keyboard
 
     if typeof key == "undefined"
       key = String.fromCharCode(code);
-      if event.shiftKey
-        key = key.toUpperCase()
+      if not event.shiftKey
+        key = key.toLowerCase()
 
     return key;

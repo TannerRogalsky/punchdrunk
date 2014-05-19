@@ -1,12 +1,12 @@
-require("lua.table-save")
-require("lua.player")
-require("lua.cloud")
-require("lua.train")
-require("lua.tunnel")
-require("lua.gorge")
-require("lua.bird")
-require("lua.terrain")
-require("lua.menu")
+require("table-save")
+require("player")
+require("cloud")
+require("train")
+require("tunnel")
+require("gorge")
+require("bird")
+require("terrain")
+require("menu")
 
 WIDTH = 300
 HEIGHT = 100
@@ -38,7 +38,8 @@ function love.load()
 	love.graphics.drawq = love.graphics.draw
 	love.graphics.setBackgroundColor(bgcolor)
 
-	loadHighscore()
+	-- loadstring isn't working right now so loadhighscore is disabled
+	-- loadHighscore()
 	loadResources()
 	love.graphics.setFont(imgfont)
 
@@ -236,7 +237,7 @@ end
 function love.keypressed(key,unicode)
 	if key == ' ' then -- will be space most of the time
 		return         -- avoid unnecessary checks
-	elseif key == 'r' or key == "R" then
+	elseif key == 'r' then
 		restart()
 	elseif key == 'up' then
 		selection = selection-1
@@ -247,10 +248,10 @@ function love.keypressed(key,unicode)
 		if gamestate == 1 then
 			if submenu == 0 then -- splash screen
 				submenu = 2 -- Jumps straight to difficulty.
-				-- auSelect:stop() auSelect:play()
+				auSelect:stop() auSelect:play()
 			elseif submenu == 2 then  -- difficulty selection
 				difficulty = selection+1
-				-- auSelect:stop() auSelect:play()
+				auSelect:stop() auSelect:play()
 				gamestate = 0
 				restart()
 			end
@@ -268,7 +269,7 @@ function love.keypressed(key,unicode)
 				submenu = 0
 			end
 		end
-		-- auSelect:stop() auSelect:play()
+		auSelect:stop() auSelect:play()
 	elseif key == 'p' then
 		if gamestate == 0 and pl.alive == true then
 			pause = not pause
@@ -320,18 +321,18 @@ function loadResources()
 	-- fontimg:setFilter("nearest","nearest")
 	-- imgfont = love.graphics.newImageFont(fontimg," abcdefghijklmnopqrstuvwxyz0123456789.!'-:*")
 	-- imgfont:setLineHeight(2)
-	imgfont = love.graphics.newFont("Vera", 12)
+	imgfont = love.graphics.newFont()
 
 	-- Load sound effects
-	-- auCoffee = love.audio.newSource("sfx/coffee.wav","static")
-	-- auHit = love.audio.newSource("sfx/hit.wav","static")
-	-- auSelect = love.audio.newSource("sfx/select.wav","static")
-	-- if use_music == true then
-	-- 	auBGM = love.audio.newSource("sfx/bgm.ogg","stream")
-	-- 	auBGM:setLooping(true)
-	-- 	auBGM:setVolume(0.6)
-	-- 	auBGM:play()
-	-- end
+	auCoffee = love.audio.newSource("sfx/coffee.wav","static")
+	auHit = love.audio.newSource("sfx/hit.wav","static")
+	auSelect = love.audio.newSource("sfx/select.wav","static")
+	if use_music == true then
+		auBGM = love.audio.newSource("sfx/bgm.ogg","stream")
+		auBGM:setLooping(true)
+		auBGM:setVolume(0.6)
+		auBGM:play()
+	end
 end
 
 function loadHighscore()
