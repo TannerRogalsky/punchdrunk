@@ -74,6 +74,8 @@ class Graphics
     @canvas.getBackgroundColor()
 
   getBlendMode: () =>
+    @canvas.getBlendMode()
+
   getCanvas: () =>
     @canvas
 
@@ -81,28 +83,61 @@ class Graphics
     @canvas.getColor()
 
   getColorMask: () =>
+    @canvas.getColorMask()
+
   getDefaultFilter: () =>
+    @canvas.getDefaultFilter()
+
   getFont: () =>
+    @canvas.getFont()
+
   getLineJoin: () =>
+    @canvas.getLineJoin()
+
   getLineStyle: () =>
+    @canvas.getLineStyle()
+
   getLineWidth: () =>
+    @canvas.getLineWidth()
+
   getMaxImageSize: () =>
+    @canvas.getMaxImageSize()
+
   getMaxPointSize: () =>
+    @canvas.getMaxPointSize()
+
   getPointSize: () =>
+    @canvas.getPointSize()
+
   getPointStyle: () =>
+    @canvas.getPointStyle()
+
   getRendererInfo: () =>
+    @canvas.getRendererInfo()
+
   getScissor: () =>
+    @canvas.getScissor()
+
   getShader: () =>
+    @canvas.getShader()
+
   getSystemLimit: () =>
+    @canvas.getSystemLimit()
 
   isSupported: () =>
+
   isWireframe: () =>
+    @canvas.isWireframe()
+
   reset: () =>
+    @setCanvas()
+    @origin()
 
   setBackgroundColor: (r, g, b, a = 255) =>
     @canvas.setBackgroundColor(r, g, b, a)
 
-  setBlendMode: () =>
+  setBlendMode: (mode) =>
+    @canvas.setBlendMode(mode)
 
   setCanvas: (canvas) =>
     if canvas == undefined or canvas == null
@@ -118,18 +153,41 @@ class Graphics
   setFont: (font) =>
     @canvas.setFont(font)
 
-  setColorMask: () =>
-  setDefaultFilter: () =>
-  setInvertedStencil: () =>
-  setLineJoin: () =>
-  setLineStyle: () =>
-  setLineWidth: () =>
-  setPointSize: () =>
-  setPointStyle: () =>
-  setScissor: () =>
-  setShader: () =>
-  setStencil: () =>
-  setWireframe: () =>
+  setColorMask: (r, g, b, a) =>
+    @canvas.setColorMask(r, g, b, a)
+
+  setDefaultFilter: (min, mag, anisotropy) =>
+    @canvas.setDefaultFilter(min, mag, anisotropy)
+
+  setInvertedStencil: (callback) =>
+    @canvas.setInvertedStencil(callback)
+
+  setLineJoin: (join) =>
+    @canvas.setLineJoin(join)
+
+  setLineStyle: (style) =>
+    @canvas.setLineStyle(style)
+
+  setLineWidth: (width) =>
+    @canvas.setLineWidth(width)
+
+  setPointSize: (size) =>
+    @canvas.setPointSize(size)
+
+  setPointStyle: (style) =>
+    @canvas.setPointStyle(style)
+
+  setScissor: (x, y, width, height) =>
+    @canvas.setScissor(x, y, width, height)
+
+  setShader: (shader) =>
+    @canvas.setShader(shader)
+
+  setStencil: (callback) =>
+    @canvas.setStencil(callback)
+
+  setWireframe: (enable) =>
+    @canvas.setWireframe(enable)
 
   # COORDINATE SYSTEM
   origin: () =>
