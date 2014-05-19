@@ -1544,8 +1544,11 @@
 
   Image = (function() {
     function Image(path) {
-      this.element = document.createElement("img");
-      this.element.setAttribute("src", "lua/" + path);
+      this.element = document.getElementById(path);
+      if (this.element === null) {
+        this.element = document.createElement("img");
+        this.element.setAttribute("src", "lua/" + path);
+      }
     }
 
     Image.prototype.getData = function(self) {};
