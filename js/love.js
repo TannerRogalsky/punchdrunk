@@ -1,5 +1,5 @@
 (function() {
-  var Audio, Canvas2D, Color, EventQueue, FileSystem, Font, Graphics, Image, ImageData, Keyboard, Mouse, Quad, Source, System, Timer, Window,
+  var Audio, Canvas2D, Color, EventQueue, FileSystem, Font, Graphics, Image, ImageData, Keyboard, Mouse, Quad, Source, System, Timer, Touch, Window,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
@@ -792,6 +792,7 @@
       this.event = new EventQueue();
       this.keyboard = new Keyboard(this.event);
       this.mouse = new Mouse(this.event, this.graphics.default_canvas.element);
+      this.touch = new Touch(this.event, this.graphics.default_canvas.element);
       this.filesystem = new FileSystem();
       this.audio = new Audio();
       this.system = new System();
@@ -833,6 +834,12 @@
     Love.prototype.mousepressed = function(x, y, button) {};
 
     Love.prototype.mousereleased = function(x, y, button) {};
+
+    Love.prototype.touchpressed = function(id, x, y) {};
+
+    Love.prototype.touchreleased = function(id, x, y) {};
+
+    Love.prototype.touchmoved = function(id, x, y) {};
 
     Love.prototype.keypressed = function(key, unicode) {};
 
@@ -1108,6 +1115,154 @@
     };
 
     return Timer;
+
+  })();
+
+  Touch = (function() {
+    var Finger, getFingerByIdentifier, getMaxPosition, getNextAvailablePosition;
+
+    function Touch(eventQueue, canvas) {
+      this.getTouch = __bind(this.getTouch, this);
+      var preventDefault, touchend;
+      this.fingers = {};
+      preventDefault = function(evt) {
+        evt.preventDefault();
+        return evt.stopPropagation();
+      };
+      canvas.addEventListener('gesturestart', preventDefault);
+      canvas.addEventListener('gesturechange', preventDefault);
+      canvas.addEventListener('gestureend', preventDefault);
+      canvas.addEventListener('touchstart', (function(_this) {
+        return function(evt) {
+          var finger, t, _i, _len, _ref, _results;
+          preventDefault(evt);
+          _ref = evt.targetTouches;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            t = _ref[_i];
+            finger = getFingerByIdentifier(t.identifier);
+            if (!finger) {
+              finger = new Finder(t.identifier, getNextAvailablePosition(), t.offsetX, t.offsetY);
+              _this.fingers[finger.position] = finger;
+              _results.push(eventQueue.push("touchpressed", finger.identifier, finger.x, finger.y));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
+        };
+      })(this));
+      touchend = (function(_this) {
+        return function(evt) {
+          var finger, t, _i, _len, _ref, _results;
+          preventDefault(evt);
+          _ref = evt.targetTouches;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            t = _ref[_i];
+            finger = getFingerByIdentifier(t.identifier);
+            if (finger) {
+              delete _this.fingers[finger.position];
+              _results.push(eventQueue.push("touchreleased", finger.identifier, finger.x, finger.y));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
+        };
+      })(this);
+      canvas.addEventListener('touchend', touchend);
+      canvas.addEventListener('touchleave', touchend);
+      canvas.addEventListener('touchcancel', touchend);
+      el.addEventListener('touchmove', (function(_this) {
+        return function(evt) {
+          var finger, t, _i, _len, _ref, _results;
+          preventDefault(evt);
+          _ref = evt.targetTouches;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            t = _ref[_i];
+            finger = getFingerByIdentifier(t.identifier);
+            if (finger) {
+              finger.x = t.offsetX;
+              finger.y = t.offsetY;
+              _results.push(eventQueue.push("touchmoved", finger.identifier, finger.x, finger.y));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
+        };
+      })(this));
+    }
+
+    Touch.prototype.getTouch = function(index) {
+      var finger;
+      finger = this.fingers[index];
+      return [finger.identifier, finger.x, finger.y];
+    };
+
+    Touch.prototype.getTouchCount = function() {
+      var count, i, maxPosition, _i;
+      maxPosition = getMaxPosition();
+      count = 0;
+      for (i = _i = 0; 0 <= maxPosition ? _i < maxPosition : _i > maxPosition; i = 0 <= maxPosition ? ++_i : --_i) {
+        if (touch.getTouch(i)) {
+          count += 1;
+        }
+      }
+      return count;
+    };
+
+    getMaxPosition = function() {
+      var positions;
+      positions = Object.keys(touch.fingers);
+      if (positions.length === 0) {
+        return 0;
+      } else {
+        return Math.max.apply(Math, positions);
+      }
+    };
+
+    getNextAvailablePosition = function() {
+      var i, maxPosition, _i;
+      maxPosition = getMaxPosition();
+      for (i = _i = 0; 0 <= maxPosition ? _i < maxPosition : _i > maxPosition; i = 0 <= maxPosition ? ++_i : --_i) {
+        if (!touch.getTouch(i)) {
+          i;
+        }
+      }
+      return maxPosition + 1;
+    };
+
+    getFingerByIdentifier = function(identifier) {
+      var fingers, position, _i, _len, _results;
+      fingers = Touch.fingers;
+      _results = [];
+      for (_i = 0, _len = fingers.length; _i < _len; _i++) {
+        position = fingers[_i];
+        if (fingers.hasOwnProperty(position) && fingers[position].identifier === identifier) {
+          _results.push(fingers[position]);
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
+    Finger = (function() {
+      function Finger(identifier, position, x, y) {
+        this.identifier = identifier;
+        this.position = position;
+        this.x = x;
+        this.y = y;
+      }
+
+      return Finger;
+
+    })();
+
+    return Touch;
 
   })();
 
