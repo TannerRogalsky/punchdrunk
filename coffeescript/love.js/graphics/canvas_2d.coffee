@@ -4,6 +4,8 @@ class Canvas2D
     this.setDimensions(width, height)
     @context = @element.getContext('2d')
 
+    @current_transform = Matrix.I(3)
+
   clear: (self, r, g, b, a) ->
     if r == null or r == undefined
       color = Canvas2D.transparent
@@ -18,7 +20,7 @@ class Canvas2D
     self.context.restore()
 
   getDimensions: (self) ->
-    [self.width, self.height]
+    [@getWidth(self), @getHeight(self)]
 
   getHeight: (self) ->
     self.height
@@ -105,34 +107,34 @@ class Canvas2D
       when "fill" then @context.fillRect(x, y, width, height)
       when "line" then @context.strokeRect(x, y, width, height)
 
-  getBackgroundColor: () =>
+  getBackgroundColor: () ->
     c = @background_color
     [c.r, c.g, c.b, c.a]
 
-  getBlendMode: () =>
+  getBlendMode: () ->
 
-  getColor: () =>
+  getColor: () ->
     c = @current_color
     [c.r, c.g, c.b, c.a]
 
-  getColorMask: () =>
-  getDefaultFilter: () =>
-  getFont: () =>
-  getLineJoin: () =>
-  getLineStyle: () =>
-  getLineWidth: () =>
-  getMaxImageSize: () =>
-  getMaxPointSize: () =>
-  getPointSize: () =>
-  getPointStyle: () =>
-  getRendererInfo: () =>
-  getScissor: () =>
-  getShader: () =>
-  getSystemLimit: () =>
+  getColorMask: () ->
+  getDefaultFilter: () ->
+  getFont: () ->
+    @current_font
 
-  isSupported: () =>
-  isWireframe: () =>
-  reset: () =>
+  getLineJoin: () ->
+  getLineStyle: () ->
+  getLineWidth: () ->
+  getMaxImageSize: () ->
+  getMaxPointSize: () ->
+  getPointSize: () ->
+  getPointStyle: () ->
+  getRendererInfo: () ->
+  getScissor: () ->
+  getShader: () ->
+  getSystemLimit: () ->
+  isSupported: () ->
+  isWireframe: () ->
 
   setBackgroundColor: (r, g, b, a) ->
     if typeof(r) == "number"
@@ -150,23 +152,24 @@ class Canvas2D
     @context.globalAlpha = @current_color.a / 255
 
   setFont: (font) ->
+    @current_font = font
     if font
       @context.font = font.html_code
     else
       @context.font = @default_font.html_code
 
-  setColorMask: () =>
-  setDefaultFilter: () =>
-  setInvertedStencil: () =>
-  setLineJoin: () =>
-  setLineStyle: () =>
-  setLineWidth: () =>
-  setPointSize: () =>
-  setPointStyle: () =>
-  setScissor: () =>
-  setShader: () =>
-  setStencil: () =>
-  setWireframe: () =>
+  setColorMask: () ->
+  setDefaultFilter: () ->
+  setInvertedStencil: () ->
+  setLineJoin: () ->
+  setLineStyle: () ->
+  setLineWidth: () ->
+  setPointSize: () ->
+  setPointStyle: () ->
+  setScissor: (x, y, width, height) ->
+  setShader: () ->
+  setStencil: (callback) ->
+  setWireframe: () ->
 
   origin: () ->
     @context.setTransform(1,0,0,1,0,0)
