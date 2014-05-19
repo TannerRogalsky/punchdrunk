@@ -317,11 +317,11 @@ function loadResources()
 	imgSplash = love.graphics.newImage("gfx/splash.png")
 	imgSplash:setFilter("nearest","nearest")
 
-	-- fontimg = love.graphics.newImage("gfx/imgfont.png")
-	-- fontimg:setFilter("nearest","nearest")
-	-- imgfont = love.graphics.newImageFont(fontimg," abcdefghijklmnopqrstuvwxyz0123456789.!'-:*")
-	-- imgfont:setLineHeight(2)
-	imgfont = love.graphics.newFont()
+	fontimg = love.graphics.newImage("gfx/imgfont.png")
+	fontimg:setFilter("nearest","nearest")
+	imgfont = love.graphics.newImageFont(fontimg," abcdefghijklmnopqrstuvwxyz0123456789.!'-:*")
+	imgfont:setLineHeight(2)
+	-- imgfont = love.graphics.newFont()
 
 	-- Load sound effects
 	auCoffee = love.audio.newSource("sfx/coffee.wav","static")

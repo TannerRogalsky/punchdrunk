@@ -53,7 +53,8 @@ class Graphics
   newImage: (path) =>
     new Image(path)
 
-  newImageFont: =>
+  newImageFont: (image, glyphs) =>
+    new ImageFont(image, glyphs)
 
   newMesh: () =>
   newParticleSystem: () =>
