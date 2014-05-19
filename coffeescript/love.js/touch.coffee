@@ -32,7 +32,7 @@ class Touch
     canvas.addEventListener('touchleave',  touchend)
     canvas.addEventListener('touchcancel', touchend)
 
-    el.addEventListener 'touchmove', (evt) =>
+    canvas.addEventListener 'touchmove', (evt) =>
       preventDefault(evt)
 
       for t in evt.targetTouches

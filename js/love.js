@@ -1174,7 +1174,7 @@
       canvas.addEventListener('touchend', touchend);
       canvas.addEventListener('touchleave', touchend);
       canvas.addEventListener('touchcancel', touchend);
-      el.addEventListener('touchmove', (function(_this) {
+      canvas.addEventListener('touchmove', (function(_this) {
         return function(evt) {
           var finger, t, _i, _len, _ref, _results;
           preventDefault(evt);
