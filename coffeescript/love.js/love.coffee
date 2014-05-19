@@ -5,6 +5,7 @@ class @Love
     @timer = new Timer()
     @event = new EventQueue()
     @keyboard = new Keyboard(@event)
+    @mouse = new Mouse(@event, @graphics.default_canvas.element)
     @filesystem = new FileSystem()
     @audio = new Audio()
     @system = new System()

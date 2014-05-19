@@ -27,10 +27,13 @@ Pretty much everything else has partial support. I'm not going to make a long li
 # FAQ
 
 - Can I run my own game in the browser?
+
 Sure! Just delete what's in the `lua` folder, replace it with your source code and run `grunt`. It should compile the Lua code in JSON-ized bytecode which should then just work, if you aren't using anything that hasn't been implemented yet. You may also have to preload your graphics and audio by putting tags for them in `index.html`.
 
 - This is cool! How can I help?
+
 Everything that I'm working on should be [logged as an issue](https://github.com/TannerRogalsky/punchdrunk/issues). If you find something that doesn't work, please create a new issue for it. If you're interested in picking one of the existing issues up, please comment on it first so that I can let you know if I've already done any work on it.
 
 - Why is your CoffeScript so weird?
+
 The interop between Lua and CoffeeScript has necessitated some CoffeeScript that is atypical. Mainly, you'll notice two things: heavy use of the 'fat-arrow notation' for function binding and a lot of passing the object being operated on to the function instead of using proper JavaScript context. Both of these are because the differences between how JavaScript and Lua handle function context. You can read more about it [here](https://github.com/gamesys/moonshine/issues/12).
