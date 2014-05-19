@@ -6,6 +6,7 @@ class @Love
     @event = new EventQueue()
     @keyboard = new Keyboard(@event)
     @mouse = new Mouse(@event, @graphics.default_canvas.element)
+    @touch = new Touch(@event, @graphics.default_canvas.element)
     @filesystem = new FileSystem()
     @audio = new Audio()
     @system = new System()
@@ -40,6 +41,9 @@ class @Love
   update: (dt) ->
   mousepressed: (x, y, button) ->
   mousereleased: (x, y, button) ->
+  touchpressed: (id, x, y) ->
+  touchreleased: (id, x, y) ->
+  touchmoved: (id, x, y) ->
   keypressed: (key, unicode) ->
   keyreleased: (key, unicode) ->
   draw: () ->
