@@ -16,13 +16,17 @@ class Audio
   newSource: (filename, type) =>
     new Source(filename, type)
 
-  pause: () =>
+  pause: (source) =>
+    source.pause(source)
 
-  play: () =>
+  play: (source) =>
+    source.play(source)
 
-  resume: () =>
+  resume: (source) =>
+    source.play(source)
 
-  rewind: () =>
+  rewind: (source) =>
+    source.rewind(source)
 
   setDistanceModel: () =>
 
@@ -34,4 +38,5 @@ class Audio
 
   setVolume: () =>
 
-  stop: () =>
+  stop: (source) =>
+    source.stop(source)
