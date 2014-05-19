@@ -40,13 +40,21 @@
       return new Source(filename, type);
     };
 
-    Audio.prototype.pause = function() {};
+    Audio.prototype.pause = function(source) {
+      return source.pause(source);
+    };
 
-    Audio.prototype.play = function() {};
+    Audio.prototype.play = function(source) {
+      return source.play(source);
+    };
 
-    Audio.prototype.resume = function() {};
+    Audio.prototype.resume = function(source) {
+      return source.play(source);
+    };
 
-    Audio.prototype.rewind = function() {};
+    Audio.prototype.rewind = function(source) {
+      return source.rewind(source);
+    };
 
     Audio.prototype.setDistanceModel = function() {};
 
@@ -58,7 +66,9 @@
 
     Audio.prototype.setVolume = function() {};
 
-    Audio.prototype.stop = function() {};
+    Audio.prototype.stop = function(source) {
+      return source.stop(source);
+    };
 
     return Audio;
 
@@ -973,9 +983,14 @@
     function Source(filename, type) {
       this.filename = filename;
       this.type = type;
+      this.element = document.createElement("audio");
+      this.element.setAttribute("src", "lua/" + filename);
+      this.element.setAttribute("preload", "auto");
     }
 
-    Source.prototype.clone = function(self) {};
+    Source.prototype.clone = function(self) {
+      return new Source(self.filename, self.type);
+    };
 
     Source.prototype.getAttenuationDistances = function(self) {};
 
@@ -993,31 +1008,57 @@
 
     Source.prototype.getVelocity = function(self) {};
 
-    Source.prototype.getVolume = function(self) {};
+    Source.prototype.getVolume = function(self) {
+      return self.element.volume;
+    };
 
     Source.prototype.getVolumeLimits = function(self) {};
 
-    Source.prototype.isLooping = function(self) {};
+    Source.prototype.isLooping = function(self) {
+      return !!self.element.getAttribute("loop");
+    };
 
-    Source.prototype.isPaused = function(self) {};
+    Source.prototype.isPaused = function(self) {
+      return self.element.paused;
+    };
 
-    Source.prototype.isPlaying = function(self) {};
+    Source.prototype.isPlaying = function(self) {
+      return !self.element.paused;
+    };
 
     Source.prototype.isRelative = function(self) {};
 
     Source.prototype.isStatic = function(self) {};
 
-    Source.prototype.isStopped = function(self) {};
+    Source.prototype.isStopped = function(self) {
+      return self.isPaused(self) && self.currentTime === 0;
+    };
 
-    Source.prototype.pause = function(self) {};
+    Source.prototype.pause = function(self) {
+      return self.element.pause();
+    };
 
-    Source.prototype.play = function(self) {};
+    Source.prototype.play = function(self) {
+      return self.element.play();
+    };
 
-    Source.prototype.resume = function(self) {};
+    Source.prototype.resume = function(self) {
+      return self.element.play();
+    };
 
-    Source.prototype.rewind = function(self) {};
+    Source.prototype.rewind = function(self) {
+      return self.element.currentTime = 0;
+    };
 
-    Source.prototype.seek = function(self) {};
+    Source.prototype.seek = function(self, offset, time_unit) {
+      if (time_unit == null) {
+        time_unit = "seconds";
+      }
+      switch (time_unit) {
+        case "seconds":
+          return self.element.currentTime = offset;
+      }
+    };
 
     Source.prototype.setAttenuationDistances = function(self) {};
 
@@ -1025,7 +1066,9 @@
 
     Source.prototype.setDirection = function(self) {};
 
-    Source.prototype.setLooping = function(self) {};
+    Source.prototype.setLooping = function(self, looping) {
+      return self.element.setAttribute("loop", looping);
+    };
 
     Source.prototype.setPitch = function(self) {};
 
@@ -1037,13 +1080,27 @@
 
     Source.prototype.setVelocity = function(self) {};
 
-    Source.prototype.setVolume = function(self) {};
+    Source.prototype.setVolume = function(self, volume) {
+      return self.element.volume = volume;
+    };
 
     Source.prototype.setVolumeLimits = function(self) {};
 
-    Source.prototype.stop = function(self) {};
+    Source.prototype.stop = function(self) {
+      return self.element.load();
+    };
 
-    Source.prototype.tell = function(self) {};
+    Source.prototype.tell = function(self, time_unit) {
+      if (time_unit == null) {
+        time_unit = "seconds";
+      }
+      switch (time_unit) {
+        case "seconds":
+          return self.element.currentTime;
+        case "samples":
+          return 0;
+      }
+    };
 
     return Source;
 
