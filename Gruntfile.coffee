@@ -11,8 +11,8 @@ module.exports = (grunt) ->
             'coffeescript/love.js/audio/*.coffee',
             'coffeescript/love.js/graphics/*.coffee',
           ]
-          'js/amore.js': [
-            'coffeescript/amore.coffee'
+          'js/punchdrunk.js': [
+            'coffeescript/punchdrunk.coffee'
           ]
     watch:
       coffeescript:
