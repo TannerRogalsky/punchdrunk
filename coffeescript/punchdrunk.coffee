@@ -1,19 +1,20 @@
-# Forward print() messages to the console
-shine.stdout.write = () ->
-  console.log.apply(console, arguments)
+window.onload = ->
+  # Forward print() messages to the console
+  shine.stdout.write = () ->
+    console.log.apply(console, arguments)
 
-conf = {
-  window: {},
-  modules: {}
-}
+  conf = {
+    window: {},
+    modules: {}
+  }
 
-new shine.FileManager().load './lua/conf.lua.json', (_, file) ->
-  conf_env = {love: {}}
-  conf_vm = new shine.VM(conf_env)
-  conf_vm.execute(null, file)
-  conf_env.love.conf.call(null, conf)
+  new shine.FileManager().load './lua/conf.lua.json', (_, file) ->
+    conf_env = {love: {}}
+    conf_vm = new shine.VM(conf_env)
+    conf_vm.execute(null, file)
+    conf_env.love.conf.call(null, conf)
 
-  vm = new shine.VM({
-    love: new Love(conf.window)
-  })
-  vm.load('./js/boot.lua.json')
+    vm = new shine.VM({
+      love: new Love(conf.window)
+    })
+    vm.load('./js/boot.lua.json')
