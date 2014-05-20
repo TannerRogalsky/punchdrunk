@@ -11,7 +11,8 @@ class Window
 
   getFullscreenModes: () =>
 
-  getHeight: () =>
+  getHeight: =>
+    @graphics.getHeight()
 
   getIcon: () =>
 
@@ -21,7 +22,8 @@ class Window
 
   getTitle: () =>
 
-  getWidth: () =>
+  getWidth: =>
+    @graphics.getWidth()
 
   hasFocus: () =>
 
