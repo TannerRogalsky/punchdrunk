@@ -1,19 +1,28 @@
 module.exports = (grunt) ->
 
   grunt.initConfig
+    pkg: grunt.file.readJSON('package.json')
+    banner: """/*! <%= pkg.name %> <%= pkg.version %> (<%= grunt.template.today('yyyy-mm-dd') %>) - <%= pkg.homepage %> */
+            /*! <%= pkg.description %> */
+            /*! <%= pkg.author %> */"""
     coffee:
       app:
         options:
+          banner: '<%= banner %>'
           join: true
         files:
-          'js/love.js': [
+          'js/punchdrunk.js': [
+            'coffeescript/punchdrunk.coffee'
             'coffeescript/love.js/*.coffee',
             'coffeescript/love.js/audio/*.coffee',
             'coffeescript/love.js/graphics/*.coffee',
           ]
-          'js/punchdrunk.js': [
-            'coffeescript/punchdrunk.coffee'
-          ]
+    concat:
+      banner:
+        options:
+          banner: '<%= banner %>'
+        src: ['js/moonshine.js', 'js/sylvester.src.js', 'js/punchdrunk.js']
+        dest: 'js/punchdrunk.js'
     watch:
       coffeescript:
         files: ['coffeescript/**/*.coffee', 'coffeescript/*.coffee']
@@ -37,8 +46,9 @@ module.exports = (grunt) ->
 
   grunt.loadNpmTasks('grunt-contrib-coffee')
   grunt.loadNpmTasks('grunt-contrib-watch')
-  grunt.loadNpmTasks('grunt-shell')
+  grunt.loadNpmTasks('grunt-contrib-concat')
   grunt.loadNpmTasks('grunt-contrib-connect')
+  grunt.loadNpmTasks('grunt-shell')
 
   grunt.registerTask 'default', ['coffee', 'shell', 'connect:server', 'watch']
   grunt.registerTask 'compile', ['coffee', 'shell']
