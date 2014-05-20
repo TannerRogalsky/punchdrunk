@@ -1349,7 +1349,7 @@
     Window.prototype.setIcon = function() {};
 
     Window.prototype.setMode = function(width, height, flags) {
-      return this.graphics.canvas.setDimensions(width, height);
+      return this.graphics.default_canvas.setDimensions(width, height);
     };
 
     Window.prototype.setTitle = function() {};
