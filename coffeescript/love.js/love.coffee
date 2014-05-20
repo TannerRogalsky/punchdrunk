@@ -1,5 +1,5 @@
 class @Love
-  constructor: (window_conf) ->
+  constructor: (window_conf, module_conf) ->
     @graphics = new Graphics(window_conf.width, window_conf.height)
     @window = new Window(@graphics)
     @timer = new Timer()
