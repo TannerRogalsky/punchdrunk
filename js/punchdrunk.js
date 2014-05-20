@@ -21,7 +21,7 @@
     vm = new shine.VM({
       love: new Love(conf.window)
     });
-    return vm.load('./lua/boot.lua.json');
+    return vm.load('./js/boot.lua.json');
   });
 
 }).call(this);

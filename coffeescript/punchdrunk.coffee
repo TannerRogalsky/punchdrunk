@@ -16,4 +16,4 @@ new shine.FileManager().load './lua/conf.lua.json', (_, file) ->
   vm = new shine.VM({
     love: new Love(conf.window)
   })
-  vm.load('./lua/boot.lua.json')
+  vm.load('./js/boot.lua.json')
