@@ -31,7 +31,7 @@ class Graphics
     @canvas.point(x, y)
 
   polygon: (mode, points...) =>
-    @canvas.polygon(mode, points)
+    @canvas.polygon(mode, points...)
 
   print: (text, x, y) =>
     @canvas.print(text, x, y)
@@ -216,7 +216,7 @@ class Graphics
     [@getWidth(), @getHeight()]
 
   getHeight: () =>
-    @default_canvas.getHeight()
+    @default_canvas.getHeight(@default_canvas)
 
   getWidth: () =>
-    @default_canvas.getWidth()
+    @default_canvas.getWidth(@default_canvas)

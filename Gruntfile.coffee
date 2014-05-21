@@ -31,13 +31,15 @@ module.exports = (grunt) ->
         files: ['lua/*.lua']
         tasks: ['shell:distil_game']
       bootstrap:
-        files: ['coffeescript/boot.lua']
+        files: ['js/boot.lua']
         tasks: ['shell:distil_bootstrap']
     shell:
       distil_game:
         command: './node_modules/moonshine/bin/moonshine distil -d lua lua'
       distil_bootstrap:
-        command: './node_modules/moonshine/bin/moonshine distil -o js/boot.lua.json coffeescript/boot.lua'
+        command: './node_modules/moonshine/bin/moonshine distil -o js/boot.lua.json js/boot.lua'
+      distil_examples:
+        command: './node_modules/moonshine/bin/moonshine distil -d examples examples'
     connect:
       server:
         options:

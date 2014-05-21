@@ -3,29 +3,43 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
-  window.onload = function() {
-    var conf;
-    shine.stdout.write = function() {
-      return console.log.apply(console, arguments);
-    };
-    conf = {
-      window: {},
-      modules: {}
-    };
-    return new shine.FileManager().load('./lua/conf.lua.json', function(_, file) {
-      var conf_env, conf_vm, vm;
-      conf_env = {
-        love: {}
+  this.Punchdrunk = (function() {
+    function Punchdrunk(game_root, punchdrunk_root) {
+      var conf;
+      if (game_root == null) {
+        game_root = "lua";
+      }
+      if (punchdrunk_root == null) {
+        punchdrunk_root = "./js";
+      }
+      shine.stdout.write = function() {
+        return console.log.apply(console, arguments);
       };
-      conf_vm = new shine.VM(conf_env);
-      conf_vm.execute(null, file);
-      conf_env.love.conf.call(null, conf);
-      vm = new shine.VM({
-        love: new Love(conf.window)
+      conf = {
+        window: {},
+        modules: {}
+      };
+      new shine.FileManager().load("" + game_root + "/conf.lua.json", function(_, file) {
+        var conf_env, conf_vm, love, vm;
+        conf_env = {
+          love: {}
+        };
+        conf_vm = new shine.VM(conf_env);
+        conf_vm.execute(null, file);
+        conf_env.love.conf.call(null, conf);
+        Love.root = game_root;
+        love = new Love(conf.window, conf.modules);
+        vm = new shine.VM({
+          love: love
+        });
+        vm._globals['package'].path = ("" + game_root + "/?.lua.json;" + game_root + "/?.json;") + vm._globals['package'].path;
+        return vm.load("" + punchdrunk_root + "/boot.lua.json");
       });
-      return vm.load('./js/boot.lua.json');
-    });
-  };
+    }
+
+    return Punchdrunk;
+
+  })();
 
   Audio = (function() {
     function Audio() {
@@ -371,9 +385,9 @@
     };
 
     Graphics.prototype.polygon = function() {
-      var mode, points;
+      var mode, points, _ref;
       mode = arguments[0], points = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      return this.canvas.polygon(mode, points);
+      return (_ref = this.canvas).polygon.apply(_ref, [mode].concat(__slice.call(points)));
     };
 
     Graphics.prototype.print = function(text, x, y) {
@@ -627,11 +641,11 @@
     };
 
     Graphics.prototype.getHeight = function() {
-      return this.default_canvas.getHeight();
+      return this.default_canvas.getHeight(this.default_canvas);
     };
 
     Graphics.prototype.getWidth = function() {
-      return this.default_canvas.getWidth();
+      return this.default_canvas.getWidth(this.default_canvas);
     };
 
     return Graphics;
@@ -808,7 +822,7 @@
   })();
 
   this.Love = (function() {
-    function Love(window_conf) {
+    function Love(window_conf, module_conf) {
       this.run = __bind(this.run, this);
       this.graphics = new Graphics(window_conf.width, window_conf.height);
       this.window = new Window(this.graphics);
@@ -876,6 +890,8 @@
     return Love;
 
   })();
+
+  Love.root = "lua";
 
   Mouse = (function() {
     var getButtonFromEvent, getWheelButtonFromEvent, mouseButtonNames;
@@ -1324,7 +1340,9 @@
 
     Window.prototype.getFullscreenModes = function() {};
 
-    Window.prototype.getHeight = function() {};
+    Window.prototype.getHeight = function() {
+      return this.graphics.getHeight();
+    };
 
     Window.prototype.getIcon = function() {};
 
@@ -1334,7 +1352,9 @@
 
     Window.prototype.getTitle = function() {};
 
-    Window.prototype.getWidth = function() {};
+    Window.prototype.getWidth = function() {
+      return this.graphics.getWidth();
+    };
 
     Window.prototype.hasFocus = function() {};
 
@@ -1349,7 +1369,7 @@
     Window.prototype.setIcon = function() {};
 
     Window.prototype.setMode = function(width, height, flags) {
-      return this.graphics.canvas.setDimensions(width, height);
+      return this.graphics.default_canvas.setDimensions(width, height);
     };
 
     Window.prototype.setTitle = function() {};
@@ -1363,7 +1383,7 @@
       this.filename = filename;
       this.type = type;
       this.element = document.createElement("audio");
-      this.element.setAttribute("src", "lua/" + filename);
+      this.element.setAttribute("src", Love.root + "/" + filename);
       this.element.setAttribute("preload", "auto");
     }
 
@@ -1575,6 +1595,9 @@
     Canvas2D.prototype.line = function() {
       var i, points, x, y, _i, _ref, _ref1;
       points = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      if (points.length === 1) {
+        points = points[0].__shine.numValues.slice(1, points[0].__shine.numValues.length);
+      }
       this.context.beginPath();
       this.context.moveTo(points[0], points[1]);
       for (i = _i = 2, _ref = points.length; _i < _ref; i = _i += 2) {
@@ -1591,6 +1614,9 @@
     Canvas2D.prototype.polygon = function() {
       var i, mode, points, x, y, _i, _ref, _ref1;
       mode = arguments[0], points = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      if (points.length === 1) {
+        points = points[0].__shine.numValues.slice(1, points[0].__shine.numValues.length);
+      }
       this.context.beginPath();
       this.context.moveTo(points[0], points[1]);
       for (i = _i = 2, _ref = points.length; _i < _ref; i = _i += 2) {
@@ -1926,7 +1952,7 @@
       this.element = document.getElementById(path);
       if (this.element === null) {
         this.element = document.createElement("img");
-        this.element.setAttribute("src", "lua/" + path);
+        this.element.setAttribute("src", Love.root + "/" + path);
       }
     }
 
