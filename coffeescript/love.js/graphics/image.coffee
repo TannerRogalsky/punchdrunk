@@ -1,10 +1,14 @@
 class Image
-  constructor: (path) ->
-    @element = document.getElementById(path)
-
-    if @element == null
+  constructor: (data) ->
+    if data instanceof ImageData
       @element = document.createElement("img")
-      @element.setAttribute("src", Love.root + "/" + path)
+      @element.setAttribute("src", data.getString(data))
+    else
+      @element = document.getElementById(data)
+
+      if @element == null
+        @element = document.createElement("img")
+        @element.setAttribute("src", Love.root + "/" + data)
 
   getData: (self) ->
 

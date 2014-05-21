@@ -16,6 +16,8 @@ module.exports = (grunt) ->
             'coffeescript/love.js/*.coffee',
             'coffeescript/love.js/audio/*.coffee',
             'coffeescript/love.js/graphics/*.coffee',
+            'coffeescript/love.js/filesystem/*.coffee',
+            'coffeescript/love.js/image/*.coffee',
           ]
     concat:
       banner:

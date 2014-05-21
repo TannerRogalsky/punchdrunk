@@ -118,6 +118,11 @@ class Canvas2D
     [c.r, c.g, c.b, c.a]
 
   getBlendMode: () ->
+    switch @context.globalCompositeOperation
+      when "source-over" then "alpha"
+      when "multiply" then "multiplicative"
+      when "lighten" then "subtractive"
+      when "darken" then "additive"
 
   getColor: () ->
     c = @current_color
@@ -147,6 +152,13 @@ class Canvas2D
       @background_color = new Color(r, g, b, a)
     else # we were passed a sequence
       @background_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
+
+  setBlendMode: (mode) ->
+    switch mode
+      when "alpha" then @context.globalCompositeOperation = "source-over"
+      when "multiplicative" then @context.globalCompositeOperation = "multiply"
+      when "subtractive" then @context.globalCompositeOperation = "lighten"
+      when "additive" then @context.globalCompositeOperation = "darken"
 
   setColor: (r, g, b, a = 255) ->
     if typeof(r) == "number"

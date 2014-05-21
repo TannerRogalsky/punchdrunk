@@ -1,5 +1,5 @@
 (function() {
-  var Audio, Canvas2D, Color, EventQueue, FileSystem, Font, Graphics, Image, ImageData, Keyboard, Mouse, Quad, Source, System, Timer, Touch, Window,
+  var Audio, Canvas2D, Color, EventQueue, FileData, FileSystem, Font, Graphics, Image, ImageData, ImageModule, Keyboard, Mouse, Quad, Source, System, Timer, Touch, Window,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
@@ -248,7 +248,9 @@
 
     FileSystem.prototype.newFile = function() {};
 
-    FileSystem.prototype.newFileData = function() {};
+    FileSystem.prototype.newFileData = function(contents, name, decoder) {
+      return new FileData(contents, name, decoder);
+    };
 
     FileSystem.prototype.read = function(filename) {
       return localStorage.getItem(filename);
@@ -406,6 +408,12 @@
     };
 
     Graphics.prototype.newCanvas = function(width, height) {
+      if (width == null) {
+        width = this.getWidth();
+      }
+      if (height == null) {
+        height = this.getHeight();
+      }
       return new Canvas(width, height);
     };
 
@@ -416,8 +424,8 @@
       return new Font(filename, size);
     };
 
-    Graphics.prototype.newImage = function(path) {
-      return new Image(path);
+    Graphics.prototype.newImage = function(data) {
+      return new Image(data);
     };
 
     Graphics.prototype.newImageFont = function() {};
@@ -652,6 +660,25 @@
 
   })();
 
+  ImageModule = (function() {
+    function ImageModule() {
+      this.newImageData = __bind(this.newImageData, this);
+      this.newCompressedData = __bind(this.newCompressedData, this);
+      this.isCompressed = __bind(this.isCompressed, this);
+    }
+
+    ImageModule.prototype.isCompressed = function() {};
+
+    ImageModule.prototype.newCompressedData = function() {};
+
+    ImageModule.prototype.newImageData = function(filedata) {
+      return new ImageData(filedata);
+    };
+
+    return ImageModule;
+
+  })();
+
   Keyboard = (function() {
     var getKeyFromEvent, keys, rightKeys, shiftedKeys;
 
@@ -834,6 +861,7 @@
       this.filesystem = new FileSystem();
       this.audio = new Audio();
       this.system = new System();
+      this.image = new ImageModule();
       window.addEventListener("beforeunload", (function(_this) {
         return function() {
           return _this.quit.call();
@@ -1672,7 +1700,18 @@
       return [c.r, c.g, c.b, c.a];
     };
 
-    Canvas2D.prototype.getBlendMode = function() {};
+    Canvas2D.prototype.getBlendMode = function() {
+      switch (this.context.globalCompositeOperation) {
+        case "source-over":
+          return "alpha";
+        case "multiply":
+          return "multiplicative";
+        case "lighten":
+          return "subtractive";
+        case "darken":
+          return "additive";
+      }
+    };
 
     Canvas2D.prototype.getColor = function() {
       var c;
@@ -1719,6 +1758,19 @@
         return this.background_color = new Color(r, g, b, a);
       } else {
         return this.background_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4));
+      }
+    };
+
+    Canvas2D.prototype.setBlendMode = function(mode) {
+      switch (mode) {
+        case "alpha":
+          return this.context.globalCompositeOperation = "source-over";
+        case "multiplicative":
+          return this.context.globalCompositeOperation = "multiply";
+        case "subtractive":
+          return this.context.globalCompositeOperation = "lighten";
+        case "additive":
+          return this.context.globalCompositeOperation = "darken";
       }
     };
 
@@ -1948,11 +2000,16 @@
   })();
 
   Image = (function() {
-    function Image(path) {
-      this.element = document.getElementById(path);
-      if (this.element === null) {
+    function Image(data) {
+      if (data instanceof ImageData) {
         this.element = document.createElement("img");
-        this.element.setAttribute("src", Love.root + "/" + path);
+        this.element.setAttribute("src", data.getString(data));
+      } else {
+        this.element = document.getElementById(data);
+        if (this.element === null) {
+          this.element = document.createElement("img");
+          this.element.setAttribute("src", Love.root + "/" + data);
+        }
       }
     }
 
@@ -2019,6 +2076,62 @@
     };
 
     return Quad;
+
+  })();
+
+  FileData = (function() {
+    function FileData(contents, name, decoder) {
+      this.contents = contents;
+      this.name = name;
+      this.extension = this.name.match("\\.(.*)")[1];
+    }
+
+    FileData.prototype.getPointer = function(self) {};
+
+    FileData.prototype.getSize = function(self) {};
+
+    FileData.prototype.getString = function(self) {
+      return self.contents;
+    };
+
+    FileData.prototype.getExtension = function(self) {
+      return self.extension;
+    };
+
+    FileData.prototype.getFilename = function(self) {
+      return self.name;
+    };
+
+    return FileData;
+
+  })();
+
+  ImageData = (function() {
+    function ImageData(filedata) {
+      this.contents = "data:image/" + (filedata.getExtension(filedata)) + ";base64," + (filedata.getString(filedata));
+    }
+
+    ImageData.prototype.getString = function(self) {
+      return this.contents;
+    };
+
+    ImageData.prototype.encode = function(self) {};
+
+    ImageData.prototype.getDimensions = function(self) {};
+
+    ImageData.prototype.getHeight = function(self) {};
+
+    ImageData.prototype.getPixel = function(self) {};
+
+    ImageData.prototype.getWidth = function(self) {};
+
+    ImageData.prototype.mapPixel = function(self) {};
+
+    ImageData.prototype.paste = function(self) {};
+
+    ImageData.prototype.setPixel = function(self) {};
+
+    return ImageData;
 
   })();
 

@@ -40,7 +40,8 @@ class FileSystem
 
   newFile: () =>
 
-  newFileData: () =>
+  newFileData: (contents, name, decoder) =>
+    new FileData(contents, name, decoder)
 
   read: (filename) =>
     localStorage.getItem(filename)
