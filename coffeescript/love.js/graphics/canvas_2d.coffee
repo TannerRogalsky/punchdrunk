@@ -65,6 +65,9 @@ class Canvas2D
       when quad instanceof Quad then drawWithQuad.apply(this, arguments)
 
   line: (points...) ->
+    if points.length == 1
+      points = points[0].__shine.numValues.slice(1, points[0].__shine.numValues.length)
+
     @context.beginPath()
     @context.moveTo(points[0], points[1])
     for i in [2...points.length] by 2
@@ -76,6 +79,9 @@ class Canvas2D
     @context.fillRect(x, y, 1, 1)
 
   polygon: (mode, points...) ->
+    if points.length == 1
+      points = points[0].__shine.numValues.slice(1, points[0].__shine.numValues.length)
+
     @context.beginPath()
     @context.moveTo(points[0], points[1])
     for i in [2...points.length] by 2
