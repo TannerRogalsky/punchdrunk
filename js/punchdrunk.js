@@ -4,10 +4,13 @@
     __slice = [].slice;
 
   this.Punchdrunk = (function() {
-    function Punchdrunk(game_root) {
+    function Punchdrunk(game_root, punchdrunk_root) {
       var conf;
       if (game_root == null) {
         game_root = "lua";
+      }
+      if (punchdrunk_root == null) {
+        punchdrunk_root = "./js";
       }
       shine.stdout.write = function() {
         return console.log.apply(console, arguments);
@@ -30,7 +33,7 @@
           love: love
         });
         vm._globals['package'].path = ("" + game_root + "/?.lua.json;" + game_root + "/?.json;") + vm._globals['package'].path;
-        return vm.load('./js/boot.lua.json');
+        return vm.load("" + punchdrunk_root + "/boot.lua.json");
       });
     }
 

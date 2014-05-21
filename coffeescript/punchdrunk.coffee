@@ -1,5 +1,5 @@
 class @Punchdrunk
-  constructor: (game_root = "lua") ->
+  constructor: (game_root = "lua", punchdrunk_root = "./js") ->
     # Forward print() messages to the console
     shine.stdout.write = () ->
       console.log.apply(console, arguments)
@@ -24,4 +24,4 @@ class @Punchdrunk
 
       vm._globals['package'].path = "#{game_root}/?.lua.json;#{game_root}/?.json;" + vm._globals['package'].path
 
-      vm.load('./js/boot.lua.json')
+      vm.load("#{punchdrunk_root}/boot.lua.json")
