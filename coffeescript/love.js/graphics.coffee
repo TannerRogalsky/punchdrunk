@@ -216,7 +216,7 @@ class Graphics
     [@getWidth(), @getHeight()]
 
   getHeight: () =>
-    @default_canvas.getHeight()
+    @default_canvas.getHeight(@default_canvas)
 
   getWidth: () =>
-    @default_canvas.getWidth()
+    @default_canvas.getWidth(@default_canvas)
