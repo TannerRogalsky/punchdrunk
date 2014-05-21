@@ -48,3 +48,5 @@ class @Love
   keyreleased: (key, unicode) ->
   draw: () ->
   quit: () ->
+
+Love.root = "lua"

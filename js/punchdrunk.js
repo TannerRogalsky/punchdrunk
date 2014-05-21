@@ -3,29 +3,40 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
-  window.onload = function() {
-    var conf;
-    shine.stdout.write = function() {
-      return console.log.apply(console, arguments);
-    };
-    conf = {
-      window: {},
-      modules: {}
-    };
-    return new shine.FileManager().load('./lua/conf.lua.json', function(_, file) {
-      var conf_env, conf_vm, vm;
-      conf_env = {
-        love: {}
+  this.Punchdrunk = (function() {
+    function Punchdrunk(game_root) {
+      var conf;
+      if (game_root == null) {
+        game_root = "lua";
+      }
+      shine.stdout.write = function() {
+        return console.log.apply(console, arguments);
       };
-      conf_vm = new shine.VM(conf_env);
-      conf_vm.execute(null, file);
-      conf_env.love.conf.call(null, conf);
-      vm = new shine.VM({
-        love: new Love(conf.window)
+      conf = {
+        window: {},
+        modules: {}
+      };
+      new shine.FileManager().load("" + game_root + "/conf.lua.json", function(_, file) {
+        var conf_env, conf_vm, love, vm;
+        conf_env = {
+          love: {}
+        };
+        conf_vm = new shine.VM(conf_env);
+        conf_vm.execute(null, file);
+        conf_env.love.conf.call(null, conf);
+        Love.root = game_root;
+        love = new Love(conf.window, conf.modules);
+        vm = new shine.VM({
+          love: love
+        });
+        vm._globals['package'].path = ("" + game_root + "/?.lua.json;" + game_root + "/?.json;") + vm._globals['package'].path;
+        return vm.load('./js/boot.lua.json');
       });
-      return vm.load('./js/boot.lua.json');
-    });
-  };
+    }
+
+    return Punchdrunk;
+
+  })();
 
   Audio = (function() {
     function Audio() {
@@ -808,7 +819,7 @@
   })();
 
   this.Love = (function() {
-    function Love(window_conf) {
+    function Love(window_conf, module_conf) {
       this.run = __bind(this.run, this);
       this.graphics = new Graphics(window_conf.width, window_conf.height);
       this.window = new Window(this.graphics);
@@ -876,6 +887,8 @@
     return Love;
 
   })();
+
+  Love.root = "lua";
 
   Mouse = (function() {
     var getButtonFromEvent, getWheelButtonFromEvent, mouseButtonNames;
@@ -1324,7 +1337,9 @@
 
     Window.prototype.getFullscreenModes = function() {};
 
-    Window.prototype.getHeight = function() {};
+    Window.prototype.getHeight = function() {
+      return this.graphics.getHeight();
+    };
 
     Window.prototype.getIcon = function() {};
 
@@ -1334,7 +1349,9 @@
 
     Window.prototype.getTitle = function() {};
 
-    Window.prototype.getWidth = function() {};
+    Window.prototype.getWidth = function() {
+      return this.graphics.getWidth();
+    };
 
     Window.prototype.hasFocus = function() {};
 
@@ -1363,7 +1380,7 @@
       this.filename = filename;
       this.type = type;
       this.element = document.createElement("audio");
-      this.element.setAttribute("src", "lua/" + filename);
+      this.element.setAttribute("src", Love.root + "/" + filename);
       this.element.setAttribute("preload", "auto");
     }
 
@@ -1926,7 +1943,7 @@
       this.element = document.getElementById(path);
       if (this.element === null) {
         this.element = document.createElement("img");
-        this.element.setAttribute("src", "lua/" + path);
+        this.element.setAttribute("src", Love.root + "/" + path);
       }
     }
 
