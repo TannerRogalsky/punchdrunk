@@ -11,7 +11,8 @@ class Window
 
   getFullscreenModes: () =>
 
-  getHeight: () =>
+  getHeight: =>
+    @graphics.getHeight()
 
   getIcon: () =>
 
@@ -21,7 +22,8 @@ class Window
 
   getTitle: () =>
 
-  getWidth: () =>
+  getWidth: =>
+    @graphics.getWidth()
 
   hasFocus: () =>
 
@@ -36,7 +38,7 @@ class Window
   setIcon: () =>
 
   setMode: (width, height, flags) =>
-    @graphics.canvas.setDimensions(width, height)
+    @graphics.default_canvas.setDimensions(width, height)
 
   setTitle: () =>
 

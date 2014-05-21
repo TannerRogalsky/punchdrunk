@@ -1,7 +1,45 @@
 (function() {
-  var Audio, Canvas2D, Color, EventQueue, FileSystem, Font, Graphics, Image, ImageData, Keyboard, Quad, Source, Timer, Window,
+  var Audio, Canvas2D, Color, EventQueue, FileSystem, Font, Graphics, Image, ImageData, Keyboard, Mouse, Quad, Source, System, Timer, Touch, Window,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
+
+  this.Punchdrunk = (function() {
+    function Punchdrunk(game_root, punchdrunk_root) {
+      var conf;
+      if (game_root == null) {
+        game_root = "lua";
+      }
+      if (punchdrunk_root == null) {
+        punchdrunk_root = "./js";
+      }
+      shine.stdout.write = function() {
+        return console.log.apply(console, arguments);
+      };
+      conf = {
+        window: {},
+        modules: {}
+      };
+      new shine.FileManager().load("" + game_root + "/conf.lua.json", function(_, file) {
+        var conf_env, conf_vm, love, vm;
+        conf_env = {
+          love: {}
+        };
+        conf_vm = new shine.VM(conf_env);
+        conf_vm.execute(null, file);
+        conf_env.love.conf.call(null, conf);
+        Love.root = game_root;
+        love = new Love(conf.window, conf.modules);
+        vm = new shine.VM({
+          love: love
+        });
+        vm._globals['package'].path = ("" + game_root + "/?.lua.json;" + game_root + "/?.json;") + vm._globals['package'].path;
+        return vm.load("" + punchdrunk_root + "/boot.lua.json");
+      });
+    }
+
+    return Punchdrunk;
+
+  })();
 
   Audio = (function() {
     function Audio() {
@@ -347,9 +385,9 @@
     };
 
     Graphics.prototype.polygon = function() {
-      var mode, points;
+      var mode, points, _ref;
       mode = arguments[0], points = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      return this.canvas.polygon(mode, points);
+      return (_ref = this.canvas).polygon.apply(_ref, [mode].concat(__slice.call(points)));
     };
 
     Graphics.prototype.print = function(text, x, y) {
@@ -603,11 +641,11 @@
     };
 
     Graphics.prototype.getHeight = function() {
-      return this.default_canvas.getHeight();
+      return this.default_canvas.getHeight(this.default_canvas);
     };
 
     Graphics.prototype.getWidth = function() {
-      return this.default_canvas.getWidth();
+      return this.default_canvas.getWidth(this.default_canvas);
     };
 
     return Graphics;
@@ -784,15 +822,18 @@
   })();
 
   this.Love = (function() {
-    function Love(window_conf) {
+    function Love(window_conf, module_conf) {
       this.run = __bind(this.run, this);
       this.graphics = new Graphics(window_conf.width, window_conf.height);
       this.window = new Window(this.graphics);
       this.timer = new Timer();
       this.event = new EventQueue();
       this.keyboard = new Keyboard(this.event);
+      this.mouse = new Mouse(this.event, this.graphics.default_canvas.element);
+      this.touch = new Touch(this.event, this.graphics.default_canvas.element);
       this.filesystem = new FileSystem();
       this.audio = new Audio();
+      this.system = new System();
       window.addEventListener("beforeunload", (function(_this) {
         return function() {
           return _this.quit.call();
@@ -832,6 +873,12 @@
 
     Love.prototype.mousereleased = function(x, y, button) {};
 
+    Love.prototype.touchpressed = function(id, x, y) {};
+
+    Love.prototype.touchreleased = function(id, x, y) {};
+
+    Love.prototype.touchmoved = function(id, x, y) {};
+
     Love.prototype.keypressed = function(key, unicode) {};
 
     Love.prototype.keyreleased = function(key, unicode) {};
@@ -841,6 +888,206 @@
     Love.prototype.quit = function() {};
 
     return Love;
+
+  })();
+
+  Love.root = "lua";
+
+  Mouse = (function() {
+    var getButtonFromEvent, getWheelButtonFromEvent, mouseButtonNames;
+
+    function Mouse(eventQueue, canvas) {
+      this.setY = __bind(this.setY, this);
+      this.setX = __bind(this.setX, this);
+      this.setVisible = __bind(this.setVisible, this);
+      this.setPosition = __bind(this.setPosition, this);
+      this.setGrabbed = __bind(this.setGrabbed, this);
+      this.setCursor = __bind(this.setCursor, this);
+      this.newCursor = __bind(this.newCursor, this);
+      this.isVisible = __bind(this.isVisible, this);
+      this.isGrabbed = __bind(this.isGrabbed, this);
+      this.isDown = __bind(this.isDown, this);
+      this.getY = __bind(this.getY, this);
+      this.getX = __bind(this.getX, this);
+      this.getSystemCursor = __bind(this.getSystemCursor, this);
+      this.getPosition = __bind(this.getPosition, this);
+      this.getCursor = __bind(this.getCursor, this);
+      var handlePress, handleRelease, handleWheel;
+      this.x = 0;
+      this.y = 0;
+      this.buttonsDown = {};
+      this.wheelTimeOuts = {};
+      handlePress = (function(_this) {
+        return function(button) {
+          _this.buttonsDown[button] = true;
+          return eventQueue.push("mousepressed", _this.x, _this.y, button);
+        };
+      })(this);
+      handleRelease = (function(_this) {
+        return function(button) {
+          _this.buttonsDown[button] = false;
+          return eventQueue.push("mousereleased", _this.x, _this.y, button);
+        };
+      })(this);
+      handleWheel = (function(_this) {
+        return function(evt) {
+          var button;
+          evt.preventDefault();
+          button = getWheelButtonFromEvent(evt);
+          clearTimeout(mouse.wheelTimeOuts[button]);
+          mouse.wheelTimeOuts[button] = setTimeout(function() {
+            return handleRelease(button);
+          }, Mouse.WHEEL_TIMEOUT * 1000);
+          return handlePress(button);
+        };
+      })(this);
+      canvas.addEventListener('mousemove', (function(_this) {
+        return function(evt) {
+          _this.x = evt.offsetX;
+          return _this.y = evt.offsetY;
+        };
+      })(this));
+      canvas.addEventListener('mousedown', (function(_this) {
+        return function(evt) {
+          return handlePress(getButtonFromEvent(evt));
+        };
+      })(this));
+      canvas.addEventListener('mouseup', (function(_this) {
+        return function(evt) {
+          return handleRelease(getButtonFromEvent(evt));
+        };
+      })(this));
+      canvas.addEventListener('DOMMouseScroll', handleWheel);
+      canvas.addEventListener('mousewheel', handleWheel);
+    }
+
+    Mouse.prototype.getCursor = function() {
+      return null;
+    };
+
+    Mouse.prototype.getPosition = function() {
+      return [this.x, this.y];
+    };
+
+    Mouse.prototype.getSystemCursor = function() {
+      return null;
+    };
+
+    Mouse.prototype.getX = function() {
+      return this.x;
+    };
+
+    Mouse.prototype.getY = function() {
+      return this.y;
+    };
+
+    Mouse.prototype.isDown = function() {
+      var button, others;
+      button = arguments[0], others = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      if (this.buttonsDown[button]) {
+        return true;
+      } else {
+        if (others.length === 0) {
+          return false;
+        } else {
+          return this.isDown.apply(this, others);
+        }
+      }
+    };
+
+    Mouse.prototype.isGrabbed = function() {
+      return false;
+    };
+
+    Mouse.prototype.isVisible = function() {
+      return true;
+    };
+
+    Mouse.prototype.newCursor = function() {
+      return null;
+    };
+
+    Mouse.prototype.setCursor = function(cursor) {};
+
+    Mouse.prototype.setGrabbed = function(grab) {};
+
+    Mouse.prototype.setPosition = function(x, y) {
+      this.setX(x);
+      return this.setY(y);
+    };
+
+    Mouse.prototype.setVisible = function(visible) {};
+
+    Mouse.prototype.setX = function(x) {};
+
+    Mouse.prototype.setY = function(y) {};
+
+    mouseButtonNames = {
+      1: "l",
+      2: "m",
+      3: "r"
+    };
+
+    getButtonFromEvent = function(evt) {
+      return mouseButtonNames[evt.which];
+    };
+
+    getWheelButtonFromEvent = function(evt) {
+      var delta;
+      delta = Math.max(-1, Math.min(1, evt.wheelDelta || -evt.detail));
+      if (delta === 1) {
+        return 'wu';
+      } else {
+        return 'wd';
+      }
+    };
+
+    return Mouse;
+
+  })();
+
+  Mouse.WHEEL_TIMEOUT = 0.02;
+
+  System = (function() {
+    function System() {
+      this.setClipboardText = __bind(this.setClipboardText, this);
+      this.openURL = __bind(this.openURL, this);
+      this.getProcessorCount = __bind(this.getProcessorCount, this);
+      this.getPowerInfo = __bind(this.getPowerInfo, this);
+      this.getOS = __bind(this.getOS, this);
+      this.getClipboardText = __bind(this.getClipboardText, this);
+    }
+
+    System.prototype.getClipboardText = function() {};
+
+    System.prototype.getOS = function() {
+      return window.navigator.appVersion;
+    };
+
+    System.prototype.getPowerInfo = function() {
+      var battery, percent, seconds, state;
+      battery = window.navigator.battery;
+      if (battery) {
+        state = battery.charging ? "charging" : "unknown";
+        percent = battery.level * 100;
+        seconds = battery.dischargingTime;
+        return [state, percent, seconds];
+      } else {
+        return ["unknown", null, null];
+      }
+    };
+
+    System.prototype.getProcessorCount = function() {
+      return window.navigator.hardwareConcurrency || 1;
+    };
+
+    System.prototype.openURL = function(url) {
+      return window.open(url);
+    };
+
+    System.prototype.setClipboardText = function(text) {};
+
+    return System;
 
   })();
 
@@ -911,6 +1158,154 @@
 
   })();
 
+  Touch = (function() {
+    var Finger, getFingerByIdentifier, getMaxPosition, getNextAvailablePosition;
+
+    function Touch(eventQueue, canvas) {
+      this.getTouch = __bind(this.getTouch, this);
+      var preventDefault, touchend;
+      this.fingers = {};
+      preventDefault = function(evt) {
+        evt.preventDefault();
+        return evt.stopPropagation();
+      };
+      canvas.addEventListener('gesturestart', preventDefault);
+      canvas.addEventListener('gesturechange', preventDefault);
+      canvas.addEventListener('gestureend', preventDefault);
+      canvas.addEventListener('touchstart', (function(_this) {
+        return function(evt) {
+          var finger, t, _i, _len, _ref, _results;
+          preventDefault(evt);
+          _ref = evt.targetTouches;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            t = _ref[_i];
+            finger = getFingerByIdentifier(t.identifier);
+            if (!finger) {
+              finger = new Finder(t.identifier, getNextAvailablePosition(), t.offsetX, t.offsetY);
+              _this.fingers[finger.position] = finger;
+              _results.push(eventQueue.push("touchpressed", finger.identifier, finger.x, finger.y));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
+        };
+      })(this));
+      touchend = (function(_this) {
+        return function(evt) {
+          var finger, t, _i, _len, _ref, _results;
+          preventDefault(evt);
+          _ref = evt.targetTouches;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            t = _ref[_i];
+            finger = getFingerByIdentifier(t.identifier);
+            if (finger) {
+              delete _this.fingers[finger.position];
+              _results.push(eventQueue.push("touchreleased", finger.identifier, finger.x, finger.y));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
+        };
+      })(this);
+      canvas.addEventListener('touchend', touchend);
+      canvas.addEventListener('touchleave', touchend);
+      canvas.addEventListener('touchcancel', touchend);
+      canvas.addEventListener('touchmove', (function(_this) {
+        return function(evt) {
+          var finger, t, _i, _len, _ref, _results;
+          preventDefault(evt);
+          _ref = evt.targetTouches;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            t = _ref[_i];
+            finger = getFingerByIdentifier(t.identifier);
+            if (finger) {
+              finger.x = t.offsetX;
+              finger.y = t.offsetY;
+              _results.push(eventQueue.push("touchmoved", finger.identifier, finger.x, finger.y));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
+        };
+      })(this));
+    }
+
+    Touch.prototype.getTouch = function(index) {
+      var finger;
+      finger = this.fingers[index];
+      return [finger.identifier, finger.x, finger.y];
+    };
+
+    Touch.prototype.getTouchCount = function() {
+      var count, i, maxPosition, _i;
+      maxPosition = getMaxPosition();
+      count = 0;
+      for (i = _i = 0; 0 <= maxPosition ? _i < maxPosition : _i > maxPosition; i = 0 <= maxPosition ? ++_i : --_i) {
+        if (touch.getTouch(i)) {
+          count += 1;
+        }
+      }
+      return count;
+    };
+
+    getMaxPosition = function() {
+      var positions;
+      positions = Object.keys(touch.fingers);
+      if (positions.length === 0) {
+        return 0;
+      } else {
+        return Math.max.apply(Math, positions);
+      }
+    };
+
+    getNextAvailablePosition = function() {
+      var i, maxPosition, _i;
+      maxPosition = getMaxPosition();
+      for (i = _i = 0; 0 <= maxPosition ? _i < maxPosition : _i > maxPosition; i = 0 <= maxPosition ? ++_i : --_i) {
+        if (!touch.getTouch(i)) {
+          i;
+        }
+      }
+      return maxPosition + 1;
+    };
+
+    getFingerByIdentifier = function(identifier) {
+      var fingers, position, _i, _len, _results;
+      fingers = Touch.fingers;
+      _results = [];
+      for (_i = 0, _len = fingers.length; _i < _len; _i++) {
+        position = fingers[_i];
+        if (fingers.hasOwnProperty(position) && fingers[position].identifier === identifier) {
+          _results.push(fingers[position]);
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
+    Finger = (function() {
+      function Finger(identifier, position, x, y) {
+        this.identifier = identifier;
+        this.position = position;
+        this.x = x;
+        this.y = y;
+      }
+
+      return Finger;
+
+    })();
+
+    return Touch;
+
+  })();
+
   Window = (function() {
     function Window(graphics) {
       this.graphics = graphics;
@@ -945,7 +1340,9 @@
 
     Window.prototype.getFullscreenModes = function() {};
 
-    Window.prototype.getHeight = function() {};
+    Window.prototype.getHeight = function() {
+      return this.graphics.getHeight();
+    };
 
     Window.prototype.getIcon = function() {};
 
@@ -955,7 +1352,9 @@
 
     Window.prototype.getTitle = function() {};
 
-    Window.prototype.getWidth = function() {};
+    Window.prototype.getWidth = function() {
+      return this.graphics.getWidth();
+    };
 
     Window.prototype.hasFocus = function() {};
 
@@ -970,7 +1369,7 @@
     Window.prototype.setIcon = function() {};
 
     Window.prototype.setMode = function(width, height, flags) {
-      return this.graphics.canvas.setDimensions(width, height);
+      return this.graphics.default_canvas.setDimensions(width, height);
     };
 
     Window.prototype.setTitle = function() {};
@@ -984,7 +1383,7 @@
       this.filename = filename;
       this.type = type;
       this.element = document.createElement("audio");
-      this.element.setAttribute("src", "lua/" + filename);
+      this.element.setAttribute("src", Love.root + "/" + filename);
       this.element.setAttribute("preload", "auto");
     }
 
@@ -1196,6 +1595,9 @@
     Canvas2D.prototype.line = function() {
       var i, points, x, y, _i, _ref, _ref1;
       points = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      if (points.length === 1) {
+        points = points[0].__shine.numValues.slice(1, points[0].__shine.numValues.length);
+      }
       this.context.beginPath();
       this.context.moveTo(points[0], points[1]);
       for (i = _i = 2, _ref = points.length; _i < _ref; i = _i += 2) {
@@ -1212,6 +1614,9 @@
     Canvas2D.prototype.polygon = function() {
       var i, mode, points, x, y, _i, _ref, _ref1;
       mode = arguments[0], points = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      if (points.length === 1) {
+        points = points[0].__shine.numValues.slice(1, points[0].__shine.numValues.length);
+      }
       this.context.beginPath();
       this.context.moveTo(points[0], points[1]);
       for (i = _i = 2, _ref = points.length; _i < _ref; i = _i += 2) {
@@ -1547,7 +1952,7 @@
       this.element = document.getElementById(path);
       if (this.element === null) {
         this.element = document.createElement("img");
-        this.element.setAttribute("src", "lua/" + path);
+        this.element.setAttribute("src", Love.root + "/" + path);
       }
     }
 

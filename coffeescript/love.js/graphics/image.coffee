@@ -4,7 +4,7 @@ class Image
 
     if @element == null
       @element = document.createElement("img")
-      @element.setAttribute("src", "lua/" + path)
+      @element.setAttribute("src", Love.root + "/" + path)
 
   getData: (self) ->
 

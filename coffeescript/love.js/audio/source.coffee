@@ -1,7 +1,7 @@
 class Source
   constructor: (@filename, @type) ->
     @element = document.createElement("audio")
-    @element.setAttribute("src", "lua/" + filename)
+    @element.setAttribute("src", Love.root + "/" + filename)
 
     # one would think that you should use preload=none for a stream type asset
     # except that that doesn't really work for our use-case

@@ -1,12 +1,15 @@
 class @Love
-  constructor: (window_conf) ->
+  constructor: (window_conf, module_conf) ->
     @graphics = new Graphics(window_conf.width, window_conf.height)
     @window = new Window(@graphics)
     @timer = new Timer()
     @event = new EventQueue()
     @keyboard = new Keyboard(@event)
+    @mouse = new Mouse(@event, @graphics.default_canvas.element)
+    @touch = new Touch(@event, @graphics.default_canvas.element)
     @filesystem = new FileSystem()
     @audio = new Audio()
+    @system = new System()
 
     window.addEventListener "beforeunload", () =>
       @quit.call()
@@ -38,7 +41,12 @@ class @Love
   update: (dt) ->
   mousepressed: (x, y, button) ->
   mousereleased: (x, y, button) ->
+  touchpressed: (id, x, y) ->
+  touchreleased: (id, x, y) ->
+  touchmoved: (id, x, y) ->
   keypressed: (key, unicode) ->
   keyreleased: (key, unicode) ->
   draw: () ->
   quit: () ->
+
+Love.root = "lua"
