@@ -38,6 +38,8 @@ module.exports = (grunt) ->
         command: './node_modules/moonshine/bin/moonshine distil -d lua lua'
       distil_bootstrap:
         command: './node_modules/moonshine/bin/moonshine distil -o js/boot.lua.json js/boot.lua'
+      distil_examples:
+        command: './node_modules/moonshine/bin/moonshine distil -d examples examples'
     connect:
       server:
         options:
