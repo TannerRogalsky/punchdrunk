@@ -382,9 +382,9 @@
     };
 
     Graphics.prototype.polygon = function() {
-      var mode, points;
+      var mode, points, _ref;
       mode = arguments[0], points = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      return this.canvas.polygon(mode, points);
+      return (_ref = this.canvas).polygon.apply(_ref, [mode].concat(__slice.call(points)));
     };
 
     Graphics.prototype.print = function(text, x, y) {
@@ -638,11 +638,11 @@
     };
 
     Graphics.prototype.getHeight = function() {
-      return this.default_canvas.getHeight();
+      return this.default_canvas.getHeight(this.default_canvas);
     };
 
     Graphics.prototype.getWidth = function() {
-      return this.default_canvas.getWidth();
+      return this.default_canvas.getWidth(this.default_canvas);
     };
 
     return Graphics;
@@ -1592,6 +1592,9 @@
     Canvas2D.prototype.line = function() {
       var i, points, x, y, _i, _ref, _ref1;
       points = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      if (points.length === 1) {
+        points = points[0].__shine.numValues.slice(1, points[0].__shine.numValues.length);
+      }
       this.context.beginPath();
       this.context.moveTo(points[0], points[1]);
       for (i = _i = 2, _ref = points.length; _i < _ref; i = _i += 2) {
@@ -1608,6 +1611,9 @@
     Canvas2D.prototype.polygon = function() {
       var i, mode, points, x, y, _i, _ref, _ref1;
       mode = arguments[0], points = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      if (points.length === 1) {
+        points = points[0].__shine.numValues.slice(1, points[0].__shine.numValues.length);
+      }
       this.context.beginPath();
       this.context.moveTo(points[0], points[1]);
       for (i = _i = 2, _ref = points.length; _i < _ref; i = _i += 2) {
