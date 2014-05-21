@@ -10,6 +10,7 @@ class @Love
     @filesystem = new FileSystem()
     @audio = new Audio()
     @system = new System()
+    @image = new ImageModule()
 
     window.addEventListener "beforeunload", () =>
       @quit.call()

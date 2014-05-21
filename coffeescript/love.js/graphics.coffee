@@ -50,8 +50,8 @@ class Graphics
   newFont: (filename, size = 12) =>
     new Font(filename, size)
 
-  newImage: (path) =>
-    new Image(path)
+  newImage: (data) =>
+    new Image(data)
 
   newImageFont: =>
 
