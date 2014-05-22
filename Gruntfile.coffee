@@ -11,7 +11,7 @@ module.exports = (grunt) ->
           banner: '<%= banner %>'
           join: true
         files:
-          'js/punchdrunk.js': [
+          'js/love.js': [
             'coffeescript/punchdrunk.coffee'
             'coffeescript/love.js/*.coffee',
             'coffeescript/love.js/audio/*.coffee',
@@ -20,15 +20,15 @@ module.exports = (grunt) ->
             'coffeescript/love.js/image/*.coffee',
           ]
     concat:
-      banner:
+      punchdrunk:
         options:
           banner: '<%= banner %>'
-        src: ['js/moonshine.js', 'js/sylvester.src.js', 'js/punchdrunk.js']
+        src: ['js/moonshine.js', 'js/sylvester.src.js', 'js/simplex-noise.js', 'js/love.js']
         dest: 'js/punchdrunk.js'
     watch:
       coffeescript:
         files: ['coffeescript/**/*.coffee', 'coffeescript/*.coffee']
-        tasks: ['coffee:app']
+        tasks: ['coffee:app', 'concat:punchdrunk']
       game:
         files: ['lua/*.lua']
         tasks: ['shell:distil_game']
