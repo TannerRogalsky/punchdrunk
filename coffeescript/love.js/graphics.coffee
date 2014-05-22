@@ -44,8 +44,8 @@ class Graphics
     @canvas.rectangle(mode, x, y, width, height)
 
   # OBJECT CREATION
-  newCanvas: (width = @getWidth(), height = @getHeight()) =>
-    new Canvas(width, height)
+  newCanvas: (width = @getWidth(@), height = @getHeight(@)) =>
+    new Canvas2D(width, height)
 
   newFont: (filename, size = 12) =>
     new Font(filename, size)

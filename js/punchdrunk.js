@@ -409,12 +409,12 @@
 
     Graphics.prototype.newCanvas = function(width, height) {
       if (width == null) {
-        width = this.getWidth();
+        width = this.getWidth(this);
       }
       if (height == null) {
-        height = this.getHeight();
+        height = this.getHeight(this);
       }
-      return new Canvas(width, height);
+      return new Canvas2D(width, height);
     };
 
     Graphics.prototype.newFont = function(filename, size) {
@@ -1707,8 +1707,6 @@
         case "multiply":
           return "multiplicative";
         case "lighten":
-          return "subtractive";
-        case "darken":
           return "additive";
       }
     };
@@ -1767,10 +1765,8 @@
           return this.context.globalCompositeOperation = "source-over";
         case "multiplicative":
           return this.context.globalCompositeOperation = "multiply";
-        case "subtractive":
-          return this.context.globalCompositeOperation = "lighten";
         case "additive":
-          return this.context.globalCompositeOperation = "darken";
+          return this.context.globalCompositeOperation = "lighten";
       }
     };
 

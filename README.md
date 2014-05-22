@@ -8,10 +8,11 @@ Demo: http://tannerrogalsky.com/punchdrunk/
 # Get This Running
 
 1. Install [node.js](http://nodejs.org/)
-2. Install grunt: `npm install grunt-cli -g`
-3. Install the project dependencies: `npm install`
-4. `grunt` will watch and compile the source as well as run a simple web server on port 8000.
-5. Open `localhost:8000` in your browser.
+2. Install [Lua](http://www.lua.org/) and make sure that it's in your path.
+3. Install grunt: `npm install grunt-cli -g`
+4. Install the project dependencies: `npm install`
+5. `grunt` will watch and compile the source as well as run a simple web server on port 8000.
+6. Open `localhost:8000` in your browser.
 
 # Caveats
 
@@ -21,6 +22,7 @@ Some things don't work (and some may never work):
 - love.math
 - love.physics
 - love.thread
+- love.filesystem
 
 Pretty much everything else has partial support. I'm not going to make a long list of everything that doesn't work right now because there's still too much that doesn't. I think you'll find that all the most basic elements of the API are functional. Those that aren't should be stubbed out in the hopes that they aren't crucial to the game that is being ported.
 

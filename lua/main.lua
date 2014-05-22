@@ -837,12 +837,45 @@ function love.load()
   rain.ox = -rain.img_w / 2
   rain.oy = -rain.img_h / 2
   rain.t = 0
+
+  create_rain()
+end
+
+function create_rain()
+  local sx = rain.spacing_x
+  local sy = rain.spacing_y
+  local ox = rain.ox
+  local oy = rain.oy
+
+  local m = 1
+  local batch_w = 2 * math.ceil(m * love.graphics.getWidth() / sx) + 2
+  local batch_h = 2 * math.ceil(m * love.graphics.getHeight() / sy) + 2
+
+  rain.canvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight() + sy)
+
+  local canvas = rain.canvas
+  love.graphics.setCanvas(canvas)
+  for i = 0, batch_h - 1 do
+    for j = 0, batch_w - 1 do
+      local is_even = (j % 2) == 0
+      local offset_y = is_even and 0 or sy / 2
+      local x = ox + j * sx
+      local y = oy + i * sy + offset_y
+      love.graphics.draw(rain.image, x, y)
+    end
+  end
+
+  love.graphics.setCanvas()
+end
+
+local function update_rain(t)
+  rain.t = t
 end
 
 function love.update(dt)
   g_time = g_time + dt / 2
   local int, frac = math.modf(g_time)
-  -- update_rain(frac)
+  update_rain(frac)
   local scale = 1
   inspector.x = love.graphics.getWidth() * 0.45 / scale
   inspector.y = love.graphics.getHeight() * 0.55 / scale
@@ -854,13 +887,13 @@ local function draw_grid()
   local small_y = -rain.spacing_y + y / 2
   local big_y = -rain.spacing_y + y
 
-  love.graphics.setBlendMode("subtractive")
-  love.graphics.setColor(255, 255, 255, 128)
-  love.graphics.draw(rain.batch, -rain.spacing_x, small_y, 0, 0.5, 0.5)
+  -- love.graphics.setBlendMode("additive")
+  -- love.graphics.setColor(255, 255, 255, 128)
+  -- love.graphics.draw(rain.canvas, -rain.spacing_x, small_y, 0, 0.5, 0.5)
 
   love.graphics.setBlendMode("alpha")
   love.graphics.setColor(255, 255, 255, 255)
-  love.graphics.draw(rain.batch, -rain.spacing_x, big_y)
+  love.graphics.draw(rain.canvas, 0, big_y)
 end
 
 local function draw_text(x, y)
@@ -910,5 +943,6 @@ end
 function love.draw()
   love.graphics.setColor(255, 255, 255)
 
+  draw_grid()
   draw_inspector()
 end
