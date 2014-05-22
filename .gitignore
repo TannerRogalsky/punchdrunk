@@ -1,3 +1,4 @@
 *.lua.json
+js/love.js
 js/punchdrunk.js
 node_modules
