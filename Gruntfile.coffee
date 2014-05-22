@@ -23,7 +23,7 @@ module.exports = (grunt) ->
       punchdrunk:
         options:
           banner: '<%= banner %>'
-        src: ['js/moonshine.js', 'js/sylvester.src.js', 'js/love.js']
+        src: ['js/moonshine.js', 'js/sylvester.src.js', 'js/simplex-noise.js', 'js/love.js']
         dest: 'js/punchdrunk.js'
     watch:
       coffeescript:

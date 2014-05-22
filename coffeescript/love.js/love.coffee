@@ -11,6 +11,7 @@ class @Love
     @audio = new Audio()
     @system = new System()
     @image = new ImageModule()
+    @math = new MathModule()
 
     window.addEventListener "beforeunload", () =>
       @quit.call()
