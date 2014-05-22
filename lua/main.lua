@@ -866,6 +866,7 @@ function create_rain()
   end
 
   love.graphics.setCanvas(rain.small_canvas)
+  ox = ox / 2
   for i = 0, (batch_h - 1) * 4 do
     for j = 0, (batch_w - 1) * 4 do
       local is_even = (j % 2) == 0
@@ -900,7 +901,7 @@ local function draw_grid()
 
   love.graphics.setBlendMode("additive")
   love.graphics.setColor(255, 255, 255, 128)
-  love.graphics.draw(rain.small_canvas, -rain.spacing_x / 4, small_y)
+  love.graphics.draw(rain.small_canvas, 0, small_y)
 
   love.graphics.setBlendMode("alpha")
   love.graphics.setColor(255, 255, 255, 255)
