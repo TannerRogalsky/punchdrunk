@@ -797,7 +797,7 @@ function love.load()
   jkiAkiMSoOSIBCg5IgFKjkiAkiMSoOSIBCg5IgFKjv8D/zcFVeg+jbUAAAAASUVORK5CYII=\
   "
 
-  love.graphics.setBackgroundColor(137, 194, 218)
+  love.graphics.setBackgroundColor(11, 88, 123)
 
   local function loadimage(file, name)
     return love.graphics.newImage(love.image.newImageData(love.filesystem.newFileData(file, name:gsub("_", "."), "base64")))
@@ -852,9 +852,9 @@ function create_rain()
   local batch_h = 2 * math.ceil(m * love.graphics.getHeight() / sy) + 2
 
   rain.canvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight() + sy)
+  rain.small_canvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight() + sy)
 
-  local canvas = rain.canvas
-  love.graphics.setCanvas(canvas)
+  love.graphics.setCanvas(rain.canvas)
   for i = 0, batch_h - 1 do
     for j = 0, batch_w - 1 do
       local is_even = (j % 2) == 0
@@ -862,6 +862,17 @@ function create_rain()
       local x = ox + j * sx
       local y = oy + i * sy + offset_y
       love.graphics.draw(rain.image, x, y)
+    end
+  end
+
+  love.graphics.setCanvas(rain.small_canvas)
+  for i = 0, (batch_h - 1) * 4 do
+    for j = 0, (batch_w - 1) * 4 do
+      local is_even = (j % 2) == 0
+      local offset_y = is_even and 0 or sy / 4
+      local x = ox + j * sx / 2
+      local y = oy + i * sy / 2 + offset_y
+      love.graphics.draw(rain.image, x, y, 0, 0.5, 0.5)
     end
   end
 
@@ -887,9 +898,9 @@ local function draw_grid()
   local small_y = -rain.spacing_y + y / 2
   local big_y = -rain.spacing_y + y
 
-  -- love.graphics.setBlendMode("additive")
-  -- love.graphics.setColor(255, 255, 255, 128)
-  -- love.graphics.draw(rain.canvas, -rain.spacing_x, small_y, 0, 0.5, 0.5)
+  love.graphics.setBlendMode("additive")
+  love.graphics.setColor(255, 255, 255, 128)
+  love.graphics.draw(rain.small_canvas, -rain.spacing_x / 4, small_y)
 
   love.graphics.setBlendMode("alpha")
   love.graphics.setColor(255, 255, 255, 255)
