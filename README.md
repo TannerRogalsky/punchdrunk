@@ -22,6 +22,7 @@ Some things don't work (and some may never work):
 - love.math
 - love.physics
 - love.thread
+- love.filesystem
 
 Pretty much everything else has partial support. I'm not going to make a long list of everything that doesn't work right now because there's still too much that doesn't. I think you'll find that all the most basic elements of the API are functional. Those that aren't should be stubbed out in the hopes that they aren't crucial to the game that is being ported.
 
