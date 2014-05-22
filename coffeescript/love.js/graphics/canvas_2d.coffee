@@ -121,8 +121,7 @@ class Canvas2D
     switch @context.globalCompositeOperation
       when "source-over" then "alpha"
       when "multiply" then "multiplicative"
-      when "lighten" then "subtractive"
-      when "darken" then "additive"
+      when "lighten" then "additive"
 
   getColor: () ->
     c = @current_color
@@ -157,8 +156,7 @@ class Canvas2D
     switch mode
       when "alpha" then @context.globalCompositeOperation = "source-over"
       when "multiplicative" then @context.globalCompositeOperation = "multiply"
-      when "subtractive" then @context.globalCompositeOperation = "lighten"
-      when "additive" then @context.globalCompositeOperation = "darken"
+      when "additive" then @context.globalCompositeOperation = "lighten"
 
   setColor: (r, g, b, a = 255) ->
     if typeof(r) == "number"
