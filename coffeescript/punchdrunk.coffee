@@ -1,5 +1,9 @@
 class @Punchdrunk
-  constructor: (game_root = "lua", punchdrunk_root = "./js") ->
+  constructor: (config = {}) ->
+    game_root = config["game_root"] or "lua"
+    punchdrunk_root = config["punchdrunk_root"] or "./js"
+    element = config["canvas"] or null
+
     # Forward print() messages to the console
     shine.stdout.write = () ->
       console.log.apply(console, arguments)
@@ -16,7 +20,7 @@ class @Punchdrunk
       conf_env.love.conf.call(null, conf)
 
       Love.root = game_root
-      love = new Love(conf.window, conf.modules)
+      love = new Love(element, conf.window, conf.modules)
 
       vm = new shine.VM({
         love: love
