@@ -1,29 +1,72 @@
 <!doctype html>
 <html>
 <head><meta charset="utf-8" />
+  <link href='http://fonts.googleapis.com/css?family=Ubuntu:400,400italic' rel='stylesheet' type='text/css'>
   <script src="./js/punchdrunk.js"></script>
   <!-- <script src="./js/debug/debug.moonshine.js"></script>
   <script src="./js/debug/local.debug.moonshine.js" data-ui-url="/js/debug/ui"></script> -->
   <style type="text/css">
-    img {
-      display: none;
-    }
-
     @font-face {
       font-family: 'Vera';
       src: url('coffeescript/love.js/graphics/Vera.ttf');
     }
+
+    body {
+      font-family: 'Ubuntu', sans-serif;
+      background: rgb(137, 194, 218);
+    }
+
+    main {
+      max-width: 900px;
+      width: 80%;
+      margin: 0 auto;
+    }
+
+    main ul {
+      list-style-type: upper-roman;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 3em;
+    }
+
+    #game_container {
+      text-align: center;
+    }
+
   </style>
-  <script>
-    new Punchdrunk()
-  </script>
 </head>
 <body>
-  <a href="./examples/iyfct.html">In Your Face Crazy Trains</a>
-  <a href="./examples/cube.html">Cube</a>
-  <a href="./examples/falling_blocks.html">Falling Blocks</a>
-  <a href="./examples/trails.html">Trails</a>
-  <a href="./examples/rolling_hills.html">Rolling Hills</a>
-  <br/>
+  <a href="https://github.com/TannerRogalsky/punchdrunk"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+  <header>
+    <h1>Punchdrunk = Moonshine + LÖVE</h1>
+
+    <div id="game_container">
+      <canvas id="game"></canvas>
+    </div>
+  </header>
+  <main>
+    <h2>About</h2>
+    <p>Have you ever made a <a href="http://love2d.org/">Love</a> game and wished that you could easily show it to people without them having to download an executable? Well now they can! ... maybe. Punchdrunk is a project that aims to replicate most part of the Love API in the browser and enable to you to run your original Lua code in the browser via a Lua Virtual Machine named <a href="http://moonshinejs.org/">Moonshine</a>.</p>
+
+    <p>Punchdrunk is still very early alpha software. It works well with a limited subset of Love's API. If it doesn't work with the game you made, please consider <a href="https://github.com/TannerRogalsky/punchdrunk/issues">sending me your game</a> to test against or forking the project. I am working to expand which portions of the Love API that Punchdrunk supports but I will prioritize feature requests from actual users when possible. However, certain elements of the API will require a lot of additional work (i.e. Shaders) or be altogether impossible (full filesystem integration).</p>
+
+    <p>Please check out <a href="https://github.com/TannerRogalsky/punchdrunk">the Github</a> page for more information on how to get your own game running in the browser.
+
+    <h2>Examples</h2>
+    <ul>
+      <li><a href="./examples/iyfct.html">In Your Face Crazy Trains</a></li>
+      <li><a href="./examples/cube.html">Cube</a></li>
+      <li><a href="./examples/falling_blocks.html">Falling Blocks</a></li>
+      <li><a href="./examples/trails.html">Trails</a></li>
+      <li><a href="./examples/rolling_hills.html">Rolling Hills</a></li>
+    </ul>
+  </main>
+  <script>
+    new Punchdrunk({
+      canvas: document.getElementById("game")
+    })
+  </script>
 </body>
 </html>
