@@ -1,12 +1,13 @@
 class @Love
-  constructor: (window_conf, module_conf) ->
+  constructor: (element, window_conf, module_conf) ->
+    Love.element = element
     @graphics = new Graphics(window_conf.width, window_conf.height)
     @window = new Window(@graphics)
     @timer = new Timer()
     @event = new EventQueue()
     @keyboard = new Keyboard(@event)
-    @mouse = new Mouse(@event, @graphics.default_canvas.element)
-    @touch = new Touch(@event, @graphics.default_canvas.element)
+    @mouse = new Mouse(@event, Love.element)
+    @touch = new Touch(@event, Love.element)
     @filesystem = new FileSystem()
     @audio = new Audio()
     @system = new System()
@@ -52,3 +53,4 @@ class @Love
   quit: () ->
 
 Love.root = "lua"
+Love.element = null

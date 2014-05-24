@@ -1,7 +1,11 @@
 class Graphics
   constructor: (@width = 800, @height = 600) ->
-    @canvas = new Canvas2D(@width, @height)
-    document.body.appendChild(@canvas.element)
+    if Love.element
+      @canvas = new Canvas2D(@width, @height, Love.element)
+    else
+      @canvas = new Canvas2D(@width, @height)
+      document.body.appendChild(@canvas.element)
+      Love.element = @canvas.element
 
     @default_canvas = @canvas
     @default_font = new Font("Vera", 12)
