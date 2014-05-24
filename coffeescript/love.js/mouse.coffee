@@ -18,8 +18,8 @@ class Mouse
       button = getWheelButtonFromEvent(evt)
       # The 'wheel has stopped scrolling' event is triggered via setTimeout, since
       # browsers don't provide a native 'stopped scrolling' event
-      clearTimeout(mouse.wheelTimeOuts[button])
-      mouse.wheelTimeOuts[button] = setTimeout ->
+      clearTimeout(@wheelTimeOuts[button])
+      @wheelTimeOuts[button] = setTimeout ->
         handleRelease(button)
       , Mouse.WHEEL_TIMEOUT * 1000
       handlePress(button)
