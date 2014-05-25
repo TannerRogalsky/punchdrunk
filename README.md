@@ -1,7 +1,7 @@
 punchdrunk.js
 ================
 
-[Moonshine](http://moonshinejs.org/) + [LÖVE](http://love2d.org/) = PunchDrunk
+Punchdrunk = [Moonshine](http://moonshinejs.org/) + [LÖVE](http://love2d.org/)
 
 Demo: http://tannerrogalsky.com/punchdrunk/
 

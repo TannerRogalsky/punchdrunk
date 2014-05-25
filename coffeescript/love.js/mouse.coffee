@@ -18,15 +18,16 @@ class Mouse
       button = getWheelButtonFromEvent(evt)
       # The 'wheel has stopped scrolling' event is triggered via setTimeout, since
       # browsers don't provide a native 'stopped scrolling' event
-      clearTimeout(mouse.wheelTimeOuts[button])
-      mouse.wheelTimeOuts[button] = setTimeout ->
+      clearTimeout(@wheelTimeOuts[button])
+      @wheelTimeOuts[button] = setTimeout ->
         handleRelease(button)
       , Mouse.WHEEL_TIMEOUT * 1000
       handlePress(button)
 
     canvas.addEventListener 'mousemove', (evt) =>
-      @x = evt.offsetX
-      @y = evt.offsetY
+      rect = Love.element.getBoundingClientRect()
+      @x = evt.pageX - rect.left
+      @y = evt.pageY - rect.top
 
     canvas.addEventListener 'mousedown', (evt) =>
       handlePress(getButtonFromEvent(evt))

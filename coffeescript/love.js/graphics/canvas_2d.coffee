@@ -1,6 +1,6 @@
 class Canvas2D
-  constructor: (width, height) ->
-    @element = document.createElement('canvas')
+  constructor: (width, height, @element) ->
+    @element ?= document.createElement('canvas')
     this.setDimensions(width, height)
     @context = @element.getContext('2d')
 
