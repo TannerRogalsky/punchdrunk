@@ -1,4 +1,4 @@
-/*! punchdrunk 0.0.1 (2014-05-22) - https://github.com/TannerRogalsky/punchdrunk */
+/*! punchdrunk 0.0.1 (2014-05-25) - https://github.com/TannerRogalsky/punchdrunk */
 /*! An attempt to replicate the Love API in JavaScript */
 /*! Tanner Rogalsky *//*
  * Moonshine - a Lua virtual machine.
@@ -6896,14 +6896,13 @@ if (typeof module !== 'undefined') {
     __slice = [].slice;
 
   this.Punchdrunk = (function() {
-    function Punchdrunk(game_root, punchdrunk_root) {
-      var conf;
-      if (game_root == null) {
-        game_root = "lua";
+    function Punchdrunk(config) {
+      var conf, element, game_root;
+      if (config == null) {
+        config = {};
       }
-      if (punchdrunk_root == null) {
-        punchdrunk_root = "./js";
-      }
+      game_root = config["game_root"] || "lua";
+      element = config["canvas"] || null;
       shine.stdout.write = function() {
         return console.log.apply(console, arguments);
       };
@@ -6920,12 +6919,27 @@ if (typeof module !== 'undefined') {
         conf_vm.execute(null, file);
         conf_env.love.conf.call(null, conf);
         Love.root = game_root;
-        love = new Love(conf.window, conf.modules);
+        love = new Love(element, conf.window, conf.modules);
         vm = new shine.VM({
           love: love
         });
         vm._globals['package'].path = ("" + game_root + "/?.lua.json;" + game_root + "/?.json;") + vm._globals['package'].path;
-        return vm.load("" + punchdrunk_root + "/boot.lua.json");
+        return vm.load({
+          "sourceName": "@js/boot.lua",
+          "lineDefined": 0,
+          "lastLineDefined": 0,
+          "upvalueCount": 0,
+          "paramCount": 0,
+          "is_vararg": 2,
+          "maxStackSize": 2,
+          "instructions": [5, 0, 0, 0, 1, 1, 1, 0, 28, 0, 2, 1, 5, 0, 2, 0, 6, 0, 0, 259, 28, 0, 1, 1, 30, 0, 1, 0],
+          "constants": ["require", "main", "love", "run"],
+          "functions": [],
+          "linePositions": [1, 1, 1, 3, 3, 3, 3],
+          "locals": [],
+          "upvalues": [],
+          "sourcePath": "js/boot.lua"
+        });
       });
     }
 
@@ -7239,8 +7253,13 @@ if (typeof module !== 'undefined') {
       this.clear = __bind(this.clear, this);
       this.circle = __bind(this.circle, this);
       this.arc = __bind(this.arc, this);
-      this.canvas = new Canvas2D(this.width, this.height);
-      document.body.appendChild(this.canvas.element);
+      if (Love.element) {
+        this.canvas = new Canvas2D(this.width, this.height, Love.element);
+      } else {
+        this.canvas = new Canvas2D(this.width, this.height);
+        document.body.appendChild(this.canvas.element);
+        Love.element = this.canvas.element;
+      }
       this.default_canvas = this.canvas;
       this.default_font = new Font("Vera", 12);
       this.setColor(255, 255, 255);
@@ -7741,15 +7760,16 @@ if (typeof module !== 'undefined') {
   })();
 
   this.Love = (function() {
-    function Love(window_conf, module_conf) {
+    function Love(element, window_conf, module_conf) {
       this.run = __bind(this.run, this);
+      Love.element = element;
       this.graphics = new Graphics(window_conf.width, window_conf.height);
       this.window = new Window(this.graphics);
       this.timer = new Timer();
       this.event = new EventQueue();
       this.keyboard = new Keyboard(this.event);
-      this.mouse = new Mouse(this.event, this.graphics.default_canvas.element);
-      this.touch = new Touch(this.event, this.graphics.default_canvas.element);
+      this.mouse = new Mouse(this.event, Love.element);
+      this.touch = new Touch(this.event, Love.element);
       this.filesystem = new FileSystem();
       this.audio = new Audio();
       this.system = new System();
@@ -7813,6 +7833,8 @@ if (typeof module !== 'undefined') {
   })();
 
   Love.root = "lua";
+
+  Love.element = null;
 
   MathModule = (function() {
     function MathModule() {
@@ -7917,8 +7939,8 @@ if (typeof module !== 'undefined') {
           var button;
           evt.preventDefault();
           button = getWheelButtonFromEvent(evt);
-          clearTimeout(mouse.wheelTimeOuts[button]);
-          mouse.wheelTimeOuts[button] = setTimeout(function() {
+          clearTimeout(_this.wheelTimeOuts[button]);
+          _this.wheelTimeOuts[button] = setTimeout(function() {
             return handleRelease(button);
           }, Mouse.WHEEL_TIMEOUT * 1000);
           return handlePress(button);
@@ -7926,8 +7948,10 @@ if (typeof module !== 'undefined') {
       })(this);
       canvas.addEventListener('mousemove', (function(_this) {
         return function(evt) {
-          _this.x = evt.offsetX;
-          return _this.y = evt.offsetY;
+          var rect;
+          rect = Love.element.getBoundingClientRect();
+          _this.x = evt.pageX - rect.left;
+          return _this.y = evt.pageY - rect.top;
         };
       })(this));
       canvas.addEventListener('mousedown', (function(_this) {
@@ -8142,9 +8166,10 @@ if (typeof module !== 'undefined') {
   })();
 
   Touch = (function() {
-    var Finger, getFingerByIdentifier, getMaxPosition, getNextAvailablePosition;
+    var Finger;
 
     function Touch(eventQueue, canvas) {
+      this.getTouchCount = __bind(this.getTouchCount, this);
       this.getTouch = __bind(this.getTouch, this);
       var preventDefault, touchend;
       this.fingers = {};
@@ -8157,17 +8182,18 @@ if (typeof module !== 'undefined') {
       canvas.addEventListener('gestureend', preventDefault);
       canvas.addEventListener('touchstart', (function(_this) {
         return function(evt) {
-          var finger, t, _i, _len, _ref, _results;
+          var finger, rect, t, _i, _len, _ref, _results;
           preventDefault(evt);
           _ref = evt.targetTouches;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             t = _ref[_i];
-            finger = getFingerByIdentifier(t.identifier);
+            finger = _this.fingers[t.identifier];
             if (!finger) {
-              finger = new Finder(t.identifier, getNextAvailablePosition(), t.offsetX, t.offsetY);
-              _this.fingers[finger.position] = finger;
-              _results.push(eventQueue.push("touchpressed", finger.identifier, finger.x, finger.y));
+              rect = Love.element.getBoundingClientRect();
+              finger = new Finger(t.identifier, t.pageX - rect.left, t.pageY - rect.top);
+              _this.fingers[finger.identifier] = finger;
+              _results.push(eventQueue.push('touchpressed', finger.identifier, finger.x, finger.y));
             } else {
               _results.push(void 0);
             }
@@ -8179,14 +8205,14 @@ if (typeof module !== 'undefined') {
         return function(evt) {
           var finger, t, _i, _len, _ref, _results;
           preventDefault(evt);
-          _ref = evt.targetTouches;
+          _ref = evt.changedTouches;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             t = _ref[_i];
-            finger = getFingerByIdentifier(t.identifier);
+            finger = _this.fingers[t.identifier];
             if (finger) {
-              delete _this.fingers[finger.position];
-              _results.push(eventQueue.push("touchreleased", finger.identifier, finger.x, finger.y));
+              delete _this.fingers[t.identifier];
+              _results.push(eventQueue.push('touchreleased', finger.identifier, finger.x, finger.y));
             } else {
               _results.push(void 0);
             }
@@ -8199,17 +8225,18 @@ if (typeof module !== 'undefined') {
       canvas.addEventListener('touchcancel', touchend);
       canvas.addEventListener('touchmove', (function(_this) {
         return function(evt) {
-          var finger, t, _i, _len, _ref, _results;
+          var finger, rect, t, _i, _len, _ref, _results;
           preventDefault(evt);
           _ref = evt.targetTouches;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             t = _ref[_i];
-            finger = getFingerByIdentifier(t.identifier);
+            finger = _this.fingers[t.identifier];
             if (finger) {
-              finger.x = t.offsetX;
-              finger.y = t.offsetY;
-              _results.push(eventQueue.push("touchmoved", finger.identifier, finger.x, finger.y));
+              rect = Love.element.getBoundingClientRect();
+              finger.x = t.pageX - rect.left;
+              finger.y = t.pageY - rect.top;
+              _results.push(eventQueue.push('touchmoved', finger.identifier, finger.x, finger.y));
             } else {
               _results.push(void 0);
             }
@@ -8219,64 +8246,23 @@ if (typeof module !== 'undefined') {
       })(this));
     }
 
-    Touch.prototype.getTouch = function(index) {
+    Touch.prototype.getTouch = function(id) {
       var finger;
-      finger = this.fingers[index];
-      return [finger.identifier, finger.x, finger.y];
+      finger = this.fingers[id];
+      if (finger) {
+        return [finger.x, finger.y];
+      } else {
+        return [null, null];
+      }
     };
 
     Touch.prototype.getTouchCount = function() {
-      var count, i, maxPosition, _i;
-      maxPosition = getMaxPosition();
-      count = 0;
-      for (i = _i = 0; 0 <= maxPosition ? _i < maxPosition : _i > maxPosition; i = 0 <= maxPosition ? ++_i : --_i) {
-        if (touch.getTouch(i)) {
-          count += 1;
-        }
-      }
-      return count;
-    };
-
-    getMaxPosition = function() {
-      var positions;
-      positions = Object.keys(touch.fingers);
-      if (positions.length === 0) {
-        return 0;
-      } else {
-        return Math.max.apply(Math, positions);
-      }
-    };
-
-    getNextAvailablePosition = function() {
-      var i, maxPosition, _i;
-      maxPosition = getMaxPosition();
-      for (i = _i = 0; 0 <= maxPosition ? _i < maxPosition : _i > maxPosition; i = 0 <= maxPosition ? ++_i : --_i) {
-        if (!touch.getTouch(i)) {
-          i;
-        }
-      }
-      return maxPosition + 1;
-    };
-
-    getFingerByIdentifier = function(identifier) {
-      var fingers, position, _i, _len, _results;
-      fingers = Touch.fingers;
-      _results = [];
-      for (_i = 0, _len = fingers.length; _i < _len; _i++) {
-        position = fingers[_i];
-        if (fingers.hasOwnProperty(position) && fingers[position].identifier === identifier) {
-          _results.push(fingers[position]);
-        } else {
-          _results.push(void 0);
-        }
-      }
-      return _results;
+      return Object.keys(this.fingers).length;
     };
 
     Finger = (function() {
-      function Finger(identifier, position, x, y) {
+      function Finger(identifier, x, y) {
         this.identifier = identifier;
-        this.position = position;
         this.x = x;
         this.y = y;
       }
@@ -8491,8 +8477,11 @@ if (typeof module !== 'undefined') {
   Canvas2D = (function() {
     var drawDrawable, drawWithQuad;
 
-    function Canvas2D(width, height) {
-      this.element = document.createElement('canvas');
+    function Canvas2D(width, height, element) {
+      this.element = element;
+      if (this.element == null) {
+        this.element = document.createElement('canvas');
+      }
       this.setDimensions(width, height);
       this.context = this.element.getContext('2d');
       this.current_transform = Matrix.I(3);
@@ -8995,13 +8984,6 @@ if (typeof module !== 'undefined') {
     Image.prototype.setWrap = function(self) {};
 
     return Image;
-
-  })();
-
-  ImageData = (function() {
-    function ImageData() {}
-
-    return ImageData;
 
   })();
 
