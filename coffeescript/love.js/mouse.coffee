@@ -25,8 +25,9 @@ class Mouse
       handlePress(button)
 
     canvas.addEventListener 'mousemove', (evt) =>
-      @x = evt.offsetX
-      @y = evt.offsetY
+      rect = Love.element.getBoundingClientRect()
+      @x = evt.pageX - rect.left
+      @y = evt.pageY - rect.top
 
     canvas.addEventListener 'mousedown', (evt) =>
       handlePress(getButtonFromEvent(evt))
