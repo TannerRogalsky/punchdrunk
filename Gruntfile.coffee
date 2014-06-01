@@ -12,7 +12,8 @@ module.exports = (grunt) ->
           join: true
         files:
           'js/love.js': [
-            'coffeescript/punchdrunk.coffee'
+            'coffeescript/punchdrunk.coffee',
+            'coffeescript/love.coffee',
             'coffeescript/love.js/*.coffee',
             'coffeescript/love.js/audio/*.coffee',
             'coffeescript/love.js/graphics/*.coffee',
