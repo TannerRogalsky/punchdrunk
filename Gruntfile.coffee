@@ -64,4 +64,4 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'default', ['coffee:app', 'shell', 'concat', 'connect:server', 'watch']
   grunt.registerTask 'compile', ['coffee:app', 'shell', 'concat']
-  grunt.registerTask 'test', ['coffee', 'mocha_phantomjs']
+  grunt.registerTask 'test', ['coffee', 'concat', 'mocha_phantomjs']
