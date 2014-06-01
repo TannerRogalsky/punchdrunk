@@ -19,6 +19,12 @@ module.exports = (grunt) ->
             'coffeescript/love.js/filesystem/*.coffee',
             'coffeescript/love.js/image/*.coffee',
           ]
+      tests:
+        files:
+          'test/tests.js': [
+            'test/src/*.coffee',
+            'test/src/**/*.coffee'
+          ]
     concat:
       punchdrunk:
         options:
@@ -46,12 +52,16 @@ module.exports = (grunt) ->
       server:
         options:
           port: 8000
+    mocha_phantomjs:
+       all: ['test/*.html']
 
   grunt.loadNpmTasks('grunt-contrib-coffee')
   grunt.loadNpmTasks('grunt-contrib-watch')
   grunt.loadNpmTasks('grunt-contrib-concat')
   grunt.loadNpmTasks('grunt-contrib-connect')
   grunt.loadNpmTasks('grunt-shell')
+  grunt.loadNpmTasks('grunt-mocha-phantomjs')
 
-  grunt.registerTask 'default', ['coffee', 'shell', 'concat', 'connect:server', 'watch']
-  grunt.registerTask 'compile', ['coffee', 'shell', 'concat']
+  grunt.registerTask 'default', ['coffee:app', 'shell', 'concat', 'connect:server', 'watch']
+  grunt.registerTask 'compile', ['coffee:app', 'shell', 'concat']
+  grunt.registerTask 'test', ['coffee:tests', 'mocha_phantomjs']
