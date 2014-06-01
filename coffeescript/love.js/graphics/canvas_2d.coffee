@@ -1,7 +1,11 @@
 class Canvas2D
   constructor: (width, height, @element) ->
     @element ?= document.createElement('canvas')
-    this.setDimensions(width, height)
+    if (canvas_width = Number(@element.getAttribute('width'))) != 0
+      width = canvas_width
+    if (canvas_height = Number(@element.getAttribute('height'))) != 0
+      height = canvas_height
+    @setDimensions(width, height)
     @context = @element.getContext('2d')
 
     @current_transform = Matrix.I(3)
