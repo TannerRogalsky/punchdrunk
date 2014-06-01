@@ -5,6 +5,8 @@ Punchdrunk = [Moonshine](http://moonshinejs.org/) + [LÖVE](http://love2d.org/)
 
 Demo: http://tannerrogalsky.com/punchdrunk/
 
+[![Build Status](https://travis-ci.org/TannerRogalsky/punchdrunk.svg?branch=tests)](https://travis-ci.org/TannerRogalsky/punchdrunk)
+
 # Get This Running
 
 1. Install [node.js](http://nodejs.org/)
