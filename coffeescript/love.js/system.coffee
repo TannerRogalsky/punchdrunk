@@ -1,4 +1,4 @@
-class System
+class Love.System
   constructor: () ->
 
   getClipboardText: () =>

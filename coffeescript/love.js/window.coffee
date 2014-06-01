@@ -1,4 +1,4 @@
-class Window
+class Love.Window
   constructor: (@graphics) ->
 
   getDesktopDimensions: () =>

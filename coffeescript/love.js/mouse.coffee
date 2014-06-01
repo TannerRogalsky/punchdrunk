@@ -1,4 +1,4 @@
-class Mouse
+class Love.Mouse
   constructor: (eventQueue, canvas) ->
     @x = 0
     @y = 0
@@ -97,4 +97,4 @@ class Mouse
     delta = Math.max(-1, Math.min(1, (evt.wheelDelta or -evt.detail)))
     if delta == 1 then 'wu' else 'wd'
 
-Mouse.WHEEL_TIMEOUT = 0.02
+Love.Mouse.WHEEL_TIMEOUT = 0.02

@@ -1,4 +1,4 @@
-class EventQueue
+class Love.EventQueue
   constructor: () ->
     @internalQueue = []
 

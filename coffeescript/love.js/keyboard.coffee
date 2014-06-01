@@ -1,4 +1,4 @@
-class Keyboard
+class Love.Keyboard
   constructor: (eventQueue) ->
     @keysDown = {}
 

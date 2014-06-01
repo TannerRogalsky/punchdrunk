@@ -1,4 +1,4 @@
-class Graphics
+class Love.Graphics
   constructor: (@width = 800, @height = 600) ->
     if Love.element
       @canvas = new Canvas2D(@width, @height, Love.element)

@@ -1,4 +1,4 @@
-class ImageModule
+class Love.ImageModule
   constructor: () ->
 
   isCompressed: =>

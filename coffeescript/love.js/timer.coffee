@@ -1,4 +1,4 @@
-class Timer
+class Love.Timer
   constructor: () ->
     # The time that has passed since the timer was created, in milliseconds
     @microTime = performance.now()

@@ -257,4 +257,4 @@ class Canvas2D
     @context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, 0, 0, quad.width, quad.height)
     @context.restore()
 
-Canvas2D.transparent = new Color(0, 0, 0, 0)
+Canvas2D.transparent = new Love.Color(0, 0, 0, 0)

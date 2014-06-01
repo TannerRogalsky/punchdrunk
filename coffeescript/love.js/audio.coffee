@@ -1,4 +1,4 @@
-class Audio
+class Love.Audio
   constructor: () ->
 
   getDistanceModel: () =>
