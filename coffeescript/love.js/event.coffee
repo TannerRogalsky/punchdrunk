@@ -16,6 +16,7 @@ class Love.EventQueue
     @internalQueue.push(newEvent)
 
   quit: () =>
+    @internalQueue.push(new Event("quit"))
 
   wait: () =>
 

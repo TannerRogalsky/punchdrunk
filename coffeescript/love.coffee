@@ -1,5 +1,5 @@
 class @Love
-  constructor: (element, window_conf, module_conf) ->
+  constructor: (element = null, window_conf = {}, module_conf = {}) ->
     Love.element = element
     @graphics = new Love.Graphics(window_conf.width, window_conf.height)
     @window = new Love.Window(@graphics)
