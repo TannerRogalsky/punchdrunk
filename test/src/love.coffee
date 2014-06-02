@@ -60,3 +60,30 @@ describe "love", ->
 
         expect(love.graphics.getWidth()).to.equal(900)
         expect(love.graphics.getHeight()).to.equal(300)
+
+  describe '.run', ->
+    it 'invokes the expected functions', ->
+      @clock = sinon.useFakeTimers(0, "setTimeout", "clearTimeout", "Date")
+
+      love = new Love()
+
+      load = sinon.spy(love, 'load')
+      update = sinon.spy(love, 'update')
+      clear = sinon.spy(love.graphics, 'clear')
+      draw = sinon.spy(love, 'draw')
+
+      counter = 0
+      nextFrame = sinon.stub love.timer, 'nextFrame', (f) ->
+        return if counter != 0
+        counter += 1
+        f(0)
+
+      love.run()
+
+      expect(load).to.have.been.called
+      expect(update).to.have.been.called
+      expect(clear).to.have.been.called
+      expect(draw).to.have.been.called
+      expect(nextFrame).to.have.been.called
+
+      this.clock.restore()
