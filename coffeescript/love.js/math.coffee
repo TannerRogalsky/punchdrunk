@@ -1,4 +1,4 @@
-class MathModule
+class Love.MathModule
   constructor: () ->
     @simplex = new SimplexNoise()
 

@@ -1,4 +1,4 @@
-class FileSystem
+class Love.FileSystem
   constructor: () ->
 
   append: () =>

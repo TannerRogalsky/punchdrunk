@@ -1,4 +1,4 @@
-class EventQueue
+class Love.EventQueue
   constructor: () ->
     @internalQueue = []
 
@@ -16,6 +16,7 @@ class EventQueue
     @internalQueue.push(newEvent)
 
   quit: () =>
+    @internalQueue.push(new Event("quit"))
 
   wait: () =>
 

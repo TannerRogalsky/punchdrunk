@@ -1,9 +1,9 @@
-class Graphics
-  constructor: (@width = 800, @height = 600) ->
+class Love.Graphics
+  constructor: (width = 800, height = 600) ->
     if Love.element
-      @canvas = new Canvas2D(@width, @height, Love.element)
+      @canvas = new Canvas2D(width, height, Love.element)
     else
-      @canvas = new Canvas2D(@width, @height)
+      @canvas = new Canvas2D(width, height)
       document.body.appendChild(@canvas.element)
       Love.element = @canvas.element
 
