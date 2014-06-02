@@ -13,10 +13,11 @@ class @Punchdrunk
     }
 
     new shine.FileManager().load "#{game_root}/conf.lua.json", (_, file) ->
-      conf_env = {love: {}}
-      conf_vm = new shine.VM(conf_env)
-      conf_vm.execute(null, file)
-      conf_env.love.conf.call(null, conf)
+      if file
+        conf_env = {love: {}}
+        conf_vm = new shine.VM(conf_env)
+        conf_vm.execute(null, file)
+        conf_env.love.conf.call(null, conf)
 
       Love.root = game_root
       love = new Love(element, conf.window, conf.modules)
