@@ -86,4 +86,4 @@ describe "love", ->
       expect(draw).to.have.been.called
       expect(nextFrame).to.have.been.called
 
-      this.clock.restore()
+      @clock.restore()
