@@ -54,6 +54,12 @@ function SimplexNoise(random) {
 
 }
 SimplexNoise.prototype = {
+    grad1: function(hash, x) {
+        var h = hash & 15;
+        var grad = 1 + (h & 7); // Gradient value 1.0, 2.0, ..., 8.0
+        if (h&8) grad = -grad;  // Set a random sign for the gradient
+        return ( grad * x );    // Multiply the gradient with the distance
+    },
     grad3: new Float32Array([1, 1, 0,
                             - 1, 1, 0,
                             1, - 1, 0,
@@ -77,6 +83,27 @@ SimplexNoise.prototype = {
                             - 1, 1, 0, 1, - 1, 1, 0, - 1, - 1, - 1, 0, 1, - 1, - 1, 0, - 1,
                             1, 1, 1, 0, 1, 1, - 1, 0, 1, - 1, 1, 0, 1, - 1, - 1, 0,
                             - 1, 1, 1, 0, - 1, 1, - 1, 0, - 1, - 1, 1, 0, - 1, - 1, - 1, 0]),
+    noise1D: function (x) {
+        var i0 = Math.floor(x);
+        var i1 = i0 + 1;
+        var x0 = x - i0;
+        var x1 = x0 - 1;
+
+        var n0, n1;
+
+        var t0 = 1 - x0*x0;
+        //  if(t0 < 0.0f) t0 = 0.0f;
+        t0 *= t0;
+        n0 = t0 * t0 * this.grad1(this.perm[i0 & 0xff], x0);
+
+        var t1 = 1 - x1*x1;
+        //  if(t1 < 0.0f) t1 = 0.0f;
+        t1 *= t1;
+        n1 = t1 * t1 * this.grad1(this.perm[i1 & 0xff], x1);
+        // The maximum value of this noise is 8*(3/4)^4 = 2.53125
+        // A factor of 0.395 will scale to fit exactly within [-1,1]
+        return 0.395 * (n0 + n1);
+    },
     noise2D: function (xin, yin) {
         var permMod12 = this.permMod12,
             perm = this.perm,
