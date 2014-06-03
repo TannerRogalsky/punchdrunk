@@ -17,7 +17,7 @@ class Love.MathModule
 
   random: (min, max) =>
     if min == undefined && max == undefined
-      Math.random()
+      return Math.random()
 
     if max == undefined
       max = min
