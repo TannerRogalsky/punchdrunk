@@ -18,7 +18,7 @@ describe 'love.math', ->
 
       it 'should return values between -1 and 1', ->
         for x in [0..10]
-          expect(noise(x)).to.be.above(-1).and.below(1)
+          expect(noise(x)).to.be.within(-1, 1)
 
       it 'should return similar values for similar inputs', ->
         expect(Math.abs(noise(0.1) - noise(0.101))).to.be.below(0.1).and.above(0)
@@ -38,7 +38,7 @@ describe 'love.math', ->
       it 'should return values between -1 and 1', ->
         for x in [0..10]
           for y in [0..10]
-            expect(noise(x, y)).to.be.above(-1).and.below(1)
+            expect(noise(x, y)).to.be.within(-1, 1)
 
       it 'should return similar values for similar inputs', ->
         expect(Math.abs(noise(0.1, 0.2) - noise(0.101, 0.201))).to.be.below(0.1).and.above(0)
@@ -58,7 +58,7 @@ describe 'love.math', ->
       it 'should return values between -1 and 1', ->
         for i in [0..10]
           for j in [0..10]
-            expect(noise(i / 5, j / 5, i + j)).to.be.above(-1).and.below(1)
+            expect(noise(i / 5, j / 5, i + j)).to.be.within(-1, 1)
 
       it 'should return similar values for similar inputs', ->
         expect(Math.abs(noise(0.1, 0.2, 0.3) - noise(0.101, 0.201, 0.301))).to.be.below(0.1).and.above(0)
@@ -78,7 +78,7 @@ describe 'love.math', ->
       it 'should return values between -1 and 1', ->
         for i in [0..10]
           for j in [0..10]
-            expect(noise(i / 5, j / 5, i + j, i - j)).to.be.above(-1).and.below(1)
+            expect(noise(i / 5, j / 5, i + j, i - j)).to.be.within(-1, 1)
 
       it 'should return similar values for similar inputs', ->
         expect(Math.abs(noise(0.1, 0.2, 0.3, 0.4) - noise(0.101, 0.201, 0.301, 0.401))).to.be.below(0.1).and.above(0)
@@ -95,12 +95,12 @@ describe 'love.math', ->
 
     describe 'when called with no arguments', ->
       it 'should return a value between 0 and 1', ->
-        expect(random()).to.be.above(0).and.below(1)
+        expect(random()).to.be.within(0, 1)
 
     describe 'when called with one argument', ->
-      it 'should return a value between 0 and the argument', ->
-        expect(random(10)).to.be.above(0).and.below(10)
+      it 'should return a value between 1 and the argument, inclusively', ->
+        expect(random(10)).to.be.within(1, 10 + 1)
 
     describe 'when called with two arguments', ->
-      it 'should return a value between the two arguments', ->
-        expect(random(5, 10)).to.be.above(5).and.below(10)
+      it 'should return a value between the two arguments, inclusively', ->
+        expect(random(5, 10)).to.be.within(5, 10 + 1)
