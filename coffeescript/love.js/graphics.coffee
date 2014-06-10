@@ -1,9 +1,15 @@
 class Love.Graphics
   constructor: (width = 800, height = 600) ->
     if Love.element
-      @canvas = new Canvas2D(width, height, Love.element)
+      if @isSupported("webgl")
+        @canvas = new CanvasWebGL(width, height, Love.element)
+      else
+        @canvas = new Canvas2D(width, height, Love.element)
     else
-      @canvas = new Canvas2D(width, height)
+      if @isSupported("webgl")
+        @canvas = new CanvasWebGL(width, height)
+      else
+        @canvas = new Canvas2D(width, height)
       document.body.appendChild(@canvas.element)
       Love.element = @canvas.element
 
