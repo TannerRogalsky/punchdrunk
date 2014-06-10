@@ -42,6 +42,9 @@ module.exports = (grunt) ->
       bootstrap:
         files: ['js/boot.lua']
         tasks: ['shell:distil_bootstrap']
+      examples:
+        files: ['examples/**/*.lua']
+        tasks: ['shell:distil_examples']
     shell:
       distil_game:
         command: 'moonshine distil -d lua lua'
