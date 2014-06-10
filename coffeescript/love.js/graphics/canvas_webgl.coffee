@@ -1,7 +1,11 @@
 class CanvasWebGL
-  constructor: (width, height) ->
-    @element = document.createElement('canvas')
-    this.setDimensions(width, height)
+  constructor: (width, height, @element) ->
+    @element ?= document.createElement('canvas')
+    if (canvas_width = Number(@element.getAttribute('width'))) != 0
+      width = canvas_width
+    if (canvas_height = Number(@element.getAttribute('height'))) != 0
+      height = canvas_height
+    @setDimensions(width, height)
     @context = getGLContext(@element)
 
     @defaultVertexShader = createShader(@context, "vertex", DEFAULT_VERTEX_SOURCE)
@@ -55,7 +59,15 @@ class CanvasWebGL
 
   setColor: () ->
 
-  setBackgroundColor: () ->
+  setBackgroundColor: (r, g, b, a) ->
+    if typeof(r) == "number"
+      @background_color = new Color(r, g, b, a)
+    else # we were passed a sequence
+      @background_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
+
+  getBackgroundColor: () ->
+    c = @background_color
+    [c.r, c.g, c.b, c.a]
 
   setFont: () ->
 
