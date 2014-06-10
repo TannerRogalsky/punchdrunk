@@ -128,7 +128,15 @@ class Love.Graphics
   getSystemLimit: () =>
     @canvas.getSystemLimit()
 
-  isSupported: () =>
+  isSupported: (features...) =>
+    for feature in features
+      switch feature
+        when "webgl"
+          if !window.WebGLRenderingContext
+            return false
+        else
+          return false
+    return true
 
   isWireframe: () =>
     @canvas.isWireframe()
