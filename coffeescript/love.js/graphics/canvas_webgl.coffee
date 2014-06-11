@@ -12,6 +12,10 @@ class CanvasWebGL
     @defaultFragmetShader = createShader(@context, "fragment", DEFAULT_FRAGMENT_SOURCE)
     @defaultProgram = createProgram(@context, @defaultVertexShader, @defaultFragmetShader)
 
+    @context.enable(@context.BLEND)
+    # @context.blendFunc(@context.SRC_ALPHA, @context.ONE)
+    @context.blendFuncSeparate(@context.SRC_ALPHA, @context.ONE_MINUS_SRC_ALPHA, @context.ONE, @context.ONE_MINUS_SRC_ALPHA)
+
     @context.useProgram(@defaultProgram)
     @defaultTexture = createDefaultTexture(@context)
 
