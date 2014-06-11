@@ -1,5 +1,5 @@
 function love.load()
-  print(love.graphics.isSupported("webgl"))
+  -- print(love.graphics.isSupported("webgl"))
 
   index = 0
 end
@@ -11,10 +11,14 @@ end
 
 function love.draw()
   local g = love.graphics
-  g.setColor(255, 255, 255)
+
+  g.setColor(100, 255, 100, 100)
+  g.polygon("fill", 150, 150, 350, 150, 350, 350, 150, 350)
+
+  g.setColor(255, 255, 255, 50)
   g.polygon("fill", 100, 100, 200, 200, 100, 200)
 
-  g.setColor(0, 255, 0, 100)
+  g.setColor(0, 255, 0, 50)
   g.polygon("fill", 300, 300, 200, 200, 300, 200)
 
   -- g.circle("fill", 50, 50 + 25, 25)
