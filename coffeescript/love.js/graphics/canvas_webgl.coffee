@@ -53,13 +53,21 @@ class CanvasWebGL
 
   origin: () ->
 
-  setColor: () ->
+  setColor: (r, g, b, a) ->
+    if typeof(r) == "number"
+      @current_color = new Color(r, g, b, a)
+    else # we were passed a sequence
+      @current_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
+    c = @current_color
+    @context.uniform4f(@colorLocation, c.r / 255, c.g / 255, c.b / 255, c.a / 255)
 
   setBackgroundColor: (r, g, b, a) ->
     if typeof(r) == "number"
       @background_color = new Color(r, g, b, a)
     else # we were passed a sequence
       @background_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
+    c = @background_color
+    @context.clearColor(c.r / 255, c.g / 255, c.b / 255, c.a / 255)
 
   getBackgroundColor: () ->
     c = @background_color
