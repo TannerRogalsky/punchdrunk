@@ -75,6 +75,30 @@ class CanvasWebGL
 
   setFont: () ->
 
+
+  polygon: (mode, points...) =>
+    # make a closed loop
+    coords = points.slice(0)
+    coords.push(coords[0])
+    coords.push(coords[1])
+
+    switch mode
+      when "line"
+        # TODO: polyline
+        console.log "not implemented yet"
+      when "fill"
+        # @context.prepareDraw()
+        @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
+
+        @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
+        @context.bufferData(@context.ARRAY_BUFFER, new Float32Array(coords), @context.STATIC_DRAW)
+        @context.enableVertexAttribArray(@positionLocation)
+        @context.vertexAttribPointer(@positionLocation, 2, @context.FLOAT, false, 0, 0)
+
+        @context.drawArrays(@context.TRIANGLE_FAN, 0, coords.length / 2)
+
+        @context.disableVertexAttribArray(@positionLocation)
+
   # PRIVATE
   setDimensions: (@width, @height) ->
     @element.setAttribute('width', @width)
