@@ -95,7 +95,7 @@ class CanvasWebGL
         @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
 
         @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
-        @context.bufferData(@context.ARRAY_BUFFER, new Float32Array(coords), @context.STATIC_DRAW)
+        @context.bufferData(@context.ARRAY_BUFFER, new Float32Array(coords), @context.DYNAMIC_DRAW)
         @context.enableVertexAttribArray(@positionLocation)
         @context.vertexAttribPointer(@positionLocation, 2, @context.FLOAT, false, 0, 0)
 
