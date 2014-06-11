@@ -15,14 +15,14 @@ class CanvasWebGL
     @context.useProgram(@defaultProgram)
     @defaultTexture = createDefaultTexture(@context)
 
-    colorLocation = @context.getUniformLocation(@defaultProgram, "u_color")
-    @context.uniform4f(colorLocation, 1, 0, 1, 1)
+    @colorLocation = @context.getUniformLocation(@defaultProgram, "u_color")
+    @context.uniform4f(@colorLocation, 1, 1, 1, 1)
 
-    resolutionLocation = @context.getUniformLocation(@defaultProgram, "u_resolution")
-    @context.uniform2f(resolutionLocation, @width, @height)
+    @resolutionLocation = @context.getUniformLocation(@defaultProgram, "u_resolution")
+    @context.uniform2f(@resolutionLocation, @width, @height)
 
-    positionLocation = @context.getAttribLocation(@defaultProgram, "a_position")
-    texCoordLocation = @context.getAttribLocation(@defaultProgram, "a_texCoord")
+    @positionLocation = @context.getAttribLocation(@defaultProgram, "a_position")
+    @texCoordLocation = @context.getAttribLocation(@defaultProgram, "a_texCoord")
 
     @texCoordBuffer = @context.createBuffer()
     @context.bindBuffer(@context.ARRAY_BUFFER, @texCoordBuffer)
@@ -33,8 +33,8 @@ class CanvasWebGL
         0.0,  1.0,
         1.0,  0.0,
         1.0,  1.0]), @context.STATIC_DRAW)
-    @context.enableVertexAttribArray(texCoordLocation)
-    @context.vertexAttribPointer(texCoordLocation, 2, @context.FLOAT, false, 0, 0)
+    @context.enableVertexAttribArray(@texCoordLocation)
+    @context.vertexAttribPointer(@texCoordLocation, 2, @context.FLOAT, false, 0, 0)
 
     @positionBuffer = @context.createBuffer()
     @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
@@ -45,8 +45,8 @@ class CanvasWebGL
        0, @height,
        @width, 0,
        @width, @height]), @context.STATIC_DRAW)
-    @context.enableVertexAttribArray(positionLocation)
-    @context.vertexAttribPointer(positionLocation, 2, @context.FLOAT, false, 0, 0)
+    @context.enableVertexAttribArray(@positionLocation)
+    @context.vertexAttribPointer(@positionLocation, 2, @context.FLOAT, false, 0, 0)
 
   clear: (self, r, g, b, a) ->
     colorLocation = @context.getUniformLocation(@defaultProgram, "u_color")
