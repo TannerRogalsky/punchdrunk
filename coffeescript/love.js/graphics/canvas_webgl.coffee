@@ -49,11 +49,7 @@ class CanvasWebGL
     @context.vertexAttribPointer(@positionLocation, 2, @context.FLOAT, false, 0, 0)
 
   clear: (self, r, g, b, a) ->
-    colorLocation = @context.getUniformLocation(@defaultProgram, "u_color")
-    @context.uniform4f(colorLocation, r / 255, g / 255, b / 255, a / 255)
-
-    @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
-    @context.drawArrays(@context.TRIANGLES, 0, 6)
+    @context.clear(@context.COLOR_BUFFER_BIT)
 
   origin: () ->
 
