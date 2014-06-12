@@ -90,6 +90,8 @@ class CanvasWebGL
 
     @context.disableVertexAttribArray(@positionLocation)
 
+  rectangle: (mode, x, y, w, h) ->
+    @polygon(mode, x,y, x,y+h, x+w,y+h, x+w,y)
 
   # PRIVATE
   setDimensions: (@width, @height) ->
