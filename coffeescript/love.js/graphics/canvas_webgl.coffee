@@ -90,6 +90,10 @@ class CanvasWebGL
 
 
   polygon: (mode, points...) =>
+    if points.length == 1
+      # we were passed a sequence
+      points = points[0]
+
     draw_mode = @context.TRIANGLE_FAN
     switch mode
       when "line"
