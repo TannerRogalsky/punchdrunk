@@ -70,6 +70,24 @@ class CanvasWebGL
   setFont: () ->
 
 
+  circle: (mode, x, y, radius, points) =>
+    angle_shift = Math.PI * 2 / points
+    phi = 0
+    coords = []
+
+    # Fill mode will use a triangle fan internally, so we want the "hub" of the
+    # fan (its first vertex) to be the midpoint of the circle.
+    if mode == "fill"
+      coords[0] = x
+      coords[1] = y
+
+    for i in [0...points]
+      phi += angle_shift
+      coords[2*i]   = x + radius * Math.cos(phi)
+      coords[2*i+1] = y + radius * Math.sin(phi)
+
+    @polygon(mode, coords)
+
 
   polygon: (mode, points...) =>
     draw_mode = @context.TRIANGLE_FAN
