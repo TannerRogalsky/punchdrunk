@@ -70,28 +70,26 @@ class CanvasWebGL
   setFont: () ->
 
 
-  polygon: (mode, points...) =>
-    # make a closed loop
-    coords = points.slice(0)
-    coords.push(coords[0])
-    coords.push(coords[1])
 
+  polygon: (mode, points...) =>
+    draw_mode = @context.TRIANGLE_FAN
     switch mode
       when "line"
-        # TODO: polyline
-        console.log "not implemented yet"
+        draw_mode = @context.LINE_LOOP
       when "fill"
-        # @context.prepareDraw()
-        @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
+        draw_mode = @context.TRIANGLE_FAN
+    # @context.prepareDraw()
+    @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
 
-        @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
-        @context.bufferData(@context.ARRAY_BUFFER, new Float32Array(coords), @context.DYNAMIC_DRAW)
-        @context.enableVertexAttribArray(@positionLocation)
-        @context.vertexAttribPointer(@positionLocation, 2, @context.FLOAT, false, 0, 0)
+    @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
+    @context.bufferData(@context.ARRAY_BUFFER, new Float32Array(points), @context.DYNAMIC_DRAW)
+    @context.enableVertexAttribArray(@positionLocation)
+    @context.vertexAttribPointer(@positionLocation, 2, @context.FLOAT, false, 0, 0)
 
-        @context.drawArrays(@context.TRIANGLE_FAN, 0, coords.length / 2)
+    @context.drawArrays(draw_mode, 0, points.length / 2)
 
-        @context.disableVertexAttribArray(@positionLocation)
+    @context.disableVertexAttribArray(@positionLocation)
+
 
   # PRIVATE
   setDimensions: (@width, @height) ->
