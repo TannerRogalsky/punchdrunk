@@ -88,6 +88,18 @@ class CanvasWebGL
 
     @polygon(mode, coords)
 
+  line: (points...) =>
+    @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
+
+    @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
+    @context.bufferData(@context.ARRAY_BUFFER, new Float32Array(points), @context.DYNAMIC_DRAW)
+    @context.enableVertexAttribArray(@positionLocation)
+    @context.vertexAttribPointer(@positionLocation, 2, @context.FLOAT, false, 0, 0)
+
+    @context.drawArrays(@context.LINE_STRIP, 0, points.length / 2)
+
+    @context.disableVertexAttribArray(@positionLocation)
+
 
   polygon: (mode, points...) =>
     if points.length == 1
