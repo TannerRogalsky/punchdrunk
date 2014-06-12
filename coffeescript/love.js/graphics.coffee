@@ -24,7 +24,7 @@ class Love.Graphics
   arc: (mode, x, y, radius, startAngle, endAngle, segments) =>
     @canvas.arc(mode, x, y, radius, startAngle, endAngle, segments)
 
-  circle: (mode, x, y, radius, segments) =>
+  circle: (mode, x, y, radius, segments = radius) =>
     @canvas.circle(mode, x, y, radius, segments)
 
   clear: () =>
