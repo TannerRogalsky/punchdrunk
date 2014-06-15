@@ -13,7 +13,7 @@ class Image
   getData: (self) ->
 
   getDimensions: (self) ->
-    [self.element.width, self.element.height]
+    [self.getWidth(self), self.getHeight(self)]
 
   getFilter: (self) ->
 
