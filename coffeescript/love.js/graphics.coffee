@@ -61,7 +61,7 @@ class Love.Graphics
     new Font(filename, size)
 
   newImage: (data) =>
-    new Image(data)
+    new Image(data, @default_canvas.context)
 
   newImageFont: =>
 
