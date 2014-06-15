@@ -23,7 +23,7 @@ class CanvasWebGL
     @context.uniform4f(@colorLocation, 1, 1, 1, 1)
 
     @resolutionLocation = @context.getUniformLocation(@defaultProgram, "u_resolution")
-    @context.uniform2f(@resolutionLocation, @width, @height)
+    @context.uniform4f(@resolutionLocation, @width, @height, 0, 0)
 
     @positionLocation = @context.getAttribLocation(@defaultProgram, "a_position")
     @texCoordLocation = @context.getAttribLocation(@defaultProgram, "a_texCoord")
@@ -206,24 +206,26 @@ class CanvasWebGL
     return texture
 
   DEFAULT_VERTEX_SOURCE = """
-attribute vec2 a_position;
-attribute vec2 a_texCoord;
+attribute vec4 a_position;
+attribute vec4 a_texCoord;
 
-uniform vec2 u_resolution;
+uniform vec4 u_resolution;
 
-varying vec2 v_texCoord;
+varying vec4 v_texCoord;
 
 void main() {
    // convert the rectangle from pixels to 0.0 to 1.0
-   vec2 zeroToOne = a_position / u_resolution;
+   vec4 zeroToOne = a_position / u_resolution;
 
    // convert from 0->1 to 0->2
-   vec2 zeroToTwo = zeroToOne * 2.0;
+   vec4 zeroToTwo = zeroToOne * 2.0;
 
    // convert from 0->2 to -1->+1 (clipspace)
-   vec2 clipSpace = zeroToTwo - 1.0;
+   vec4 clipSpace = zeroToTwo - 1.0;
+   clipSpace.xy *= vec2(1, -1);
+   clipSpace.zw = vec2(0.0, 1.0);
 
-   gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+   gl_Position = clipSpace;
 
    // pass the texCoord to the fragment shader
    // The GPU will interpolate this value between points.
@@ -235,11 +237,11 @@ precision mediump float;
 uniform vec4 u_color;
 
 // our texture
-uniform sampler2D u_image;
+uniform sampler2D _tex0_;
 
 // the texCoords passed in from the vertex shader.
-varying vec2 v_texCoord;
+varying vec4 v_texCoord;
 
 void main() {
-  gl_FragColor = u_color * texture2D(u_image, v_texCoord);
+  gl_FragColor = u_color * texture2D(_tex0_, v_texCoord.st);
 }"""
