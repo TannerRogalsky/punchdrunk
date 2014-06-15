@@ -3,6 +3,7 @@
 class ImageData
   constructor: (filedata) ->
     @contents = "data:image/#{filedata.getExtension(filedata)};base64,#{filedata.getString(filedata)}"
+    @name = filedata.name
 
   getString: (self) ->
     @contents
