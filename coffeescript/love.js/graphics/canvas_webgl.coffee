@@ -127,6 +127,43 @@ class CanvasWebGL
   rectangle: (mode, x, y, w, h) ->
     @polygon(mode, x,y, x,y+h, x+w,y+h, x+w,y)
 
+  draw: (drawable, x, y, r, sx, syx, ox, oy, kx, ky) ->
+    @context.bindTexture(@context.TEXTURE_2D, drawable.texture)
+
+    @context.enableVertexAttribArray(@positionLocation)
+    @context.enableVertexAttribArray(@texCoordLocation)
+
+    @context.bindBuffer(@context.ARRAY_BUFFER, @texCoordBuffer)
+    @context.bufferData(@context.ARRAY_BUFFER, new Float32Array([
+        0.0,  0.0,
+        1.0,  0.0,
+        0.0,  1.0,
+        0.0,  1.0,
+        1.0,  0.0,
+        1.0,  1.0]), @context.DYNAMIC_DRAW)
+    @context.vertexAttribPointer(@texCoordLocation, 2, @context.FLOAT, false, 0, 0)
+
+    [width, height] = drawable.getDimensions(drawable)
+    x1 = x
+    x2 = x + width
+    y1 = y
+    y2 = y + height
+
+    @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
+    @context.bufferData(@context.ARRAY_BUFFER, new Float32Array([
+       x1, y1,
+       x2, y1,
+       x1, y2,
+       x1, y2,
+       x2, y1,
+       x2, y2]), @context.DYNAMIC_DRAW)
+    @context.vertexAttribPointer(@positionLocation, 2, @context.FLOAT, false, 0, 0)
+
+    @context.drawArrays(@context.TRIANGLES, 0, 6)
+
+    @context.disableVertexAttribArray(@positionLocation)
+    @context.disableVertexAttribArray(@texCoordLocation)
+
   # PRIVATE
   setDimensions: (@width, @height) ->
     @element.setAttribute('width', @width)

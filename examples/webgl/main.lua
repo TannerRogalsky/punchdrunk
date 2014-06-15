@@ -1,7 +1,7 @@
 function love.load()
   -- print(love.graphics.isSupported("webgl"))
-
   index = 0
+  sprite_sheet = love.graphics.newImage("sprites.png")
 end
 
 function love.update(dt)
@@ -15,11 +15,39 @@ function love.draw()
   g.setColor(100, 255, 100, 100)
   g.polygon("fill", 150, 150, 350, 150, 350, 350, 150, 350)
 
+  g.setColor(0, 0, 0)
+  g.polygon("fill", 25, 25, 50, 25, 30, 30, 50, 50, 25, 50)
+  g.setColor(0, 255, 255)
+  g.polygon("line", 25, 25, 50, 25, 30, 30, 50, 50, 25, 50)
+
   g.setColor(255, 255, 255, 50)
   g.polygon("fill", 100, 100, 200, 200, 100, 200)
 
   g.setColor(0, 255, 0, 50)
   g.polygon("fill", 300, 300, 200, 200, 300, 200)
+
+  g.setColor(0, 0, 0)
+  g.polygon("line", 50, 50, 200, 200, 50, 200)
+
+  g.rectangle("fill", 150, 300, 50, 50)
+  g.setColor(255, 0, 0, 200)
+  g.rectangle("line", 175 - 25 / 2, 325 - 25 / 2, 25, 25)
+
+  g.setColor(0, 0, 0)
+  g.circle("fill", 100, 250, 50)
+  g.setColor(255, 255, 255)
+  g.circle("line", 100, 255, 25, 8)
+
+  g.line(200, 200, 300, 300, 100, 300)
+
+  g.setColor(0, 0, 0)
+  g.point(10, 10)
+
+  g.setColor(255, 255, 255)
+  g.draw(sprite_sheet, 100, 0)
+
+  g.setColor(50, 255, 50)
+  g.draw(sprite_sheet, 100 + sprite_sheet:getWidth(), 0)
 
   -- g.circle("fill", 50, 50 + 25, 25)
 
