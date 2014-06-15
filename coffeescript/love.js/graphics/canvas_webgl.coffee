@@ -58,6 +58,7 @@ class CanvasWebGL
 
   setFont: () ->
 
+  arc: (mode, x, y, radius, startAngle, endAngle, segments) =>
 
   circle: (mode, x, y, radius, points) ->
     angle_shift = Math.PI * 2 / points
@@ -89,6 +90,18 @@ class CanvasWebGL
 
     @context.disableVertexAttribArray(@positionLocation)
 
+  point: (x, y) ->
+    # this doesn't work for some reason
+    @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
+
+    @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
+    @context.bufferData(@context.ARRAY_BUFFER, new Float32Array([x, y]), @context.DYNAMIC_DRAW)
+    @context.enableVertexAttribArray(@positionLocation)
+    @context.vertexAttribPointer(@positionLocation, 2, @context.FLOAT, false, 0, 0)
+
+    @context.drawArrays(@context.POINTS, 0, 1)
+
+    @context.disableVertexAttribArray(@positionLocation)
 
   polygon: (mode, points...) ->
     if points.length == 1
