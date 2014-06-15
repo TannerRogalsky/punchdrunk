@@ -70,7 +70,7 @@ class CanvasWebGL
   setFont: () ->
 
 
-  circle: (mode, x, y, radius, points) =>
+  circle: (mode, x, y, radius, points) ->
     angle_shift = Math.PI * 2 / points
     phi = 0
     coords = []
@@ -88,7 +88,7 @@ class CanvasWebGL
 
     @polygon(mode, coords)
 
-  line: (points...) =>
+  line: (points...) ->
     @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
 
     @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
@@ -101,7 +101,7 @@ class CanvasWebGL
     @context.disableVertexAttribArray(@positionLocation)
 
 
-  polygon: (mode, points...) =>
+  polygon: (mode, points...) ->
     if points.length == 1
       # we were passed a sequence
       points = points[0]
