@@ -31,17 +31,6 @@ class CanvasWebGL
     @texCoordBuffer = @context.createBuffer()
     @positionBuffer = @context.createBuffer()
 
-    # @context.bindBuffer(@context.ARRAY_BUFFER, @texCoordBuffer)
-    # @context.bufferData(@context.ARRAY_BUFFER, new Float32Array([
-    #     0.0,  0.0,
-    #     1.0,  0.0,
-    #     0.0,  1.0,
-    #     0.0,  1.0,
-    #     1.0,  0.0,
-    #     1.0,  1.0]), @context.STATIC_DRAW)
-    # @context.enableVertexAttribArray(@texCoordLocation)
-    # @context.vertexAttribPointer(@texCoordLocation, 2, @context.FLOAT, false, 0, 0)
-
   clear: (self, r, g, b, a) ->
     @context.clear(@context.COLOR_BUFFER_BIT)
 
