@@ -38,6 +38,7 @@ function love.draw()
   g.setColor(255, 255, 255)
   g.circle("line", 100, 255, 25, 8)
 
+  g.setColor(255, 255, 255)
   g.line(200, 200, 300, 300, 100, 300)
 
   g.setColor(0, 0, 0)
@@ -48,12 +49,4 @@ function love.draw()
 
   g.setColor(50, 255, 50)
   g.draw(sprite_sheet, 100 + sprite_sheet:getWidth(), 0)
-
-  -- g.circle("fill", 50, 50 + 25, 25)
-
-  -- g.setColor(100, 100, 255)
-  -- g.rectangle("line", 100, 50, 25, 50)
-
-  -- g.setColor(0, 255, 0)
-  -- g.line(150, 50, 200, 100)
 end
