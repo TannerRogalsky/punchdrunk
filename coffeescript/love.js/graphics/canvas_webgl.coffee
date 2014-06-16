@@ -19,14 +19,12 @@ class CanvasWebGL
     @context.useProgram(@defaultProgram)
     @defaultTexture = createDefaultTexture(@context)
 
-    @colorLocation = @context.getUniformLocation(@defaultProgram, "u_color")
-    @context.uniform4f(@colorLocation, 1, 1, 1, 1)
-
     @resolutionLocation = @context.getUniformLocation(@defaultProgram, "love_ScreenSize")
     @context.uniform4f(@resolutionLocation, @width, @height, 0, 0)
 
     @positionLocation = @context.getAttribLocation(@defaultProgram, "VertexPosition")
     @texCoordLocation = @context.getAttribLocation(@defaultProgram, "VertexTexCoord")
+    @colorLocation = @context.getAttribLocation(@defaultProgram, "VertexColor")
 
     @texCoordBuffer = @context.createBuffer()
     @positionBuffer = @context.createBuffer()
@@ -42,7 +40,7 @@ class CanvasWebGL
     else # we were passed a sequence
       @current_color = new Color(r.getMember(1), r.getMember(2), r.getMember(3), r.getMember(4))
     c = @current_color
-    @context.uniform4f(@colorLocation, c.r / 255, c.g / 255, c.b / 255, c.a / 255)
+    @context.vertexAttrib4f(@colorLocation, c.r / 255, c.g / 255, c.b / 255, c.a / 255)
 
   setBackgroundColor: (r, g, b, a) ->
     if typeof(r) == "number"
@@ -273,6 +271,7 @@ void main() {
    // pass the texCoord to the fragment shader
    // The GPU will interpolate this value between points.
    VaryingTexCoord = VertexTexCoord;
+   VaryingColor = VertexColor;
 }"""
 
   DEFAULT_FRAGMENT_SOURCE = """
@@ -297,8 +296,6 @@ uniform sampler2D _tex0_;
 uniform mediump vec4 love_ScreenSize;
 uniform mediump float love_PointSize;
 
-uniform vec4 u_color;
-
 vec4 effect(lowp vec4 vcolor, Image texture, vec2 texcoord, vec2 pixcoord) {
   return Texel(texture, texcoord) * vcolor;
 }
@@ -306,5 +303,5 @@ vec4 effect(lowp vec4 vcolor, Image texture, vec2 texcoord, vec2 pixcoord) {
 void main() {
   vec2 pixelcoord = vec2(gl_FragCoord.x, (gl_FragCoord.y * love_ScreenSize.z) + love_ScreenSize.w);
 
-  gl_FragColor = effect(u_color, _tex0_, VaryingTexCoord.st, pixelcoord);
+  gl_FragColor = effect(VaryingColor, _tex0_, VaryingTexCoord.st, pixelcoord);
 }"""
