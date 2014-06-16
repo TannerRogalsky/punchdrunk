@@ -25,8 +25,8 @@ class CanvasWebGL
     @resolutionLocation = @context.getUniformLocation(@defaultProgram, "u_resolution")
     @context.uniform4f(@resolutionLocation, @width, @height, 0, 0)
 
-    @positionLocation = @context.getAttribLocation(@defaultProgram, "a_position")
-    @texCoordLocation = @context.getAttribLocation(@defaultProgram, "a_texCoord")
+    @positionLocation = @context.getAttribLocation(@defaultProgram, "VertexPosition")
+    @texCoordLocation = @context.getAttribLocation(@defaultProgram, "VertexTexCoord")
 
     @texCoordBuffer = @context.createBuffer()
     @positionBuffer = @context.createBuffer()
@@ -183,6 +183,8 @@ class CanvasWebGL
     program = gl.createProgram()
     gl.attachShader(program, vertex_shader)
     gl.attachShader(program, fragment_shader)
+    gl.bindAttribLocation(program, 0, "VertexPosition")
+    gl.bindAttribLocation(program, 1, "VertexTexCoord")
     gl.linkProgram(program)
 
     # Check the link status
@@ -219,16 +221,16 @@ class CanvasWebGL
     return texture
 
   DEFAULT_VERTEX_SOURCE = """
-attribute vec4 a_position;
-attribute vec4 a_texCoord;
+attribute vec4 VertexPosition;
+attribute vec4 VertexTexCoord;
 
 uniform vec4 u_resolution;
 
-varying vec4 v_texCoord;
+varying vec4 VaryingTexCoord;
 
 void main() {
    // convert the rectangle from pixels to 0.0 to 1.0
-   vec4 zeroToOne = a_position / u_resolution;
+   vec4 zeroToOne = VertexPosition / u_resolution;
 
    // convert from 0->1 to 0->2
    vec4 zeroToTwo = zeroToOne * 2.0;
@@ -242,7 +244,7 @@ void main() {
 
    // pass the texCoord to the fragment shader
    // The GPU will interpolate this value between points.
-   v_texCoord = a_texCoord;
+   VaryingTexCoord = VertexTexCoord;
 }"""
 
   DEFAULT_FRAGMENT_SOURCE = """
@@ -253,8 +255,8 @@ uniform vec4 u_color;
 uniform sampler2D _tex0_;
 
 // the texCoords passed in from the vertex shader.
-varying vec4 v_texCoord;
+varying mediump vec4 VaryingTexCoord;
 
 void main() {
-  gl_FragColor = u_color * texture2D(_tex0_, v_texCoord.st);
+  gl_FragColor = u_color * texture2D(_tex0_, VaryingTexCoord.st);
 }"""
