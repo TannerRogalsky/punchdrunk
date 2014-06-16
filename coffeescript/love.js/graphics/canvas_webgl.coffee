@@ -255,23 +255,22 @@ vec4 position(mat4 transform_proj, vec4 vertpos) {
 }
 
 void main() {
-   // convert the rectangle from pixels to 0.0 to 1.0
-   vec4 zeroToOne = VertexPosition / love_ScreenSize;
+  // convert the rectangle from pixels to 0.0 to 1.0
+  vec4 zeroToOne = VertexPosition / love_ScreenSize;
 
-   // convert from 0->1 to 0->2
-   vec4 zeroToTwo = zeroToOne * 2.0;
+  // convert from 0->1 to 0->2
+  vec4 zeroToTwo = zeroToOne * 2.0;
 
-   // convert from 0->2 to -1->+1 (clipspace)
-   vec4 clipSpace = zeroToTwo - 1.0;
-   clipSpace.xy *= vec2(1, -1);
-   clipSpace.zw = vec2(0.0, 1.0);
+  // convert from 0->2 to -1->+1 (clipspace)
+  vec4 clipSpace = zeroToTwo - 1.0;
+  clipSpace.xy *= vec2(1, -1);
+  clipSpace.zw = vec2(0.0, 1.0);
 
-   gl_Position = clipSpace;
-
-   // pass the texCoord to the fragment shader
-   // The GPU will interpolate this value between points.
-   VaryingTexCoord = VertexTexCoord;
-   VaryingColor = VertexColor;
+  VaryingTexCoord = VertexTexCoord;
+  VaryingColor = VertexColor;
+  gl_PointSize = love_PointSize;
+  gl_Position = clipSpace;
+  // gl_Position = position(TransformProjectionMatrix, VertexPosition);
 }"""
 
   DEFAULT_FRAGMENT_SOURCE = """
