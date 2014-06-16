@@ -22,7 +22,7 @@ class CanvasWebGL
     @colorLocation = @context.getUniformLocation(@defaultProgram, "u_color")
     @context.uniform4f(@colorLocation, 1, 1, 1, 1)
 
-    @resolutionLocation = @context.getUniformLocation(@defaultProgram, "u_resolution")
+    @resolutionLocation = @context.getUniformLocation(@defaultProgram, "love_ScreenSize")
     @context.uniform4f(@resolutionLocation, @width, @height, 0, 0)
 
     @positionLocation = @context.getAttribLocation(@defaultProgram, "VertexPosition")
@@ -221,16 +221,44 @@ class CanvasWebGL
     return texture
 
   DEFAULT_VERTEX_SOURCE = """
+#define number float
+#define Image sampler2D
+#define extern uniform
+#define Texel texture2D
+#define love_Canvases gl_FragData
+
+#define VERTEX
+
 attribute vec4 VertexPosition;
 attribute vec4 VertexTexCoord;
-
-uniform vec4 u_resolution;
+attribute vec4 VertexColor;
 
 varying vec4 VaryingTexCoord;
+varying vec4 VaryingColor;
+
+//#if defined(GL_EXT_draw_instanced)
+//  #extension GL_EXT_draw_instanced : enable
+//  #define love_InstanceID gl_InstanceIDEXT
+//#else
+//  attribute float love_PseudoInstanceID;
+//  int love_InstanceID = int(love_PseudoInstanceID);
+//#endif
+
+// uniform mat4 TransformMatrix;
+// uniform mat4 ProjectionMatrix;
+// uniform mat4 TransformProjectionMatrix;
+// uniform mat4 NormalMatrix;
+uniform sampler2D _tex0_;
+uniform mediump vec4 love_ScreenSize;
+uniform mediump float love_PointSize;
+
+vec4 position(mat4 transform_proj, vec4 vertpos) {
+  return transform_proj * vertpos;
+}
 
 void main() {
    // convert the rectangle from pixels to 0.0 to 1.0
-   vec4 zeroToOne = VertexPosition / u_resolution;
+   vec4 zeroToOne = VertexPosition / love_ScreenSize;
 
    // convert from 0->1 to 0->2
    vec4 zeroToTwo = zeroToOne * 2.0;
@@ -248,15 +276,35 @@ void main() {
 }"""
 
   DEFAULT_FRAGMENT_SOURCE = """
+#define number float
+#define Image sampler2D
+#define extern uniform
+#define Texel texture2D
+#define love_Canvases gl_FragData
+
+#define PIXEL
+
 precision mediump float;
+
+varying mediump vec4 VaryingTexCoord;
+varying lowp vec4 VaryingColor;
+
+// uniform mat4 TransformMatrix;
+// uniform mat4 ProjectionMatrix;
+// uniform mat4 TransformProjectionMatrix;
+// uniform mat4 NormalMatrix;
+uniform sampler2D _tex0_;
+uniform mediump vec4 love_ScreenSize;
+uniform mediump float love_PointSize;
+
 uniform vec4 u_color;
 
-// our texture
-uniform sampler2D _tex0_;
-
-// the texCoords passed in from the vertex shader.
-varying mediump vec4 VaryingTexCoord;
+vec4 effect(lowp vec4 vcolor, Image texture, vec2 texcoord, vec2 pixcoord) {
+  return Texel(texture, texcoord) * vcolor;
+}
 
 void main() {
-  gl_FragColor = u_color * texture2D(_tex0_, VaryingTexCoord.st);
+  vec2 pixelcoord = vec2(gl_FragCoord.x, (gl_FragCoord.y * love_ScreenSize.z) + love_ScreenSize.w);
+
+  gl_FragColor = effect(u_color, _tex0_, VaryingTexCoord.st, pixelcoord);
 }"""
