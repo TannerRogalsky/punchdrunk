@@ -26,7 +26,6 @@ class CanvasWebGL
     @transformProjectionMatrixLocation = @context.getUniformLocation(@defaultProgram, "TransformProjectionMatrix")
 
     @transformMatrix = Matrix.I(4)
-    # orthographic projection
     @projectionMatrix = Matrix.Ortho(0, @width, @height, 0)
     @transformProjectionMatrix = @transformMatrix.x(@projectionMatrix)
 
@@ -197,6 +196,7 @@ class CanvasWebGL
     gl.attachShader(program, fragment_shader)
     gl.bindAttribLocation(program, 0, "VertexPosition")
     gl.bindAttribLocation(program, 1, "VertexTexCoord")
+    gl.bindAttribLocation(program, 2, "VertexColor")
     gl.linkProgram(program)
 
     # Check the link status
