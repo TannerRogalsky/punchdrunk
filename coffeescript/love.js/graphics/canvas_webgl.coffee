@@ -20,7 +20,26 @@ class CanvasWebGL
     @defaultTexture = createDefaultTexture(@context)
 
     @resolutionLocation = @context.getUniformLocation(@defaultProgram, "love_ScreenSize")
+    @pointSizeLocation = @context.getUniformLocation(@defaultProgram, "love_PointSize")
+    @transformMatrixLocation = @context.getUniformLocation(@defaultProgram, "TransformMatrix")
+    @projectionMatrixLocation = @context.getUniformLocation(@defaultProgram, "ProjectionMatrix")
+    @transformProjectionMatrixLocation = @context.getUniformLocation(@defaultProgram, "TransformProjectionMatrix")
+
+    @transformMatrix = Matrix.I(4)
+    # orthographic projection
+    @projectionMatrix = Matrix.I(4)
+    @projectionMatrix.elements[0][0] = 2 / (@width - 0)
+    @projectionMatrix.elements[1][1] = 2 / (0 - @height)
+    @projectionMatrix.elements[2][2] = -1.0
+    @projectionMatrix.elements[0][3] = -(@width + 0) / (@width - 0)
+    @projectionMatrix.elements[1][3] = -(0 + @height) / (0 - @height)
+    @transformProjectionMatrix = @transformMatrix.x(@projectionMatrix)
+
     @context.uniform4f(@resolutionLocation, @width, @height, 0, 0)
+    @context.uniform1f(@pointSizeLocation, 1)
+    @context.uniformMatrix4fv(@transformMatrixLocation, false, new Float32Array(@transformMatrix.flatten()))
+    @context.uniformMatrix4fv(@projectionMatrixLocation, false, new Float32Array(@projectionMatrix.flatten()))
+    @context.uniformMatrix4fv(@transformProjectionMatrixLocation, false, new Float32Array(@transformProjectionMatrix.flatten()))
 
     @positionLocation = @context.getAttribLocation(@defaultProgram, "VertexPosition")
     @texCoordLocation = @context.getAttribLocation(@defaultProgram, "VertexTexCoord")
@@ -227,6 +246,8 @@ class CanvasWebGL
 
 #define VERTEX
 
+precision mediump float;
+
 attribute vec4 VertexPosition;
 attribute vec4 VertexTexCoord;
 attribute vec4 VertexColor;
@@ -242,9 +263,9 @@ varying vec4 VaryingColor;
 //  int love_InstanceID = int(love_PseudoInstanceID);
 //#endif
 
-// uniform mat4 TransformMatrix;
-// uniform mat4 ProjectionMatrix;
-// uniform mat4 TransformProjectionMatrix;
+uniform mat4 TransformMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 TransformProjectionMatrix;
 // uniform mat4 NormalMatrix;
 uniform sampler2D _tex0_;
 uniform mediump vec4 love_ScreenSize;
@@ -255,22 +276,10 @@ vec4 position(mat4 transform_proj, vec4 vertpos) {
 }
 
 void main() {
-  // convert the rectangle from pixels to 0.0 to 1.0
-  vec4 zeroToOne = VertexPosition / love_ScreenSize;
-
-  // convert from 0->1 to 0->2
-  vec4 zeroToTwo = zeroToOne * 2.0;
-
-  // convert from 0->2 to -1->+1 (clipspace)
-  vec4 clipSpace = zeroToTwo - 1.0;
-  clipSpace.xy *= vec2(1, -1);
-  clipSpace.zw = vec2(0.0, 1.0);
-
   VaryingTexCoord = VertexTexCoord;
   VaryingColor = VertexColor;
   gl_PointSize = love_PointSize;
-  gl_Position = clipSpace;
-  // gl_Position = position(TransformProjectionMatrix, VertexPosition);
+  gl_Position = position(TransformProjectionMatrix, VertexPosition);
 }"""
 
   DEFAULT_FRAGMENT_SOURCE = """
@@ -287,9 +296,9 @@ precision mediump float;
 varying mediump vec4 VaryingTexCoord;
 varying lowp vec4 VaryingColor;
 
-// uniform mat4 TransformMatrix;
-// uniform mat4 ProjectionMatrix;
-// uniform mat4 TransformProjectionMatrix;
+uniform mat4 TransformMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 TransformProjectionMatrix;
 // uniform mat4 NormalMatrix;
 uniform sampler2D _tex0_;
 uniform mediump vec4 love_ScreenSize;
