@@ -102,7 +102,6 @@ class CanvasWebGL
     @context.disableVertexAttribArray(@positionLocation)
 
   point: (x, y) ->
-    # this doesn't work for some reason
     @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
 
     @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
