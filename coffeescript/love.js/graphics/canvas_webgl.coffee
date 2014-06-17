@@ -7,17 +7,18 @@ class CanvasWebGL
       height = canvas_height
     @setDimensions(width, height)
     @context = WebGL.getGLContext(@element)
+    @gl = new WebGL(@context)
 
-    @defaultVertexShader = WebGL.createShader(@context, "vertex", DEFAULT_VERTEX_SOURCE)
-    @defaultFragmetShader = WebGL.createShader(@context, "fragment", DEFAULT_FRAGMENT_SOURCE)
-    @defaultProgram = WebGL.createProgram(@context, @defaultVertexShader, @defaultFragmetShader)
+    @defaultVertexShader = @gl.createShader("vertex", DEFAULT_VERTEX_SOURCE)
+    @defaultFragmetShader = @gl.createShader("fragment", DEFAULT_FRAGMENT_SOURCE)
+    @defaultProgram = @gl.createProgram(@defaultVertexShader, @defaultFragmetShader)
 
     @context.enable(@context.BLEND)
     # @context.blendFunc(@context.SRC_ALPHA, @context.ONE)
     @context.blendFuncSeparate(@context.SRC_ALPHA, @context.ONE_MINUS_SRC_ALPHA, @context.ONE, @context.ONE_MINUS_SRC_ALPHA)
 
     @context.useProgram(@defaultProgram)
-    @defaultTexture = WebGL.createDefaultTexture(@context)
+    @defaultTexture = @gl.createDefaultTexture()
 
     @resolutionLocation = @context.getUniformLocation(@defaultProgram, "love_ScreenSize")
     @pointSizeLocation = @context.getUniformLocation(@defaultProgram, "love_PointSize")

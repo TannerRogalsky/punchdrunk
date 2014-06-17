@@ -1,6 +1,50 @@
 class WebGL
   constructor: (@context) ->
 
+  createShader: (type, source) ->
+    switch type
+      when "fragment" then shader = @context.createShader(@context.FRAGMENT_SHADER)
+      when "vertex" then shader = @context.createShader(@context.VERTEX_SHADER)
+      else return null
+    @context.shaderSource(shader, source)
+    @context.compileShader(shader)
+
+    # See if it compiled successfully
+    if not @context.getShaderParameter(shader, @context.COMPILE_STATUS)
+        console.log ("An error occurred compiling the shaders: " + @context.getShaderInfoLog(shader))
+        return null
+    else
+      return shader
+
+  createProgram: (vertex_shader, fragment_shader) ->
+    program = @context.createProgram()
+    @context.attachShader(program, vertex_shader)
+    @context.attachShader(program, fragment_shader)
+    @context.bindAttribLocation(program, 0, "VertexPosition")
+    @context.bindAttribLocation(program, 1, "VertexTexCoord")
+    @context.bindAttribLocation(program, 2, "VertexColor")
+    @context.linkProgram(program)
+
+    # Check the link status
+    linked = @context.getProgramParameter(program, @context.LINK_STATUS)
+    if not linked
+        # something went wrong with the link
+        lastError = @context.getProgramInfoLog (program)
+        console.log("Error in program linking:" + lastError)
+
+        @context.deleteProgram(program)
+        return null
+    return program
+
+  createDefaultTexture: ->
+    data = new Uint8Array([255, 255, 255, 255])
+    texture = @context.createTexture()
+    @context.bindTexture(@context.TEXTURE_2D, texture)
+    @context.texImage2D(@context.TEXTURE_2D, 0, @context.RGBA, 1, 1, 0, @context.RGBA, @context.UNSIGNED_BYTE, data)
+    @context.texParameteri(@context.TEXTURE_2D, @context.TEXTURE_MAG_FILTER, @context.NEAREST)
+    @context.texParameteri(@context.TEXTURE_2D, @context.TEXTURE_MIN_FILTER, @context.NEAREST)
+    return texture
+
 
   @getGLContext = (canvas) ->
     names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"]
@@ -11,47 +55,3 @@ class WebGL
       if context
         break
     return context
-
-  @createShader = (gl, type, source) ->
-    switch type
-      when "fragment" then shader = gl.createShader(gl.FRAGMENT_SHADER)
-      when "vertex" then shader = gl.createShader(gl.VERTEX_SHADER)
-      else return null
-    gl.shaderSource(shader, source)
-    gl.compileShader(shader)
-
-    # See if it compiled successfully
-    if not gl.getShaderParameter(shader, gl.COMPILE_STATUS)
-        console.log ("An error occurred compiling the shaders: " + gl.getShaderInfoLog(shader))
-        return null
-    else
-      return shader
-
-  @createProgram = (gl, vertex_shader, fragment_shader) ->
-    program = gl.createProgram()
-    gl.attachShader(program, vertex_shader)
-    gl.attachShader(program, fragment_shader)
-    gl.bindAttribLocation(program, 0, "VertexPosition")
-    gl.bindAttribLocation(program, 1, "VertexTexCoord")
-    gl.bindAttribLocation(program, 2, "VertexColor")
-    gl.linkProgram(program)
-
-    # Check the link status
-    linked = gl.getProgramParameter(program, gl.LINK_STATUS)
-    if not linked
-        # something went wrong with the link
-        lastError = gl.getProgramInfoLog (program)
-        console.log("Error in program linking:" + lastError)
-
-        gl.deleteProgram(program)
-        return null
-    return program
-
-  @createDefaultTexture = (gl) ->
-    data = new Uint8Array([255, 255, 255, 255])
-    texture = gl.createTexture()
-    gl.bindTexture(gl.TEXTURE_2D, texture)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-    return texture
