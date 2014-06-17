@@ -76,6 +76,16 @@ Matrix.prototype.make3x3 = function()
                           [this.elements[2][0], this.elements[2][1], this.elements[2][2]]]);
 };
 
+Matrix.Ortho = function(left, right, bottom, top) {
+    var m = Matrix.I(4);
+    m.elements[0][0] = 2 / (right - left);
+    m.elements[1][1] = 2 / (top - bottom);
+    m.elements[2][2] = -1.0;
+    m.elements[0][3] = -(right + left) / (right - left);
+    m.elements[1][3] = -(top + bottom) / (top - bottom);
+    return m;
+}
+
 Vector.prototype.flatten = function ()
 {
     return this.elements;
@@ -179,15 +189,15 @@ function makeFrustum(left, right,
 //
 // glOrtho
 //
-function makeOrtho(left, right, bottom, top, znear, zfar)
-{
-    var tx = - (right + left) / (right - left);
-    var ty = - (top + bottom) / (top - bottom);
-    var tz = - (zfar + znear) / (zfar - znear);
+// function makeOrtho(left, right, bottom, top, znear, zfar)
+// {
+//     var tx = - (right + left) / (right - left);
+//     var ty = - (top + bottom) / (top - bottom);
+//     var tz = - (zfar + znear) / (zfar - znear);
 
-    return $M([[2 / (right - left), 0, 0, tx],
-	       [0, 2 / (top - bottom), 0, ty],
-	       [0, 0, -2 / (zfar - znear), tz],
-	       [0, 0, 0, 1]]);
-}
+//     return $M([[2 / (right - left), 0, 0, tx],
+// 	       [0, 2 / (top - bottom), 0, ty],
+// 	       [0, 0, -2 / (zfar - znear), tz],
+// 	       [0, 0, 0, 1]]);
+// }
 

@@ -27,12 +27,7 @@ class CanvasWebGL
 
     @transformMatrix = Matrix.I(4)
     # orthographic projection
-    @projectionMatrix = Matrix.I(4)
-    @projectionMatrix.elements[0][0] = 2 / (@width - 0)
-    @projectionMatrix.elements[1][1] = 2 / (0 - @height)
-    @projectionMatrix.elements[2][2] = -1.0
-    @projectionMatrix.elements[0][3] = -(@width + 0) / (@width - 0)
-    @projectionMatrix.elements[1][3] = -(0 + @height) / (0 - @height)
+    @projectionMatrix = Matrix.Ortho(0, @width, @height, 0)
     @transformProjectionMatrix = @transformMatrix.x(@projectionMatrix)
 
     @context.uniform4f(@resolutionLocation, @width, @height, 0, 0)
