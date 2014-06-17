@@ -6,18 +6,18 @@ class CanvasWebGL
     if (canvas_height = Number(@element.getAttribute('height'))) != 0
       height = canvas_height
     @setDimensions(width, height)
-    @context = getGLContext(@element)
+    @context = WebGL.getGLContext(@element)
 
-    @defaultVertexShader = createShader(@context, "vertex", DEFAULT_VERTEX_SOURCE)
-    @defaultFragmetShader = createShader(@context, "fragment", DEFAULT_FRAGMENT_SOURCE)
-    @defaultProgram = createProgram(@context, @defaultVertexShader, @defaultFragmetShader)
+    @defaultVertexShader = WebGL.createShader(@context, "vertex", DEFAULT_VERTEX_SOURCE)
+    @defaultFragmetShader = WebGL.createShader(@context, "fragment", DEFAULT_FRAGMENT_SOURCE)
+    @defaultProgram = WebGL.createProgram(@context, @defaultVertexShader, @defaultFragmetShader)
 
     @context.enable(@context.BLEND)
     # @context.blendFunc(@context.SRC_ALPHA, @context.ONE)
     @context.blendFuncSeparate(@context.SRC_ALPHA, @context.ONE_MINUS_SRC_ALPHA, @context.ONE, @context.ONE_MINUS_SRC_ALPHA)
 
     @context.useProgram(@defaultProgram)
-    @defaultTexture = createDefaultTexture(@context)
+    @defaultTexture = WebGL.createDefaultTexture(@context)
 
     @resolutionLocation = @context.getUniformLocation(@defaultProgram, "love_ScreenSize")
     @pointSizeLocation = @context.getUniformLocation(@defaultProgram, "love_PointSize")
@@ -164,72 +164,6 @@ class CanvasWebGL
     @element.setAttribute('height', @height)
 
   # INTERNAL
-  getGLContext = (canvas) ->
-    names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"]
-    for name in names
-      try
-        context = canvas.getContext(name)
-      catch e
-      if context
-        break
-    return context
-
-  createShader = (gl, type, source) ->
-    switch type
-      when "fragment" then shader = gl.createShader(gl.FRAGMENT_SHADER)
-      when "vertex" then shader = gl.createShader(gl.VERTEX_SHADER)
-      else return null
-    gl.shaderSource(shader, source)
-    gl.compileShader(shader)
-
-    # See if it compiled successfully
-    if not gl.getShaderParameter(shader, gl.COMPILE_STATUS)
-        console.log ("An error occurred compiling the shaders: " + gl.getShaderInfoLog(shader))
-        return null
-    else
-      return shader
-
-  createProgram = (gl, vertex_shader, fragment_shader) ->
-    program = gl.createProgram()
-    gl.attachShader(program, vertex_shader)
-    gl.attachShader(program, fragment_shader)
-    gl.bindAttribLocation(program, 0, "VertexPosition")
-    gl.bindAttribLocation(program, 1, "VertexTexCoord")
-    gl.bindAttribLocation(program, 2, "VertexColor")
-    gl.linkProgram(program)
-
-    # Check the link status
-    linked = gl.getProgramParameter(program, gl.LINK_STATUS)
-    if not linked
-        # something went wrong with the link
-        lastError = gl.getProgramInfoLog (program)
-        console.log("Error in program linking:" + lastError)
-
-        gl.deleteProgram(program)
-        return null
-    return program
-
-  setRectangle = (gl, x, y, width, height) ->
-      x1 = x
-      x2 = x + width
-      y1 = y
-      y2 = y + height
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-         x1, y1,
-         x2, y1,
-         x1, y2,
-         x1, y2,
-         x2, y1,
-         x2, y2]), gl.STATIC_DRAW)
-
-  createDefaultTexture = (gl) ->
-    data = new Uint8Array([255, 255, 255, 255])
-    texture = gl.createTexture()
-    gl.bindTexture(gl.TEXTURE_2D, texture)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-    return texture
 
   DEFAULT_VERTEX_SOURCE = """
 #define number float
