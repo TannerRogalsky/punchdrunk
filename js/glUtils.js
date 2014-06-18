@@ -89,11 +89,11 @@ Matrix.prototype.setTransformation = function(x, y, angle, sx, sy, ox, oy, kx, k
     e[2][2] = 1;
     e[3][3] = 1;
     e[0][0]  = c * sx - ky * s * sy; // = a
-    e[0][1]  = s * sx + ky * c * sy; // = b
-    e[1][0]  = kx * c * sx - s * sy; // = c
+    e[1][0]  = s * sx + ky * c * sy; // = b
+    e[0][1]  = kx * c * sx - s * sy; // = c
     e[1][1]  = kx * s * sx + c * sy; // = d
-    e[0][3] = x - ox * e[0][0] - oy * e[1][0];
-    e[1][3] = y - ox * e[0][1] - oy * e[1][1];
+    e[0][3] = x - ox * e[0][0] - oy * e[0][1];
+    e[1][3] = y - ox * e[1][0] - oy * e[1][1];
 
     return this;
 }
