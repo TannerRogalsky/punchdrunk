@@ -48,5 +48,5 @@ function love.draw()
   g.draw(sprite_sheet, 100, 0)
 
   g.setColor(50, 255, 50)
-  g.draw(sprite_sheet, 100 + sprite_sheet:getWidth(), 0)
+  g.draw(sprite_sheet, 100 + sprite_sheet:getWidth(), 50, math.rad(index), 0.5, 0.5, sprite_sheet:getWidth() / 2, sprite_sheet:getHeight() / 2, -2, -2)
 end

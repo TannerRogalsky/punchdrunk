@@ -140,7 +140,11 @@ class CanvasWebGL
   rectangle: (mode, x, y, w, h) ->
     @polygon(mode, x,y, x,y+h, x+w,y+h, x+w,y)
 
-  draw: (drawable, x, y, r, sx, syx, ox, oy, kx, ky) ->
+  draw: (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
+    imageDrawTransform = Matrix.I(4).setTransformation(x, y, r, sx, sy, ox, oy, kx, ky)
+    imageDrawTransform = imageDrawTransform.x(@transformMatrix)
+    @context.uniformMatrix4fv(@transformProjectionMatrixLocation, false, new Float32Array(@projectionMatrix.x(imageDrawTransform).flatten()))
+
     @context.bindTexture(@context.TEXTURE_2D, drawable.texture)
 
     @context.enableVertexAttribArray(@positionLocation)
@@ -158,6 +162,8 @@ class CanvasWebGL
 
     @context.disableVertexAttribArray(@positionLocation)
     @context.disableVertexAttribArray(@texCoordLocation)
+
+    @context.uniformMatrix4fv(@transformProjectionMatrixLocation, false, new Float32Array(@transformProjectionMatrix.flatten()))
 
   # PRIVATE
   setDimensions: (@width, @height) ->
