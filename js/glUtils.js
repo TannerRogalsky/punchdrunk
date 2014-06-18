@@ -76,6 +76,28 @@ Matrix.prototype.make3x3 = function()
                           [this.elements[2][0], this.elements[2][1], this.elements[2][2]]]);
 };
 
+Matrix.prototype.setTransformation = function(x, y, angle, sx, sy, ox, oy, kx, ky){
+    var c = Math.cos(angle);
+    var s = Math.sin(angle);
+    var e = this.elements;
+    // matrix multiplication carried out on paper:
+    // |1     x| |c -s    | |sx       | | 1 ky    | |1     -ox|
+    // |  1   y| |s  c    | |   sy    | |kx  1    | |  1   -oy|
+    // |    1  | |     1  | |      1  | |      1  | |    1    |
+    // |      1| |       1| |        1| |        1| |       1 |
+    //   move      rotate      scale       skew       origin
+    e[2][2] = 1;
+    e[3][3] = 1;
+    e[0][0]  = c * sx - ky * s * sy; // = a
+    e[0][1]  = s * sx + ky * c * sy; // = b
+    e[1][0]  = kx * c * sx - s * sy; // = c
+    e[1][1]  = kx * s * sx + c * sy; // = d
+    e[0][3] = x - ox * e[0][0] - oy * e[1][0];
+    e[1][3] = y - ox * e[0][1] - oy * e[1][1];
+
+    return this;
+}
+
 Matrix.Ortho = function(left, right, bottom, top) {
     var m = Matrix.I(4);
     m.elements[0][0] = 2 / (right - left);
