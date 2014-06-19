@@ -2,6 +2,8 @@ function love.load()
   -- print(love.graphics.isSupported("webgl"))
   index = 0
   sprite_sheet = love.graphics.newImage("sprites.png")
+
+  quad = love.graphics.newQuad(0, 0, 50, 50, 128, 128)
 end
 
 function love.update(dt)
@@ -45,7 +47,7 @@ function love.draw()
   g.point(10, 10)
 
   g.setColor(255, 255, 255)
-  g.draw(sprite_sheet, 100, 0)
+  g.draw(sprite_sheet, quad, 100, 0)
 
   g.setColor(50, 255, 50)
   g.draw(sprite_sheet, 100 + sprite_sheet:getWidth(), 50, math.rad(index), 0.5, 0.5, sprite_sheet:getWidth() / 2, sprite_sheet:getHeight() / 2, -2, -2)

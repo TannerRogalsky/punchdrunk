@@ -140,22 +140,34 @@ class CanvasWebGL
   rectangle: (mode, x, y, w, h) ->
     @polygon(mode, x,y, x,y+h, x+w,y+h, x+w,y)
 
-  draw: (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
+  draw: (drawable, quad) ->
+    switch true
+      when quad not instanceof Quad then @drawDrawable.apply(this, arguments)
+      when quad instanceof Quad then @drawQuad.apply(this, arguments)
+
+  drawDrawable: (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
     imageDrawTransform = Matrix.I(4).setTransformation(x, y, r, sx, sy, ox, oy, kx, ky)
+    @drawv(drawable.texture, imageDrawTransform, drawable.coords, drawable.uvs)
+
+  drawQuad: (drawable, quad, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
+    imageDrawTransform = Matrix.I(4).setTransformation(x, y, r, sx, sy, ox, oy, kx, ky)
+    @drawv(drawable.texture, imageDrawTransform, quad.coords, quad.uvs)
+
+  drawv: (texture, imageDrawTransform, coords, uvs) ->
     imageDrawTransform = imageDrawTransform.x(@transformMatrix)
     @context.uniformMatrix4fv(@transformProjectionMatrixLocation, false, new Float32Array(@projectionMatrix.x(imageDrawTransform).flatten()))
 
-    @context.bindTexture(@context.TEXTURE_2D, drawable.texture)
+    @context.bindTexture(@context.TEXTURE_2D, texture)
 
     @context.enableVertexAttribArray(@positionLocation)
     @context.enableVertexAttribArray(@texCoordLocation)
 
     @context.bindBuffer(@context.ARRAY_BUFFER, @texCoordBuffer)
-    @context.bufferData(@context.ARRAY_BUFFER, new Float32Array(drawable.uvs), @context.DYNAMIC_DRAW)
+    @context.bufferData(@context.ARRAY_BUFFER, new Float32Array(uvs), @context.DYNAMIC_DRAW)
     @context.vertexAttribPointer(@texCoordLocation, 2, @context.FLOAT, false, 0, 0)
 
     @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
-    @context.bufferData(@context.ARRAY_BUFFER, new Float32Array(drawable.coords), @context.DYNAMIC_DRAW)
+    @context.bufferData(@context.ARRAY_BUFFER, new Float32Array(coords), @context.DYNAMIC_DRAW)
     @context.vertexAttribPointer(@positionLocation, 2, @context.FLOAT, false, 0, 0)
 
     @context.drawArrays(@context.TRIANGLE_FAN, 0, 4)
