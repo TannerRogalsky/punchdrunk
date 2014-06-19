@@ -5,6 +5,12 @@ class CanvasWebGL
       width = canvas_width
     if (canvas_height = Number(@element.getAttribute('height'))) != 0
       height = canvas_height
+
+    @transformMatrices = []
+    @projectionMatrices = []
+    @transformMatrices.push(Matrix.I(4))
+    @projectionMatrices.push(Matrix.I(4))
+
     @context = WebGL.getGLContext(@element)
     @gl = new WebGL(@context)
     @setDimensions(width, height)
@@ -26,15 +32,8 @@ class CanvasWebGL
     @projectionMatrixLocation = @context.getUniformLocation(@defaultProgram, "ProjectionMatrix")
     @transformProjectionMatrixLocation = @context.getUniformLocation(@defaultProgram, "TransformProjectionMatrix")
 
-    @transformMatrix = Matrix.I(4)
-    @projectionMatrix = Matrix.Ortho(0, @width, @height, 0)
-    @transformProjectionMatrix = @transformMatrix.x(@projectionMatrix)
-
     @context.uniform4f(@resolutionLocation, @width, @height, 0, 0)
     @context.uniform1f(@pointSizeLocation, 1)
-    @context.uniformMatrix4fv(@transformMatrixLocation, false, new Float32Array(@transformMatrix.flatten()))
-    @context.uniformMatrix4fv(@projectionMatrixLocation, false, new Float32Array(@projectionMatrix.flatten()))
-    @context.uniformMatrix4fv(@transformProjectionMatrixLocation, false, new Float32Array(@transformProjectionMatrix.flatten()))
 
     @positionLocation = @context.getAttribLocation(@defaultProgram, "VertexPosition")
     @texCoordLocation = @context.getAttribLocation(@defaultProgram, "VertexTexCoord")
@@ -91,6 +90,8 @@ class CanvasWebGL
     @polygon(mode, coords)
 
   line: (points...) ->
+    @prepareDraw()
+
     @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
 
     @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
@@ -103,6 +104,8 @@ class CanvasWebGL
     @context.disableVertexAttribArray(@positionLocation)
 
   point: (x, y) ->
+    @prepareDraw()
+
     @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
 
     @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
@@ -125,7 +128,8 @@ class CanvasWebGL
         draw_mode = @context.LINE_LOOP
       when "fill"
         draw_mode = @context.TRIANGLE_FAN
-    # @context.prepareDraw()
+    @prepareDraw()
+
     @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
 
     @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
@@ -154,8 +158,9 @@ class CanvasWebGL
     @drawv(drawable.texture, imageDrawTransform, quad.coords, quad.uvs)
 
   drawv: (texture, imageDrawTransform, coords, uvs) ->
-    imageDrawTransform = imageDrawTransform.x(@transformMatrix)
-    @context.uniformMatrix4fv(@transformProjectionMatrixLocation, false, new Float32Array(@projectionMatrix.x(imageDrawTransform).flatten()))
+    @transformMatrices.push(imageDrawTransform.x(@transformMatrices.top()))
+
+    @prepareDraw()
 
     @context.bindTexture(@context.TEXTURE_2D, texture)
 
@@ -175,15 +180,23 @@ class CanvasWebGL
     @context.disableVertexAttribArray(@positionLocation)
     @context.disableVertexAttribArray(@texCoordLocation)
 
-    @context.uniformMatrix4fv(@transformProjectionMatrixLocation, false, new Float32Array(@transformProjectionMatrix.flatten()))
+    @transformMatrices.pop()
 
   # PRIVATE
   setDimensions: (@width, @height) ->
     @element.setAttribute('width', @width)
     @element.setAttribute('height', @height)
     @context.viewport(0, 0, @width, @height)
+    @projectionMatrices.push(Matrix.Ortho(0, @width, @height, 0))
 
   # INTERNAL
+  prepareDraw: ->
+    transformMatrix = @transformMatrices.top()
+    projectionMatrix = @projectionMatrices.top()
+    transformProjectionMatrix = projectionMatrix.x(transformMatrix)
+    @context.uniformMatrix4fv(@transformMatrixLocation, false, new Float32Array(transformMatrix.flatten()))
+    @context.uniformMatrix4fv(@projectionMatrixLocation, false, new Float32Array(projectionMatrix.flatten()))
+    @context.uniformMatrix4fv(@transformProjectionMatrixLocation, false, new Float32Array(transformProjectionMatrix.flatten()))
 
   DEFAULT_VERTEX_SOURCE = """
 #define number float
