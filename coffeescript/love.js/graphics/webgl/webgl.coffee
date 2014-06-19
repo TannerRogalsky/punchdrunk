@@ -45,6 +45,10 @@ class WebGL
     @context.texParameteri(@context.TEXTURE_2D, @context.TEXTURE_MIN_FILTER, @context.NEAREST)
     return texture
 
+  bindTexture: (texture) ->
+    if texture != @activeTexture
+      @context.bindTexture(@context.TEXTURE_2D, texture)
+      @activeTexture = texture
 
   @getGLContext = (canvas) ->
     names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"]

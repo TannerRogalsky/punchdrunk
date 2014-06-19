@@ -90,7 +90,7 @@ class CanvasWebGL
   line: (points...) ->
     @prepareDraw()
 
-    @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
+    @gl.bindTexture(@defaultTexture)
 
     @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
     @context.bufferData(@context.ARRAY_BUFFER, new Float32Array(points), @context.DYNAMIC_DRAW)
@@ -104,7 +104,7 @@ class CanvasWebGL
   point: (x, y) ->
     @prepareDraw()
 
-    @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
+    @gl.bindTexture(@defaultTexture)
 
     @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
     @context.bufferData(@context.ARRAY_BUFFER, new Float32Array([x, y]), @context.DYNAMIC_DRAW)
@@ -128,7 +128,7 @@ class CanvasWebGL
         draw_mode = @context.TRIANGLE_FAN
     @prepareDraw()
 
-    @context.bindTexture(@context.TEXTURE_2D, @defaultTexture)
+    @gl.bindTexture(@defaultTexture)
 
     @context.bindBuffer(@context.ARRAY_BUFFER, @positionBuffer)
     @context.bufferData(@context.ARRAY_BUFFER, new Float32Array(points), @context.DYNAMIC_DRAW)
@@ -160,7 +160,7 @@ class CanvasWebGL
 
     @prepareDraw()
 
-    @context.bindTexture(@context.TEXTURE_2D, texture)
+    @gl.bindTexture(texture)
 
     @context.enableVertexAttribArray(@positionLocation)
     @context.enableVertexAttribArray(@texCoordLocation)
