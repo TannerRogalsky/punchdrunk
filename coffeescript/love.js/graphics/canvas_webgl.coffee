@@ -5,9 +5,9 @@ class CanvasWebGL
       width = canvas_width
     if (canvas_height = Number(@element.getAttribute('height'))) != 0
       height = canvas_height
-    @setDimensions(width, height)
     @context = WebGL.getGLContext(@element)
     @gl = new WebGL(@context)
+    @setDimensions(width, height)
 
     @defaultVertexShader = @gl.createShader("vertex", DEFAULT_VERTEX_SOURCE)
     @defaultFragmetShader = @gl.createShader("fragment", DEFAULT_FRAGMENT_SOURCE)
@@ -181,6 +181,7 @@ class CanvasWebGL
   setDimensions: (@width, @height) ->
     @element.setAttribute('width', @width)
     @element.setAttribute('height', @height)
+    @context.viewport(0, 0, @width, @height)
 
   # INTERNAL
 
