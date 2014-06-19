@@ -158,7 +158,7 @@ class CanvasWebGL
     @drawv(drawable.texture, imageDrawTransform, quad.coords, quad.uvs)
 
   drawv: (texture, imageDrawTransform, coords, uvs) ->
-    @transformMatrices.push(imageDrawTransform.x(@transformMatrices.top()))
+    @transformMatrices.push(@transformMatrices.top().x(imageDrawTransform))
 
     @prepareDraw()
 
