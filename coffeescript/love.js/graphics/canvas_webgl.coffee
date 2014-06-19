@@ -45,8 +45,6 @@ class CanvasWebGL
   clear: (self, r, g, b, a) ->
     @context.clear(@context.COLOR_BUFFER_BIT)
 
-  origin: () ->
-
   setColor: (r, g, b, a) ->
     if typeof(r) == "number"
       @current_color = new Color(r, g, b, a)
@@ -181,6 +179,50 @@ class CanvasWebGL
     @context.disableVertexAttribArray(@texCoordLocation)
 
     @transformMatrices.pop()
+
+  origin: () ->
+    @transformMatrices.pop()
+    @transformMatrices.push(Matrix.I(4))
+
+  pop: () ->
+    @transformMatrices.pop()
+
+  push: () ->
+    @transformMatrices.push(Matrix.create(@transformMatrices.top()))
+
+  rotate: (r) ->
+    new_transform = @transformMatrices.pop().x(Matrix.Rotation(r).ensure4x4())
+    @transformMatrices.push(new_transform)
+
+  scale: (sx, sy) ->
+    m = Matrix.I(4)
+    m.elements[0][0] = sx
+    m.elements[1][1] = sy
+    new_transform = @transformMatrices.pop().x(m)
+    @transformMatrices.push(new_transform)
+
+  shear: (kx, ky) ->
+    m = Matrix.I(4)
+    m.elements[0][1] = kx
+    m.elements[1][0] = ky
+    new_transform = @transformMatrices.pop().x(m)
+    @transformMatrices.push(new_transform)
+
+  translate: (dx, dy) ->
+    m = Matrix.I(4)
+    m.elements[0][3] = dx
+    m.elements[1][3] = dy
+    new_transform = @transformMatrices.pop().x(m)
+    @transformMatrices.push(new_transform)
+
+  getDimensions: (self) ->
+    [@getWidth(self), @getHeight(self)]
+
+  getHeight: (self) ->
+    self.height
+
+  getWidth: (self) ->
+    self.width
 
   # PRIVATE
   setDimensions: (@width, @height) ->

@@ -12,6 +12,10 @@ function love.update(dt)
 end
 
 function love.draw()
+  -- love.graphics.rotate(math.pi)
+  -- love.graphics.translate(-600, -600)
+  -- love.graphics.scale(2)
+  -- love.graphics.shear(2, 2)
   local g = love.graphics
 
   g.setColor(100, 255, 100, 100)
