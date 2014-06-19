@@ -19,6 +19,8 @@ class CanvasWebGL
     @defaultFragmetShader = @gl.createShader("fragment", DEFAULT_FRAGMENT_SOURCE)
     @defaultProgram = @gl.createProgram(@defaultVertexShader, @defaultFragmetShader)
 
+    @context.disable(@context.CULL_FACE)
+    @context.disable(@context.DEPTH_TEST)
     @context.enable(@context.BLEND)
     # @context.blendFunc(@context.SRC_ALPHA, @context.ONE)
     @context.blendFuncSeparate(@context.SRC_ALPHA, @context.ONE_MINUS_SRC_ALPHA, @context.ONE, @context.ONE_MINUS_SRC_ALPHA)
