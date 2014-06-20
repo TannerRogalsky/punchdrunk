@@ -120,7 +120,11 @@ class CanvasWebGL
   polygon: (mode, points...) ->
     if points.length == 1
       # we were passed a sequence
-      points = points[0]
+      points = if points[0].__shine
+        points[0].__shine.numValues.slice(1, points[0].__shine.numValues.length)
+      else
+        points[0]
+
 
     draw_mode = @context.TRIANGLE_FAN
     switch mode

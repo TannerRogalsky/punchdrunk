@@ -84,7 +84,11 @@ class Canvas2D
 
   polygon: (mode, points...) ->
     if points.length == 1
-      points = points[0].__shine.numValues.slice(1, points[0].__shine.numValues.length)
+      # we were passed a sequence
+      points = if points[0].__shine
+        points[0].__shine.numValues.slice(1, points[0].__shine.numValues.length)
+      else
+        points[0]
 
     @context.beginPath()
     @context.moveTo(points[0], points[1])
