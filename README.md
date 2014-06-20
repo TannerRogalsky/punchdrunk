@@ -7,6 +7,8 @@ Demo: http://tannerrogalsky.com/punchdrunk/
 
 [![Build Status](https://travis-ci.org/TannerRogalsky/punchdrunk.svg?branch=tests)](https://travis-ci.org/TannerRogalsky/punchdrunk)
 
+"It's not really a tool. It's a demonstration of one man's patience and lunacy." - [Telemachus](http://forums.debian.net/viewtopic.php?p=305051&sid=5e4ed2d931ed559d39b2a631c704f821#p305051), on [cb.vu](http://cb.vu/)
+
 # Get This Running
 
 1. Install [node.js](http://nodejs.org/)
