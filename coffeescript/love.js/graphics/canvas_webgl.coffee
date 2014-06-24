@@ -15,9 +15,7 @@ class CanvasWebGL
     @gl = new WebGL(@context)
     @setDimensions(width, height)
 
-    @defaultVertexShader = @gl.createShader("vertex", DEFAULT_VERTEX_SOURCE)
-    @defaultFragmetShader = @gl.createShader("fragment", DEFAULT_FRAGMENT_SOURCE)
-    @defaultProgram = @gl.createProgram(@defaultVertexShader, @defaultFragmetShader)
+    @defaultProgram = new Shader(@context)
 
     @context.disable(@context.CULL_FACE)
     @context.disable(@context.DEPTH_TEST)
@@ -25,21 +23,21 @@ class CanvasWebGL
     # @context.blendFunc(@context.SRC_ALPHA, @context.ONE)
     @context.blendFuncSeparate(@context.SRC_ALPHA, @context.ONE_MINUS_SRC_ALPHA, @context.ONE, @context.ONE_MINUS_SRC_ALPHA)
 
-    @context.useProgram(@defaultProgram)
+    @gl.useProgram(@defaultProgram)
     @defaultTexture = @gl.createDefaultTexture()
 
-    @resolutionLocation = @context.getUniformLocation(@defaultProgram, "love_ScreenSize")
-    @pointSizeLocation = @context.getUniformLocation(@defaultProgram, "love_PointSize")
-    @transformMatrixLocation = @context.getUniformLocation(@defaultProgram, "TransformMatrix")
-    @projectionMatrixLocation = @context.getUniformLocation(@defaultProgram, "ProjectionMatrix")
-    @transformProjectionMatrixLocation = @context.getUniformLocation(@defaultProgram, "TransformProjectionMatrix")
+    @resolutionLocation = @context.getUniformLocation(@defaultProgram.program, "love_ScreenSize")
+    @pointSizeLocation = @context.getUniformLocation(@defaultProgram.program, "love_PointSize")
+    @transformMatrixLocation = @context.getUniformLocation(@defaultProgram.program, "TransformMatrix")
+    @projectionMatrixLocation = @context.getUniformLocation(@defaultProgram.program, "ProjectionMatrix")
+    @transformProjectionMatrixLocation = @context.getUniformLocation(@defaultProgram.program, "TransformProjectionMatrix")
 
     @context.uniform4f(@resolutionLocation, @width, @height, 0, 0)
     @context.uniform1f(@pointSizeLocation, 1)
 
-    @positionLocation = @context.getAttribLocation(@defaultProgram, "VertexPosition")
-    @texCoordLocation = @context.getAttribLocation(@defaultProgram, "VertexTexCoord")
-    @colorLocation = @context.getAttribLocation(@defaultProgram, "VertexColor")
+    @positionLocation = @context.getAttribLocation(@defaultProgram.program, "VertexPosition")
+    @texCoordLocation = @context.getAttribLocation(@defaultProgram.program, "VertexTexCoord")
+    @colorLocation = @context.getAttribLocation(@defaultProgram.program, "VertexColor")
 
     @texCoordBuffer = @context.createBuffer()
     @positionBuffer = @context.createBuffer()
@@ -245,80 +243,3 @@ class CanvasWebGL
     @context.uniformMatrix4fv(@transformMatrixLocation, false, new Float32Array(transformMatrix.flatten()))
     @context.uniformMatrix4fv(@projectionMatrixLocation, false, new Float32Array(projectionMatrix.flatten()))
     @context.uniformMatrix4fv(@transformProjectionMatrixLocation, false, new Float32Array(transformProjectionMatrix.flatten()))
-
-  DEFAULT_VERTEX_SOURCE = """
-#define number float
-#define Image sampler2D
-#define extern uniform
-#define Texel texture2D
-#define love_Canvases gl_FragData
-
-#define VERTEX
-
-precision mediump float;
-
-attribute vec4 VertexPosition;
-attribute vec4 VertexTexCoord;
-attribute vec4 VertexColor;
-
-varying vec4 VaryingTexCoord;
-varying vec4 VaryingColor;
-
-//#if defined(GL_EXT_draw_instanced)
-//  #extension GL_EXT_draw_instanced : enable
-//  #define love_InstanceID gl_InstanceIDEXT
-//#else
-//  attribute float love_PseudoInstanceID;
-//  int love_InstanceID = int(love_PseudoInstanceID);
-//#endif
-
-uniform mat4 TransformMatrix;
-uniform mat4 ProjectionMatrix;
-uniform mat4 TransformProjectionMatrix;
-// uniform mat4 NormalMatrix;
-uniform sampler2D _tex0_;
-uniform mediump vec4 love_ScreenSize;
-uniform mediump float love_PointSize;
-
-vec4 position(mat4 transform_proj, vec4 vertpos) {
-  return transform_proj * vertpos;
-}
-
-void main() {
-  VaryingTexCoord = VertexTexCoord;
-  VaryingColor = VertexColor;
-  gl_PointSize = love_PointSize;
-  gl_Position = position(TransformProjectionMatrix, VertexPosition);
-}"""
-
-  DEFAULT_FRAGMENT_SOURCE = """
-#define number float
-#define Image sampler2D
-#define extern uniform
-#define Texel texture2D
-#define love_Canvases gl_FragData
-
-#define PIXEL
-
-precision mediump float;
-
-varying mediump vec4 VaryingTexCoord;
-varying lowp vec4 VaryingColor;
-
-uniform mat4 TransformMatrix;
-uniform mat4 ProjectionMatrix;
-uniform mat4 TransformProjectionMatrix;
-// uniform mat4 NormalMatrix;
-uniform sampler2D _tex0_;
-uniform mediump vec4 love_ScreenSize;
-uniform mediump float love_PointSize;
-
-vec4 effect(lowp vec4 vcolor, Image texture, vec2 texcoord, vec2 pixcoord) {
-  return Texel(texture, texcoord) * vcolor;
-}
-
-void main() {
-  vec2 pixelcoord = vec2(gl_FragCoord.x, (gl_FragCoord.y * love_ScreenSize.z) + love_ScreenSize.w);
-
-  gl_FragColor = effect(VaryingColor, _tex0_, VaryingTexCoord.st, pixelcoord);
-}"""
