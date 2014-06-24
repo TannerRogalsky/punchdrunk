@@ -74,6 +74,18 @@ class Shader
       when 3 then gl.uniformMatrix3fv(uniform.location, false, new Float32Array(matrix.flatten()))
       when 4 then gl.uniformMatrix4fv(uniform.location, false, new Float32Array(matrix.flatten()))
 
+  sendFloat: (gl, name, floats...) ->
+    uniform = @uniforms[name]
+
+    if not uniform
+      return
+
+    switch floats.length
+      when 1 then gl.uniform1fv(uniform.location, new Float32Array(floats))
+      when 2 then gl.uniform2fv(uniform.location, new Float32Array(floats))
+      when 3 then gl.uniform3fv(uniform.location, new Float32Array(floats))
+      when 4 then gl.uniform4fv(uniform.location, new Float32Array(floats))
+
 
 
   # Taken from the WebGl spec:
