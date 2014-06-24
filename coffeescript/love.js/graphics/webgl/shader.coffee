@@ -63,6 +63,18 @@ class Shader
 
     return uniforms
 
+  sendMatrix: (gl, name, matrix) ->
+    uniform = @uniforms[name]
+
+    if not uniform
+      return
+
+    switch matrix.elements.length
+      when 2 then gl.uniformMatrix2fv(uniform.location, false, new Float32Array(matrix.flatten()))
+      when 3 then gl.uniformMatrix3fv(uniform.location, false, new Float32Array(matrix.flatten()))
+      when 4 then gl.uniformMatrix4fv(uniform.location, false, new Float32Array(matrix.flatten()))
+
+
 
   # Taken from the WebGl spec:
   # http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14
