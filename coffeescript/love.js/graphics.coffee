@@ -72,7 +72,13 @@ class Love.Graphics
     new Quad(x, y, width, height, sw, sh)
 
   newScreenshot: =>
-  newShader: () =>
+
+  newShader: (fragment_code, vertex_code) =>
+    if @isSupported("shaders")
+      new Shader(@default_canvas.context, fragment_code, vertex_code)
+    else
+      null
+
   newSpriteBatch: () =>
 
   setNewFont: (filename, size) =>
@@ -138,6 +144,9 @@ class Love.Graphics
     for feature in features
       switch feature
         when "webgl"
+          if !window.WebGLRenderingContext
+            return false
+        when "shaders"
           if !window.WebGLRenderingContext
             return false
         else

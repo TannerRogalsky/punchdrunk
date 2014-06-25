@@ -4,6 +4,25 @@ function love.load()
   sprite_sheet = love.graphics.newImage("sprites.png")
 
   quad = love.graphics.newQuad(0, 0, 50, 50, 128, 128)
+
+  shader = love.graphics.newShader([[
+varying vec4 vpos;
+
+vec4 position( mat4 transform_projection, vec4 vertex_position )
+{
+    vpos = vertex_position;
+    return transform_projection * vertex_position;
+}
+]],[[
+varying vec4 vpos;
+
+vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords )
+{
+    color = vec4(cos(vpos.x), sin(vpos.y), tan(vpos.x + vpos.y), 1);
+    vec4 texcolor = Texel(texture, texture_coords);
+    return texcolor * color;
+}
+]])
 end
 
 function love.update(dt)
@@ -55,4 +74,9 @@ function love.draw()
 
   g.setColor(50, 255, 50)
   g.draw(sprite_sheet, 100 + sprite_sheet:getWidth(), 50, math.rad(index), 0.5, 0.5, sprite_sheet:getWidth() / 2, sprite_sheet:getHeight() / 2, -2, -2)
+
+  g.setColor(255, 255, 255)
+  g.setShader(shader)
+  g.draw(sprite_sheet, quad, 400, 400, 0, 3, 3)
+  g.setShader()
 end
