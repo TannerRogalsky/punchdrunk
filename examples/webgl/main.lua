@@ -29,6 +29,7 @@ end
 
 function love.update(dt)
   index = index + 1
+  shader:send("time", index / 30)
   love.graphics.setBackgroundColor(index % 255, 0, 255 - index % 255)
 end
 
@@ -79,7 +80,6 @@ function love.draw()
 
   g.setColor(255, 255, 255)
   g.setShader(shader)
-  shader:send("time", index / 30)
   g.draw(sprite_sheet, quad, 400, 400, 0, 3, 3)
   g.setShader()
 end
