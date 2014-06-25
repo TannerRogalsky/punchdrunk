@@ -16,9 +16,11 @@ vec4 position( mat4 transform_projection, vec4 vertex_position )
 ]],[[
 varying vec4 vpos;
 
+extern number time;
+
 vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords )
 {
-    color = vec4(cos(vpos.x), sin(vpos.y), tan(vpos.x + vpos.y), 1);
+    color = vec4(cos(time), sin(vpos.y), tan(vpos.x + vpos.y), 1);
     vec4 texcolor = Texel(texture, texture_coords);
     return texcolor * color;
 }
@@ -77,6 +79,7 @@ function love.draw()
 
   g.setColor(255, 255, 255)
   g.setShader(shader)
+  shader:send("time", index / 30)
   g.draw(sprite_sheet, quad, 400, 400, 0, 3, 3)
   g.setShader()
 end

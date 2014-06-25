@@ -64,6 +64,11 @@ class Shader
 
     return uniforms
 
+  send: (self, name, values...) ->
+    switch typeof(values[0])
+      when 'number' then self.sendFloat(name, values)
+      when 'object' then self.sendMatrix(values)
+
   sendMatrix: (name, matrix) ->
     uniform = @uniforms[name]
 
