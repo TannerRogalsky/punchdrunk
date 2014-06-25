@@ -223,6 +223,8 @@ class CanvasWebGL
   getWidth: (self) ->
     self.width
 
+  print: ->
+  printf: ->
 
   setShader: (shader = @defaultProgram) ->
     @gl.useProgram(shader)
