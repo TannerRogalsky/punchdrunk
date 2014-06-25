@@ -70,10 +70,10 @@ class Shader
     if not uniform
       return
 
-    switch matrix.elements.length
-      when 2 then @context.uniformMatrix2fv(uniform.location, false, new Float32Array(matrix.flatten()))
-      when 3 then @context.uniformMatrix3fv(uniform.location, false, new Float32Array(matrix.flatten()))
-      when 4 then @context.uniformMatrix4fv(uniform.location, false, new Float32Array(matrix.flatten()))
+    switch Math.sqrt(matrix.length)
+      when 2 then @context.uniformMatrix2fv(uniform.location, false, new Float32Array(matrix))
+      when 3 then @context.uniformMatrix3fv(uniform.location, false, new Float32Array(matrix))
+      when 4 then @context.uniformMatrix4fv(uniform.location, false, new Float32Array(matrix))
 
   sendFloat: (name, floats...) ->
     uniform = @uniforms[name]
