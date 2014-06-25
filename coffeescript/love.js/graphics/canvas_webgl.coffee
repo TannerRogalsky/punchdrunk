@@ -32,8 +32,8 @@ class CanvasWebGL
     @projectionMatrixLocation = @context.getUniformLocation(@defaultProgram.program, "ProjectionMatrix")
     @transformProjectionMatrixLocation = @context.getUniformLocation(@defaultProgram.program, "TransformProjectionMatrix")
 
-    @defaultProgram.sendFloat(@context, "love_ScreenSize", @width, @height, 0, 0)
-    @defaultProgram.sendFloat(@context, "love_PointSize",1)
+    @defaultProgram.sendFloat("love_ScreenSize", @width, @height, 0, 0)
+    @defaultProgram.sendFloat("love_PointSize", 1)
 
     @positionLocation = @context.getAttribLocation(@defaultProgram.program, "VertexPosition")
     @texCoordLocation = @context.getAttribLocation(@defaultProgram.program, "VertexTexCoord")
@@ -240,6 +240,6 @@ class CanvasWebGL
     transformMatrix = @transformMatrices.top()
     projectionMatrix = @projectionMatrices.top()
     transformProjectionMatrix = projectionMatrix.x(transformMatrix)
-    @defaultProgram.sendMatrix(@context, "TransformMatrix", transformMatrix)
-    @defaultProgram.sendMatrix(@context, "ProjectionMatrix", projectionMatrix)
-    @defaultProgram.sendMatrix(@context, "TransformProjectionMatrix", transformProjectionMatrix)
+    @defaultProgram.sendMatrix("TransformMatrix", transformMatrix)
+    @defaultProgram.sendMatrix("ProjectionMatrix", projectionMatrix)
+    @defaultProgram.sendMatrix("TransformProjectionMatrix", transformProjectionMatrix)

@@ -6,6 +6,7 @@ class Shader
     @program = @loadVolatile(gl, vertex_shader, fragment_shader)
 
     @uniforms = @mapActiveUniforms(gl)
+    @context = gl
 
   shaderCodeToGLSL = (vertex_code, fragment_code) ->
     vertex_code ?= VERTEX.DEFAULT
@@ -63,28 +64,28 @@ class Shader
 
     return uniforms
 
-  sendMatrix: (gl, name, matrix) ->
+  sendMatrix: (name, matrix) ->
     uniform = @uniforms[name]
 
     if not uniform
       return
 
     switch matrix.elements.length
-      when 2 then gl.uniformMatrix2fv(uniform.location, false, new Float32Array(matrix.flatten()))
-      when 3 then gl.uniformMatrix3fv(uniform.location, false, new Float32Array(matrix.flatten()))
-      when 4 then gl.uniformMatrix4fv(uniform.location, false, new Float32Array(matrix.flatten()))
+      when 2 then @context.uniformMatrix2fv(uniform.location, false, new Float32Array(matrix.flatten()))
+      when 3 then @context.uniformMatrix3fv(uniform.location, false, new Float32Array(matrix.flatten()))
+      when 4 then @context.uniformMatrix4fv(uniform.location, false, new Float32Array(matrix.flatten()))
 
-  sendFloat: (gl, name, floats...) ->
+  sendFloat: (name, floats...) ->
     uniform = @uniforms[name]
 
     if not uniform
       return
 
     switch floats.length
-      when 1 then gl.uniform1fv(uniform.location, new Float32Array(floats))
-      when 2 then gl.uniform2fv(uniform.location, new Float32Array(floats))
-      when 3 then gl.uniform3fv(uniform.location, new Float32Array(floats))
-      when 4 then gl.uniform4fv(uniform.location, new Float32Array(floats))
+      when 1 then @context.uniform1fv(uniform.location, new Float32Array(floats))
+      when 2 then @context.uniform2fv(uniform.location, new Float32Array(floats))
+      when 3 then @context.uniform3fv(uniform.location, new Float32Array(floats))
+      when 4 then @context.uniform4fv(uniform.location, new Float32Array(floats))
 
 
 
