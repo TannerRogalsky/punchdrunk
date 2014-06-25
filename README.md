@@ -11,7 +11,7 @@ Demo: http://tannerrogalsky.com/punchdrunk/
 
 1. Install [node.js](http://nodejs.org/)
 2. Install [Lua](http://www.lua.org/) and make sure that it's in your path.
-3. Install top-level dependencies: `npm install grunt-cli moonshine -g`
+3. Install top-level dependencies: `npm install grunt-cli -g`
 4. Install the project dependencies: `npm install`
 5. `grunt` will watch and compile the source as well as run a simple web server on port 8000.
 6. Open `localhost:8000` in your browser.
