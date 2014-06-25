@@ -65,9 +65,12 @@ class Shader
     return uniforms
 
   send: (self, name, values...) ->
+    previous = Shader.current
+    self.context.useProgram(self.program)
     switch typeof(values[0])
       when 'number' then self.sendFloat(name, values)
       when 'object' then self.sendMatrix(values)
+    self.context.useProgram(previous.program)
 
   sendMatrix: (name, matrix) ->
     uniform = @uniforms[name]
@@ -92,7 +95,7 @@ class Shader
       when 3 then @context.uniform3fv(uniform.location, new Float32Array(floats))
       when 4 then @context.uniform4fv(uniform.location, new Float32Array(floats))
 
-
+  @current = null
 
   # Taken from the WebGl spec:
   # http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14

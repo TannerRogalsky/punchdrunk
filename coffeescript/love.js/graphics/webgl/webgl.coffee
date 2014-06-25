@@ -23,6 +23,7 @@ class WebGL
 
   useProgram: (shader) ->
     @gl.useProgram(shader.program)
+    Shader.current = shader
 
   # bool initContext();
   # void deInitContext();

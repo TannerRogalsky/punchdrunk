@@ -16,7 +16,6 @@ class CanvasWebGL
     @setDimensions(width, height)
 
     @defaultProgram = new Shader(@context)
-    @currentProgram = @defaultProgram
 
     @context.disable(@context.CULL_FACE)
     @context.disable(@context.DEPTH_TEST)
@@ -24,15 +23,15 @@ class CanvasWebGL
     # @context.blendFunc(@context.SRC_ALPHA, @context.ONE)
     @context.blendFuncSeparate(@context.SRC_ALPHA, @context.ONE_MINUS_SRC_ALPHA, @context.ONE, @context.ONE_MINUS_SRC_ALPHA)
 
-    @gl.useProgram(@currentProgram)
+    @gl.useProgram(@defaultProgram)
     @defaultTexture = @gl.createDefaultTexture()
 
-    @currentProgram.sendFloat("love_ScreenSize", @width, @height, 0, 0)
-    @currentProgram.sendFloat("love_PointSize", 1)
+    Shader.current.sendFloat("love_ScreenSize", @width, @height, 0, 0)
+    Shader.current.sendFloat("love_PointSize", 1)
 
-    @positionLocation = @context.getAttribLocation(@currentProgram.program, "VertexPosition")
-    @texCoordLocation = @context.getAttribLocation(@currentProgram.program, "VertexTexCoord")
-    @colorLocation = @context.getAttribLocation(@currentProgram.program, "VertexColor")
+    @positionLocation = @context.getAttribLocation(Shader.current.program, "VertexPosition")
+    @texCoordLocation = @context.getAttribLocation(Shader.current.program, "VertexTexCoord")
+    @colorLocation = @context.getAttribLocation(Shader.current.program, "VertexColor")
 
     @texCoordBuffer = @context.createBuffer()
     @positionBuffer = @context.createBuffer()
@@ -228,7 +227,7 @@ class CanvasWebGL
 
   setShader: (shader = @defaultProgram) ->
     @gl.useProgram(shader)
-    @currentProgram = shader
+    Shader.current = shader
 
 
   # PRIVATE
@@ -243,6 +242,6 @@ class CanvasWebGL
     transformMatrix = @transformMatrices.top()
     projectionMatrix = @projectionMatrices.top()
     transformProjectionMatrix = projectionMatrix.x(transformMatrix)
-    @currentProgram.sendMatrix("TransformMatrix", transformMatrix.flatten())
-    @currentProgram.sendMatrix("ProjectionMatrix", projectionMatrix.flatten())
-    @currentProgram.sendMatrix("TransformProjectionMatrix", transformProjectionMatrix.flatten())
+    Shader.current.sendMatrix("TransformMatrix", transformMatrix.flatten())
+    Shader.current.sendMatrix("ProjectionMatrix", projectionMatrix.flatten())
+    Shader.current.sendMatrix("TransformProjectionMatrix", transformProjectionMatrix.flatten())
