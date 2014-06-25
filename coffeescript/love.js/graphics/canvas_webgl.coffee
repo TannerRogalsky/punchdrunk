@@ -26,12 +26,6 @@ class CanvasWebGL
     @gl.useProgram(@defaultProgram)
     @defaultTexture = @gl.createDefaultTexture()
 
-    @resolutionLocation = @context.getUniformLocation(@defaultProgram.program, "love_ScreenSize")
-    @pointSizeLocation = @context.getUniformLocation(@defaultProgram.program, "love_PointSize")
-    @transformMatrixLocation = @context.getUniformLocation(@defaultProgram.program, "TransformMatrix")
-    @projectionMatrixLocation = @context.getUniformLocation(@defaultProgram.program, "ProjectionMatrix")
-    @transformProjectionMatrixLocation = @context.getUniformLocation(@defaultProgram.program, "TransformProjectionMatrix")
-
     @defaultProgram.sendFloat("love_ScreenSize", @width, @height, 0, 0)
     @defaultProgram.sendFloat("love_PointSize", 1)
 
