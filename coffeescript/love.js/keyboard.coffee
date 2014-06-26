@@ -1,8 +1,10 @@
 class Love.Keyboard
-  constructor: (eventQueue) ->
+  constructor: (eventQueue, canvas) ->
     @keysDown = {}
 
-    document.addEventListener "keydown", (evt) =>
+    canvas.setAttribute("tabindex", "0")
+
+    keydown = (evt) =>
       evt.preventDefault()
       evt.stopPropagation()
 
@@ -10,8 +12,9 @@ class Love.Keyboard
       @keysDown[key] = true
 
       eventQueue.push("keypressed", key, evt.which)
+    canvas.addEventListener "keydown", keydown, true
 
-    document.addEventListener "keyup", (evt) =>
+    keyup = (evt) =>
       evt.preventDefault()
       evt.stopPropagation()
 
@@ -19,6 +22,7 @@ class Love.Keyboard
       @keysDown[key] = false
 
       eventQueue.push("keyreleased", key, evt.which)
+    canvas.addEventListener "keyup", keyup, true
 
   isDown: (key, others...) =>
     if @keysDown[key]

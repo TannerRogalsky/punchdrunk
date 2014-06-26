@@ -5,7 +5,7 @@ class @Love
     @window = new Love.Window(@graphics)
     @timer = new Love.Timer()
     @event = new Love.EventQueue()
-    @keyboard = new Love.Keyboard(@event)
+    @keyboard = new Love.Keyboard(@event, Love.element)
     @mouse = new Love.Mouse(@event, Love.element)
     @touch = new Love.Touch(@event, Love.element)
     @filesystem = new Love.FileSystem()
