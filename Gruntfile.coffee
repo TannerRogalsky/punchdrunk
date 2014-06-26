@@ -65,6 +65,7 @@ module.exports = (grunt) ->
 
   distil = require('moonshine/bin/commands/distil.js')
   grunt.registerTask 'distil_game', ->
+    done = @async()
     distil.parseCommand
       switches:
         outputFilename: ''
@@ -74,9 +75,11 @@ module.exports = (grunt) ->
         noRecursion: false
         stripDebugging: false
         watch: false
-      filenames: [ 'lua' ]
+      filenames: [ 'lua' ], ->
+        done()
 
   grunt.registerTask 'distil_bootstrap', ->
+    done = @async()
     distil.parseCommand
       switches:
         outputFilename: 'js/boot.lua.json'
@@ -86,9 +89,11 @@ module.exports = (grunt) ->
         noRecursion: false
         stripDebugging: false
         watch: false
-      filenames: [ 'js/boot.lua' ]
+      filenames: [ 'js/boot.lua' ], ->
+        done()
 
   grunt.registerTask 'distil_examples', ->
+    done = @async()
     distil.parseCommand
       switches:
         outputFilename: ''
@@ -98,4 +103,5 @@ module.exports = (grunt) ->
         noRecursion: false
         stripDebugging: false
         watch: false
-      filenames: [ 'examples' ]
+      filenames: [ 'examples' ], ->
+        done()

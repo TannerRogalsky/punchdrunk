@@ -20,7 +20,7 @@
   "dependencies": {},
   "devDependencies": {
     "coffee-script": "1.7.x",
-    "moonshine": "git+https://github.com/TannerRogalsky/moonshine.git#28b3a73",
+    "moonshine": "git+https://github.com/TannerRogalsky/moonshine.git#0c897b793",
     "grunt": "0.4.x",
     "grunt-contrib-concat": "0.1.x",
     "grunt-contrib-watch": "~0.2.x",
