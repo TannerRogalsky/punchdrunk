@@ -39,20 +39,13 @@ module.exports = (grunt) ->
         tasks: ['coffee:app', 'concat:punchdrunk']
       game:
         files: ['lua/*.lua']
-        tasks: ['shell:distil_game']
+        tasks: ['distil_game']
       bootstrap:
         files: ['js/boot.lua']
-        tasks: ['shell:distil_bootstrap']
+        tasks: ['distil_bootstrap']
       examples:
         files: ['examples/**/*.lua']
-        tasks: ['shell:distil_examples']
-    shell:
-      distil_game:
-        command: 'moonshine distil -d lua lua'
-      distil_bootstrap:
-        command: 'moonshine distil -o js/boot.lua.json js/boot.lua'
-      distil_examples:
-        command: 'moonshine distil -d examples examples'
+        tasks: ['distil_examples']
     connect:
       server:
         options:
@@ -64,9 +57,45 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-contrib-watch')
   grunt.loadNpmTasks('grunt-contrib-concat')
   grunt.loadNpmTasks('grunt-contrib-connect')
-  grunt.loadNpmTasks('grunt-shell')
   grunt.loadNpmTasks('grunt-mocha-phantomjs')
 
-  grunt.registerTask 'default', ['coffee:app', 'shell', 'concat', 'connect:server', 'watch']
-  grunt.registerTask 'compile', ['coffee:app', 'shell', 'concat']
+  grunt.registerTask 'default', ['compile', 'connect:server', 'watch']
+  grunt.registerTask 'compile', ['coffee:app', 'concat', 'distil_game', 'distil_bootstrap', 'distil_examples']
   grunt.registerTask 'test', ['coffee', 'concat', 'mocha_phantomjs']
+
+  distil = require('moonshine/bin/commands/distil.js')
+  grunt.registerTask 'distil_game', ->
+    distil.parseCommand
+      switches:
+        outputFilename: ''
+        outputPath: 'lua'
+        jsonFormat: false
+        packageMain: ''
+        noRecursion: false
+        stripDebugging: false
+        watch: false
+      filenames: [ 'lua' ]
+
+  grunt.registerTask 'distil_bootstrap', ->
+    distil.parseCommand
+      switches:
+        outputFilename: 'js/boot.lua.json'
+        outputPath: '.'
+        jsonFormat: false
+        packageMain: ''
+        noRecursion: false
+        stripDebugging: false
+        watch: false
+      filenames: [ 'js/boot.lua' ]
+
+  grunt.registerTask 'distil_examples', ->
+    distil.parseCommand
+      switches:
+        outputFilename: ''
+        outputPath: 'examples'
+        jsonFormat: false
+        packageMain: ''
+        noRecursion: false
+        stripDebugging: false
+        watch: false
+      filenames: [ 'examples' ]
