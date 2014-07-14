@@ -46,16 +46,27 @@ class Canvas2D
   setWrap: (self) ->
 
   # PRIVATE
-  arc: (mode, x, y, radius, startAngle, endAngle, segments) ->
+  arc: (mode, x, y, radius, startAngle, endAngle, points) ->
+    points ||= if radius > 10 then radius else 10
+    angle_shift = (endAngle - startAngle) / points
+    phi = startAngle - angle_shift
+
     @context.beginPath()
     @context.moveTo(x, y)
-    @context.arc(x, y, radius, startAngle, endAngle)
+    for i in [0..points]
+      phi += angle_shift
+      @context.lineTo(x + radius * Math.cos(phi), y + radius * Math.sin(phi))
     @context.closePath()
+
     switch mode
       when "fill" then @context.fill()
       when "line" then @context.stroke()
 
   circle: (mode, x, y, radius, segments) ->
+    if radius < 0
+      # don't try to draw a circle with negative radius
+      return
+
     @context.beginPath()
     @context.arc(x, y, radius, 0, 2 * Math.PI)
     @context.closePath()
