@@ -46,30 +46,18 @@ class Canvas2D
   setWrap: (self) ->
 
   # PRIVATE
-  arc: (mode, x, y, radius, startAngle, endAngle) ->
+  arc: (mode, x, y, radius, startAngle, endAngle, points) ->
+    points ||= if radius > 10 then radius else 10
+    angle_shift = (endAngle - startAngle) / points
+    phi = startAngle - angle_shift
+
     @context.beginPath()
     @context.moveTo(x, y)
-
-    # TODO: Can this be generalized and cleaned up?
-    anticlockwise = false # default value for the arc call
-    if endAngle < 0
-      anticlockwise = true
-      if startAngle < 0
-        anticlockwise = false
-      if radius < 0
-        radius = Math.abs(radius)
-        startAngle += Math.PI
-        endAngle += Math.PI
-    else if radius < 0
-      radius = Math.abs(radius)
-      anticlockwise = true
-      if startAngle < 0
-        startAngle += Math.PI
-        endAngle += Math.PI
-        anticlockwise = false
-
-    @context.arc(x, y, radius, startAngle, endAngle, anticlockwise)
+    for i in [0..points]
+      phi += angle_shift
+      @context.lineTo(x + radius * Math.cos(phi), y + radius * Math.sin(phi))
     @context.closePath()
+
     switch mode
       when "fill" then @context.fill()
       when "line" then @context.stroke()
