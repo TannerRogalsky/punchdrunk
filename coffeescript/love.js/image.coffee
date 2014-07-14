@@ -4,4 +4,4 @@ class Love.ImageModule
   isCompressed: =>
   newCompressedData: () =>
   newImageData: (filedata) =>
-    new ImageData(filedata)
+    new Love.ImageModule.ImageData(filedata)

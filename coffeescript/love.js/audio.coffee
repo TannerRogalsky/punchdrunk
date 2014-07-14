@@ -14,7 +14,7 @@ class Love.Audio
   getVolume: () =>
 
   newSource: (filename, type) =>
-    new Source(filename, type)
+    new Love.Audio.Source(filename, type)
 
   pause: (source) =>
     source.pause(source)

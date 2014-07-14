@@ -1,4 +1,4 @@
-class Image
+class Love.Graphics.Image
   constructor: (data) ->
     if data instanceof ImageData
       @element = document.createElement("img")

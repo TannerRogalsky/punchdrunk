@@ -1,4 +1,4 @@
-class Canvas2D
+class Love.Graphics.Canvas2D
   constructor: (width, height, @element) ->
     @element ?= document.createElement('canvas')
     if (canvas_width = Number(@element.getAttribute('width'))) != 0
@@ -12,7 +12,7 @@ class Canvas2D
 
   clear: (self, r, g, b, a) ->
     if r == null or r == undefined
-      color = Canvas2D.transparent
+      color = Love.Graphics.Canvas2D.transparent
     else
       color = new Color(r, g, b, a)
 
@@ -76,8 +76,8 @@ class Canvas2D
 
   draw: (drawable, quad) ->
     switch true
-      when quad not instanceof Quad then drawDrawable.apply(this, arguments)
-      when quad instanceof Quad then drawWithQuad.apply(this, arguments)
+      when quad not instanceof Love.Graphics.Quad then drawDrawable.apply(this, arguments)
+      when quad instanceof Love.Graphics.Quad then drawWithQuad.apply(this, arguments)
 
   line: (points...) ->
     if points.length == 1
@@ -272,4 +272,4 @@ class Canvas2D
     @context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, 0, 0, quad.width, quad.height)
     @context.restore()
 
-Canvas2D.transparent = new Love.Color(0, 0, 0, 0)
+Love.Graphics.Canvas2D.transparent = new Love.Color(0, 0, 0, 0)
