@@ -54,11 +54,11 @@ class Love.Mouse
     @y
 
   isDown: (button, others...) =>
-    if @buttonsDown[button]
-      return true
+    if !@buttonsDown[button]
+      return false
     else
       if others.length == 0
-        return false
+        return true
       else
         return @isDown(others...)
 
