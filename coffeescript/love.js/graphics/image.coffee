@@ -51,7 +51,7 @@ class Love.Graphics.Image
 
   # PRIVATE
   create_texture: (context) ->
-    if typeof(context.createTexture) == "function"
+    if context and typeof(context.createTexture) == "function"
       gl = context
       @texture = gl.createTexture()
       gl.bindTexture(gl.TEXTURE_2D, @texture)
