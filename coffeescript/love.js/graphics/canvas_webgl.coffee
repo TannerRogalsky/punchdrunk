@@ -142,8 +142,8 @@ class Love.Graphics.CanvasWebGL
 
   draw: (drawable, quad) ->
     switch true
-      when quad not instanceof Quad then @drawDrawable.apply(this, arguments)
-      when quad instanceof Quad then @drawQuad.apply(this, arguments)
+      when quad not instanceof Love.Graphics.Quad then @drawDrawable.apply(this, arguments)
+      when quad instanceof Love.Graphics.Quad then @drawQuad.apply(this, arguments)
 
   drawDrawable: (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
     imageDrawTransform = Matrix.I(4).setTransformation(x, y, r, sx, sy, ox, oy, kx, ky)
