@@ -1,4 +1,4 @@
-class CanvasWebGL
+class Love.Graphics.CanvasWebGL
   constructor: (width, height, @element) ->
     @element ?= document.createElement('canvas')
     if (canvas_width = Number(@element.getAttribute('width'))) != 0
