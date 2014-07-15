@@ -55,7 +55,10 @@ describe "love.graphics", ->
         expect(clear).to.have.been.called
 
     describe 'draw', ->
-      it 'should call the current canvas\'s draw method'
+      it 'should call the current canvas\'s draw method', ->
+        draw = sinon.spy(canvas, 'draw')
+        graphics.draw(new Love.Graphics.Image("sprites.png"), 100, 100)
+        expect(draw).to.have.been.called
 
     describe 'line', ->
       it 'should call the current canvas\'s line method', ->
