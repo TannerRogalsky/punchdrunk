@@ -1,4 +1,4 @@
-class Quad
+class Love.Graphics.Quad
   constructor: (@x, @y, @width, @height, @sw, @sh) ->
     @refresh_vertices()
 

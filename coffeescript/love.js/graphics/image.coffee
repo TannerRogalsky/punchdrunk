@@ -1,15 +1,16 @@
-class Image
+class Love.Graphics.Image
   constructor: (data, context) ->
-    if data instanceof ImageData
+    if data instanceof Love.ImageModule.ImageData
       @element = document.createElement("img")
       @element.setAttribute("src", data.getString(data))
       @name = data.name
     else
-      @element = document.getElementById(data)
+      filename = data
+      @element = document.getElementById(filename)
 
       if @element == null
         @element = document.createElement("img")
-        @element.setAttribute("src", Love.root + "/" + data)
+        @element.setAttribute("src", Love.root + "/" + filename)
 
       @name = data
 

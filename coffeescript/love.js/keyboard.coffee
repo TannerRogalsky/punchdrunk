@@ -25,11 +25,11 @@ class Love.Keyboard
     canvas.addEventListener "keyup", keyup, true
 
   isDown: (key, others...) =>
-    if @keysDown[key]
-      return true
+    if !@keysDown[key]
+      return false
     else
       if others.length == 0
-        return false
+        return true
       else
         return @isDown(others...)
 

@@ -4,17 +4,17 @@ class Love.Graphics
       if @isSupported("webgl")
         @canvas = new CanvasWebGL(width, height, Love.element)
       else
-        @canvas = new Canvas2D(width, height, Love.element)
+        @canvas = new Love.Graphics.Canvas2D(width, height, Love.element)
     else
       if @isSupported("webgl")
         @canvas = new CanvasWebGL(width, height)
       else
-        @canvas = new Canvas2D(width, height)
+        @canvas = new Love.Graphics.Canvas2D(width, height)
       document.body.appendChild(@canvas.element)
       Love.element = @canvas.element
 
     @default_canvas = @canvas
-    @default_font = new Font("Vera", 12)
+    @default_font = new Love.Graphics.Font("Vera", 12)
 
     @setColor(255, 255, 255)
     @setBackgroundColor(0, 0, 0)
@@ -55,13 +55,17 @@ class Love.Graphics
 
   # OBJECT CREATION
   newCanvas: (width = @getWidth(@), height = @getHeight(@)) =>
-    new Canvas2D(width, height)
+    new Love.Graphics.Canvas2D(width, height)
 
   newFont: (filename, size = 12) =>
-    new Font(filename, size)
+    new Love.Graphics.Font(filename, size)
 
   newImage: (data) =>
+<<<<<<< HEAD
     new Image(data, @default_canvas.context)
+=======
+    new Love.Graphics.Image(data)
+>>>>>>> master
 
   newImageFont: =>
 
@@ -69,7 +73,7 @@ class Love.Graphics
   newParticleSystem: () =>
 
   newQuad: (x, y, width, height, sw, sh) =>
-    new Quad(x, y, width, height, sw, sh)
+    new Love.Graphics.Quad(x, y, width, height, sw, sh)
 
   newScreenshot: =>
 
