@@ -1,6 +1,6 @@
 describe 'love.math', ->
   it 'exists', ->
-    expect(Love.MathModule).to.be.a("function")
+    expect(Love.Math).to.be.a("function")
 
   describe '.noise', ->
     noise = null
