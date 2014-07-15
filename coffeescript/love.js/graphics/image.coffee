@@ -1,6 +1,6 @@
 class Love.Graphics.Image
   constructor: (data) ->
-    if data instanceof ImageData
+    if data instanceof Love.ImageModule.ImageData
       @element = document.createElement("img")
       @element.setAttribute("src", data.getString(data))
     else
