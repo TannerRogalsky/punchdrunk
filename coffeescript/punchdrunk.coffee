@@ -40,6 +40,13 @@ class @Punchdrunk
         # it's convenient to have it embeded here because then we don't need to know its path
         vm.load({"sourceName":"@js/boot.lua","lineDefined":0,"lastLineDefined":0,"upvalueCount":0,"paramCount":0,"is_vararg":2,"maxStackSize":2,"instructions":[5,0,0,0,1,1,1,0,28,0,2,1,5,0,2,0,6,0,0,259,28,0,1,1,30,0,1,0],"constants":["require","main","love","run"],"functions":[],"linePositions":[1,1,1,3,3,3,3],"locals":[],"upvalues":[],"sourcePath":"js/boot.lua"})
 
+  Array.prototype.top = ->
+    @[@length - 1]
+
+  default_error_handler = shine.Error.catchExecutionError
+  shine.Error.catchExecutionError = (e) ->
+    default_error_handler(e)
+
   # Forward print() messages to the console
   shine.stdout.write = () ->
     console.log.apply(console, arguments)
