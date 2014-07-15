@@ -1,6 +1,7 @@
 class Love.Math
   constructor: () ->
-    @simplex = new SimplexNoise()
+    @random_generator = new Love.Math.RandomGenerator()
+    @simplex = new SimplexNoise(@random_generator.random.bind(@random_generator))
 
   gammaToLinear: =>
   getRandomSeed: =>
@@ -16,14 +17,7 @@ class Love.Math
       when 4 then @simplex.noise4D(dimensions[0], dimensions[1], dimensions[2], dimensions[3])
 
   random: (min, max) =>
-    if min == undefined && max == undefined
-      return Math.random()
-
-    if max == undefined
-      max = min
-      min = 1
-
-    Math.floor(Math.random() * (max - min + 1) + min)
+    @random_generator.random(min, max)
 
   randomNormal: =>
   setRandomSeed: =>
