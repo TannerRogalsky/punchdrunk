@@ -1,4 +1,4 @@
-class FileData
+class Love.FileSystem.FileData
   constructor: (@contents, @name, decoder) ->
     @extension = @name.match("\\.(.*)")[1]
 

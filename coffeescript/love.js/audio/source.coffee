@@ -1,4 +1,4 @@
-class Source
+class Love.Audio.Source
   constructor: (@filename, @type) ->
     @element = document.createElement("audio")
     @element.setAttribute("src", Love.root + "/" + filename)
