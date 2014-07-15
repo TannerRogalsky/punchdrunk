@@ -61,11 +61,7 @@ class Love.Graphics
     new Love.Graphics.Font(filename, size)
 
   newImage: (data) =>
-<<<<<<< HEAD
-    new Image(data, @default_canvas.context)
-=======
-    new Love.Graphics.Image(data)
->>>>>>> master
+    new Love.Graphics.Image(data, @default_canvas.context)
 
   newImageFont: =>
 
