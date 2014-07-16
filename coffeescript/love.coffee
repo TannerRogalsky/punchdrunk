@@ -12,7 +12,7 @@ class @Love
     @audio = new Love.Audio()
     @system = new Love.System()
     @image = new Love.ImageModule()
-    @math = new Love.MathModule()
+    @math = new Love.Math()
 
     window.addEventListener "beforeunload", () =>
       @quit.call()
