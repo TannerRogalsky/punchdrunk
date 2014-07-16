@@ -1,4 +1,4 @@
-/*! punchdrunk 0.0.1 (2014-05-25) - https://github.com/TannerRogalsky/punchdrunk */
+/*! punchdrunk 0.0.3 (2014-07-16) - https://github.com/TannerRogalsky/punchdrunk */
 /*! An attempt to replicate the Love API in JavaScript */
 /*! Tanner Rogalsky *//*
  * Moonshine - a Lua virtual machine.
@@ -6542,6 +6542,12 @@ function SimplexNoise(random) {
 
 }
 SimplexNoise.prototype = {
+    grad1: function(hash, x) {
+        var h = hash & 15;
+        var grad = 1 + (h & 7); // Gradient value 1.0, 2.0, ..., 8.0
+        if (h&8) grad = -grad;  // Set a random sign for the gradient
+        return ( grad * x );    // Multiply the gradient with the distance
+    },
     grad3: new Float32Array([1, 1, 0,
                             - 1, 1, 0,
                             1, - 1, 0,
@@ -6565,6 +6571,27 @@ SimplexNoise.prototype = {
                             - 1, 1, 0, 1, - 1, 1, 0, - 1, - 1, - 1, 0, 1, - 1, - 1, 0, - 1,
                             1, 1, 1, 0, 1, 1, - 1, 0, 1, - 1, 1, 0, 1, - 1, - 1, 0,
                             - 1, 1, 1, 0, - 1, 1, - 1, 0, - 1, - 1, 1, 0, - 1, - 1, - 1, 0]),
+    noise1D: function (x) {
+        var i0 = Math.floor(x);
+        var i1 = i0 + 1;
+        var x0 = x - i0;
+        var x1 = x0 - 1;
+
+        var n0, n1;
+
+        var t0 = 1 - x0*x0;
+        //  if(t0 < 0.0f) t0 = 0.0f;
+        t0 *= t0;
+        n0 = t0 * t0 * this.grad1(this.perm[i0 & 0xff], x0);
+
+        var t1 = 1 - x1*x1;
+        //  if(t1 < 0.0f) t1 = 0.0f;
+        t1 *= t1;
+        n1 = t1 * t1 * this.grad1(this.perm[i1 & 0xff], x1);
+        // The maximum value of this noise is 8*(3/4)^4 = 2.53125
+        // A factor of 0.395 will scale to fit exactly within [-1,1]
+        return 0.395 * (n0 + n1);
+    },
     noise2D: function (xin, yin) {
         var permMod12 = this.permMod12,
             perm = this.perm,
@@ -6890,64 +6917,973 @@ if (typeof module !== 'undefined') {
 
 }).call(this);
 
+// Copyright 2009 The Closure Library Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Defines a Long class for representing a 64-bit two's-complement
+ * integer value, which faithfully simulates the behavior of a Java "long". This
+ * implementation is derived from LongLib in GWT.
+ *
+ */
+
+ // This file was obtained from Google's Closure library.
+ // It was modified to work without the entire library.
+ // The only change was to replace `goog.provide('goog.math.Long');`
+ // with the below code.
+
+window.goog = {
+  math: {}
+};
+
+/**
+ * Constructs a 64-bit two's-complement integer, given its low and high 32-bit
+ * values as *signed* integers.  See the from* functions below for more
+ * convenient ways of constructing Longs.
+ *
+ * The internal representation of a long is the two given signed, 32-bit values.
+ * We use 32-bit pieces because these are the size of integers on which
+ * Javascript performs bit-operations.  For operations like addition and
+ * multiplication, we split each number into 16-bit pieces, which can easily be
+ * multiplied within Javascript's floating-point representation without overflow
+ * or change in sign.
+ *
+ * In the algorithms below, we frequently reduce the negative case to the
+ * positive case by negating the input(s) and then post-processing the result.
+ * Note that we must ALWAYS check specially whether those values are MIN_VALUE
+ * (-2^63) because -MIN_VALUE == MIN_VALUE (since 2^63 cannot be represented as
+ * a positive number, it overflows back into a negative).  Not handling this
+ * case would often result in infinite recursion.
+ *
+ * @param {number} low  The low (signed) 32 bits of the long.
+ * @param {number} high  The high (signed) 32 bits of the long.
+ * @constructor
+ * @final
+ */
+goog.math.Long = function(low, high) {
+  /**
+   * @type {number}
+   * @private
+   */
+  this.low_ = low | 0;  // force into 32 signed bits.
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this.high_ = high | 0;  // force into 32 signed bits.
+};
+
+
+// NOTE: Common constant values ZERO, ONE, NEG_ONE, etc. are defined below the
+// from* methods on which they depend.
+
+
+/**
+ * A cache of the Long representations of small integer values.
+ * @type {!Object}
+ * @private
+ */
+goog.math.Long.IntCache_ = {};
+
+
+/**
+ * Returns a Long representing the given (32-bit) integer value.
+ * @param {number} value The 32-bit integer in question.
+ * @return {!goog.math.Long} The corresponding Long value.
+ */
+goog.math.Long.fromInt = function(value) {
+  if (-128 <= value && value < 128) {
+    var cachedObj = goog.math.Long.IntCache_[value];
+    if (cachedObj) {
+      return cachedObj;
+    }
+  }
+
+  var obj = new goog.math.Long(value | 0, value < 0 ? -1 : 0);
+  if (-128 <= value && value < 128) {
+    goog.math.Long.IntCache_[value] = obj;
+  }
+  return obj;
+};
+
+
+/**
+ * Returns a Long representing the given value, provided that it is a finite
+ * number.  Otherwise, zero is returned.
+ * @param {number} value The number in question.
+ * @return {!goog.math.Long} The corresponding Long value.
+ */
+goog.math.Long.fromNumber = function(value) {
+  if (isNaN(value) || !isFinite(value)) {
+    return goog.math.Long.ZERO;
+  } else if (value <= -goog.math.Long.TWO_PWR_63_DBL_) {
+    return goog.math.Long.MIN_VALUE;
+  } else if (value + 1 >= goog.math.Long.TWO_PWR_63_DBL_) {
+    return goog.math.Long.MAX_VALUE;
+  } else if (value < 0) {
+    return goog.math.Long.fromNumber(-value).negate();
+  } else {
+    return new goog.math.Long(
+        (value % goog.math.Long.TWO_PWR_32_DBL_) | 0,
+        (value / goog.math.Long.TWO_PWR_32_DBL_) | 0);
+  }
+};
+
+
+/**
+ * Returns a Long representing the 64-bit integer that comes by concatenating
+ * the given high and low bits.  Each is assumed to use 32 bits.
+ * @param {number} lowBits The low 32-bits.
+ * @param {number} highBits The high 32-bits.
+ * @return {!goog.math.Long} The corresponding Long value.
+ */
+goog.math.Long.fromBits = function(lowBits, highBits) {
+  return new goog.math.Long(lowBits, highBits);
+};
+
+
+/**
+ * Returns a Long representation of the given string, written using the given
+ * radix.
+ * @param {string} str The textual representation of the Long.
+ * @param {number=} opt_radix The radix in which the text is written.
+ * @return {!goog.math.Long} The corresponding Long value.
+ */
+goog.math.Long.fromString = function(str, opt_radix) {
+  if (str.length == 0) {
+    throw Error('number format error: empty string');
+  }
+
+  var radix = opt_radix || 10;
+  if (radix < 2 || 36 < radix) {
+    throw Error('radix out of range: ' + radix);
+  }
+
+  if (str.charAt(0) == '-') {
+    return goog.math.Long.fromString(str.substring(1), radix).negate();
+  } else if (str.indexOf('-') >= 0) {
+    throw Error('number format error: interior "-" character: ' + str);
+  }
+
+  // Do several (8) digits each time through the loop, so as to
+  // minimize the calls to the very expensive emulated div.
+  var radixToPower = goog.math.Long.fromNumber(Math.pow(radix, 8));
+
+  var result = goog.math.Long.ZERO;
+  for (var i = 0; i < str.length; i += 8) {
+    var size = Math.min(8, str.length - i);
+    var value = parseInt(str.substring(i, i + size), radix);
+    if (size < 8) {
+      var power = goog.math.Long.fromNumber(Math.pow(radix, size));
+      result = result.multiply(power).add(goog.math.Long.fromNumber(value));
+    } else {
+      result = result.multiply(radixToPower);
+      result = result.add(goog.math.Long.fromNumber(value));
+    }
+  }
+  return result;
+};
+
+
+// NOTE: the compiler should inline these constant values below and then remove
+// these variables, so there should be no runtime penalty for these.
+
+
+/**
+ * Number used repeated below in calculations.  This must appear before the
+ * first call to any from* function below.
+ * @type {number}
+ * @private
+ */
+goog.math.Long.TWO_PWR_16_DBL_ = 1 << 16;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+goog.math.Long.TWO_PWR_24_DBL_ = 1 << 24;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+goog.math.Long.TWO_PWR_32_DBL_ =
+    goog.math.Long.TWO_PWR_16_DBL_ * goog.math.Long.TWO_PWR_16_DBL_;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+goog.math.Long.TWO_PWR_31_DBL_ =
+    goog.math.Long.TWO_PWR_32_DBL_ / 2;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+goog.math.Long.TWO_PWR_48_DBL_ =
+    goog.math.Long.TWO_PWR_32_DBL_ * goog.math.Long.TWO_PWR_16_DBL_;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+goog.math.Long.TWO_PWR_64_DBL_ =
+    goog.math.Long.TWO_PWR_32_DBL_ * goog.math.Long.TWO_PWR_32_DBL_;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+goog.math.Long.TWO_PWR_63_DBL_ =
+    goog.math.Long.TWO_PWR_64_DBL_ / 2;
+
+
+/** @type {!goog.math.Long} */
+goog.math.Long.ZERO = goog.math.Long.fromInt(0);
+
+
+/** @type {!goog.math.Long} */
+goog.math.Long.ONE = goog.math.Long.fromInt(1);
+
+
+/** @type {!goog.math.Long} */
+goog.math.Long.NEG_ONE = goog.math.Long.fromInt(-1);
+
+
+/** @type {!goog.math.Long} */
+goog.math.Long.MAX_VALUE =
+    goog.math.Long.fromBits(0xFFFFFFFF | 0, 0x7FFFFFFF | 0);
+
+
+/** @type {!goog.math.Long} */
+goog.math.Long.MIN_VALUE = goog.math.Long.fromBits(0, 0x80000000 | 0);
+
+
+/**
+ * @type {!goog.math.Long}
+ * @private
+ */
+goog.math.Long.TWO_PWR_24_ = goog.math.Long.fromInt(1 << 24);
+
+
+/** @return {number} The value, assuming it is a 32-bit integer. */
+goog.math.Long.prototype.toInt = function() {
+  return this.low_;
+};
+
+
+/** @return {number} The closest floating-point representation to this value. */
+goog.math.Long.prototype.toNumber = function() {
+  return this.high_ * goog.math.Long.TWO_PWR_32_DBL_ +
+         this.getLowBitsUnsigned();
+};
+
+
+/**
+ * @param {number=} opt_radix The radix in which the text should be written.
+ * @return {string} The textual representation of this value.
+ * @override
+ */
+goog.math.Long.prototype.toString = function(opt_radix) {
+  var radix = opt_radix || 10;
+  if (radix < 2 || 36 < radix) {
+    throw Error('radix out of range: ' + radix);
+  }
+
+  if (this.isZero()) {
+    return '0';
+  }
+
+  if (this.isNegative()) {
+    if (this.equals(goog.math.Long.MIN_VALUE)) {
+      // We need to change the Long value before it can be negated, so we remove
+      // the bottom-most digit in this base and then recurse to do the rest.
+      var radixLong = goog.math.Long.fromNumber(radix);
+      var div = this.div(radixLong);
+      var rem = div.multiply(radixLong).subtract(this);
+      return div.toString(radix) + rem.toInt().toString(radix);
+    } else {
+      return '-' + this.negate().toString(radix);
+    }
+  }
+
+  // Do several (6) digits each time through the loop, so as to
+  // minimize the calls to the very expensive emulated div.
+  var radixToPower = goog.math.Long.fromNumber(Math.pow(radix, 6));
+
+  var rem = this;
+  var result = '';
+  while (true) {
+    var remDiv = rem.div(radixToPower);
+    var intval = rem.subtract(remDiv.multiply(radixToPower)).toInt();
+    var digits = intval.toString(radix);
+
+    rem = remDiv;
+    if (rem.isZero()) {
+      return digits + result;
+    } else {
+      while (digits.length < 6) {
+        digits = '0' + digits;
+      }
+      result = '' + digits + result;
+    }
+  }
+};
+
+
+/** @return {number} The high 32-bits as a signed value. */
+goog.math.Long.prototype.getHighBits = function() {
+  return this.high_;
+};
+
+
+/** @return {number} The low 32-bits as a signed value. */
+goog.math.Long.prototype.getLowBits = function() {
+  return this.low_;
+};
+
+
+/** @return {number} The low 32-bits as an unsigned value. */
+goog.math.Long.prototype.getLowBitsUnsigned = function() {
+  return (this.low_ >= 0) ?
+      this.low_ : goog.math.Long.TWO_PWR_32_DBL_ + this.low_;
+};
+
+
+/**
+ * @return {number} Returns the number of bits needed to represent the absolute
+ *     value of this Long.
+ */
+goog.math.Long.prototype.getNumBitsAbs = function() {
+  if (this.isNegative()) {
+    if (this.equals(goog.math.Long.MIN_VALUE)) {
+      return 64;
+    } else {
+      return this.negate().getNumBitsAbs();
+    }
+  } else {
+    var val = this.high_ != 0 ? this.high_ : this.low_;
+    for (var bit = 31; bit > 0; bit--) {
+      if ((val & (1 << bit)) != 0) {
+        break;
+      }
+    }
+    return this.high_ != 0 ? bit + 33 : bit + 1;
+  }
+};
+
+
+/** @return {boolean} Whether this value is zero. */
+goog.math.Long.prototype.isZero = function() {
+  return this.high_ == 0 && this.low_ == 0;
+};
+
+
+/** @return {boolean} Whether this value is negative. */
+goog.math.Long.prototype.isNegative = function() {
+  return this.high_ < 0;
+};
+
+
+/** @return {boolean} Whether this value is odd. */
+goog.math.Long.prototype.isOdd = function() {
+  return (this.low_ & 1) == 1;
+};
+
+
+/**
+ * @param {goog.math.Long} other Long to compare against.
+ * @return {boolean} Whether this Long equals the other.
+ */
+goog.math.Long.prototype.equals = function(other) {
+  return (this.high_ == other.high_) && (this.low_ == other.low_);
+};
+
+
+/**
+ * @param {goog.math.Long} other Long to compare against.
+ * @return {boolean} Whether this Long does not equal the other.
+ */
+goog.math.Long.prototype.notEquals = function(other) {
+  return (this.high_ != other.high_) || (this.low_ != other.low_);
+};
+
+
+/**
+ * @param {goog.math.Long} other Long to compare against.
+ * @return {boolean} Whether this Long is less than the other.
+ */
+goog.math.Long.prototype.lessThan = function(other) {
+  return this.compare(other) < 0;
+};
+
+
+/**
+ * @param {goog.math.Long} other Long to compare against.
+ * @return {boolean} Whether this Long is less than or equal to the other.
+ */
+goog.math.Long.prototype.lessThanOrEqual = function(other) {
+  return this.compare(other) <= 0;
+};
+
+
+/**
+ * @param {goog.math.Long} other Long to compare against.
+ * @return {boolean} Whether this Long is greater than the other.
+ */
+goog.math.Long.prototype.greaterThan = function(other) {
+  return this.compare(other) > 0;
+};
+
+
+/**
+ * @param {goog.math.Long} other Long to compare against.
+ * @return {boolean} Whether this Long is greater than or equal to the other.
+ */
+goog.math.Long.prototype.greaterThanOrEqual = function(other) {
+  return this.compare(other) >= 0;
+};
+
+
+/**
+ * Compares this Long with the given one.
+ * @param {goog.math.Long} other Long to compare against.
+ * @return {number} 0 if they are the same, 1 if the this is greater, and -1
+ *     if the given one is greater.
+ */
+goog.math.Long.prototype.compare = function(other) {
+  if (this.equals(other)) {
+    return 0;
+  }
+
+  var thisNeg = this.isNegative();
+  var otherNeg = other.isNegative();
+  if (thisNeg && !otherNeg) {
+    return -1;
+  }
+  if (!thisNeg && otherNeg) {
+    return 1;
+  }
+
+  // at this point, the signs are the same, so subtraction will not overflow
+  if (this.subtract(other).isNegative()) {
+    return -1;
+  } else {
+    return 1;
+  }
+};
+
+
+/** @return {!goog.math.Long} The negation of this value. */
+goog.math.Long.prototype.negate = function() {
+  if (this.equals(goog.math.Long.MIN_VALUE)) {
+    return goog.math.Long.MIN_VALUE;
+  } else {
+    return this.not().add(goog.math.Long.ONE);
+  }
+};
+
+
+/**
+ * Returns the sum of this and the given Long.
+ * @param {goog.math.Long} other Long to add to this one.
+ * @return {!goog.math.Long} The sum of this and the given Long.
+ */
+goog.math.Long.prototype.add = function(other) {
+  // Divide each number into 4 chunks of 16 bits, and then sum the chunks.
+
+  var a48 = this.high_ >>> 16;
+  var a32 = this.high_ & 0xFFFF;
+  var a16 = this.low_ >>> 16;
+  var a00 = this.low_ & 0xFFFF;
+
+  var b48 = other.high_ >>> 16;
+  var b32 = other.high_ & 0xFFFF;
+  var b16 = other.low_ >>> 16;
+  var b00 = other.low_ & 0xFFFF;
+
+  var c48 = 0, c32 = 0, c16 = 0, c00 = 0;
+  c00 += a00 + b00;
+  c16 += c00 >>> 16;
+  c00 &= 0xFFFF;
+  c16 += a16 + b16;
+  c32 += c16 >>> 16;
+  c16 &= 0xFFFF;
+  c32 += a32 + b32;
+  c48 += c32 >>> 16;
+  c32 &= 0xFFFF;
+  c48 += a48 + b48;
+  c48 &= 0xFFFF;
+  return goog.math.Long.fromBits((c16 << 16) | c00, (c48 << 16) | c32);
+};
+
+
+/**
+ * Returns the difference of this and the given Long.
+ * @param {goog.math.Long} other Long to subtract from this.
+ * @return {!goog.math.Long} The difference of this and the given Long.
+ */
+goog.math.Long.prototype.subtract = function(other) {
+  return this.add(other.negate());
+};
+
+
+/**
+ * Returns the product of this and the given long.
+ * @param {goog.math.Long} other Long to multiply with this.
+ * @return {!goog.math.Long} The product of this and the other.
+ */
+goog.math.Long.prototype.multiply = function(other) {
+  if (this.isZero()) {
+    return goog.math.Long.ZERO;
+  } else if (other.isZero()) {
+    return goog.math.Long.ZERO;
+  }
+
+  if (this.equals(goog.math.Long.MIN_VALUE)) {
+    return other.isOdd() ? goog.math.Long.MIN_VALUE : goog.math.Long.ZERO;
+  } else if (other.equals(goog.math.Long.MIN_VALUE)) {
+    return this.isOdd() ? goog.math.Long.MIN_VALUE : goog.math.Long.ZERO;
+  }
+
+  if (this.isNegative()) {
+    if (other.isNegative()) {
+      return this.negate().multiply(other.negate());
+    } else {
+      return this.negate().multiply(other).negate();
+    }
+  } else if (other.isNegative()) {
+    return this.multiply(other.negate()).negate();
+  }
+
+  // If both longs are small, use float multiplication
+  if (this.lessThan(goog.math.Long.TWO_PWR_24_) &&
+      other.lessThan(goog.math.Long.TWO_PWR_24_)) {
+    return goog.math.Long.fromNumber(this.toNumber() * other.toNumber());
+  }
+
+  // Divide each long into 4 chunks of 16 bits, and then add up 4x4 products.
+  // We can skip products that would overflow.
+
+  var a48 = this.high_ >>> 16;
+  var a32 = this.high_ & 0xFFFF;
+  var a16 = this.low_ >>> 16;
+  var a00 = this.low_ & 0xFFFF;
+
+  var b48 = other.high_ >>> 16;
+  var b32 = other.high_ & 0xFFFF;
+  var b16 = other.low_ >>> 16;
+  var b00 = other.low_ & 0xFFFF;
+
+  var c48 = 0, c32 = 0, c16 = 0, c00 = 0;
+  c00 += a00 * b00;
+  c16 += c00 >>> 16;
+  c00 &= 0xFFFF;
+  c16 += a16 * b00;
+  c32 += c16 >>> 16;
+  c16 &= 0xFFFF;
+  c16 += a00 * b16;
+  c32 += c16 >>> 16;
+  c16 &= 0xFFFF;
+  c32 += a32 * b00;
+  c48 += c32 >>> 16;
+  c32 &= 0xFFFF;
+  c32 += a16 * b16;
+  c48 += c32 >>> 16;
+  c32 &= 0xFFFF;
+  c32 += a00 * b32;
+  c48 += c32 >>> 16;
+  c32 &= 0xFFFF;
+  c48 += a48 * b00 + a32 * b16 + a16 * b32 + a00 * b48;
+  c48 &= 0xFFFF;
+  return goog.math.Long.fromBits((c16 << 16) | c00, (c48 << 16) | c32);
+};
+
+
+/**
+ * Returns this Long divided by the given one.
+ * @param {goog.math.Long} other Long by which to divide.
+ * @return {!goog.math.Long} This Long divided by the given one.
+ */
+goog.math.Long.prototype.div = function(other) {
+  if (other.isZero()) {
+    throw Error('division by zero');
+  } else if (this.isZero()) {
+    return goog.math.Long.ZERO;
+  }
+
+  if (this.equals(goog.math.Long.MIN_VALUE)) {
+    if (other.equals(goog.math.Long.ONE) ||
+        other.equals(goog.math.Long.NEG_ONE)) {
+      return goog.math.Long.MIN_VALUE;  // recall that -MIN_VALUE == MIN_VALUE
+    } else if (other.equals(goog.math.Long.MIN_VALUE)) {
+      return goog.math.Long.ONE;
+    } else {
+      // At this point, we have |other| >= 2, so |this/other| < |MIN_VALUE|.
+      var halfThis = this.shiftRight(1);
+      var approx = halfThis.div(other).shiftLeft(1);
+      if (approx.equals(goog.math.Long.ZERO)) {
+        return other.isNegative() ? goog.math.Long.ONE : goog.math.Long.NEG_ONE;
+      } else {
+        var rem = this.subtract(other.multiply(approx));
+        var result = approx.add(rem.div(other));
+        return result;
+      }
+    }
+  } else if (other.equals(goog.math.Long.MIN_VALUE)) {
+    return goog.math.Long.ZERO;
+  }
+
+  if (this.isNegative()) {
+    if (other.isNegative()) {
+      return this.negate().div(other.negate());
+    } else {
+      return this.negate().div(other).negate();
+    }
+  } else if (other.isNegative()) {
+    return this.div(other.negate()).negate();
+  }
+
+  // Repeat the following until the remainder is less than other:  find a
+  // floating-point that approximates remainder / other *from below*, add this
+  // into the result, and subtract it from the remainder.  It is critical that
+  // the approximate value is less than or equal to the real value so that the
+  // remainder never becomes negative.
+  var res = goog.math.Long.ZERO;
+  var rem = this;
+  while (rem.greaterThanOrEqual(other)) {
+    // Approximate the result of division. This may be a little greater or
+    // smaller than the actual value.
+    var approx = Math.max(1, Math.floor(rem.toNumber() / other.toNumber()));
+
+    // We will tweak the approximate result by changing it in the 48-th digit or
+    // the smallest non-fractional digit, whichever is larger.
+    var log2 = Math.ceil(Math.log(approx) / Math.LN2);
+    var delta = (log2 <= 48) ? 1 : Math.pow(2, log2 - 48);
+
+    // Decrease the approximation until it is smaller than the remainder.  Note
+    // that if it is too large, the product overflows and is negative.
+    var approxRes = goog.math.Long.fromNumber(approx);
+    var approxRem = approxRes.multiply(other);
+    while (approxRem.isNegative() || approxRem.greaterThan(rem)) {
+      approx -= delta;
+      approxRes = goog.math.Long.fromNumber(approx);
+      approxRem = approxRes.multiply(other);
+    }
+
+    // We know the answer can't be zero... and actually, zero would cause
+    // infinite recursion since we would make no progress.
+    if (approxRes.isZero()) {
+      approxRes = goog.math.Long.ONE;
+    }
+
+    res = res.add(approxRes);
+    rem = rem.subtract(approxRem);
+  }
+  return res;
+};
+
+
+/**
+ * Returns this Long modulo the given one.
+ * @param {goog.math.Long} other Long by which to mod.
+ * @return {!goog.math.Long} This Long modulo the given one.
+ */
+goog.math.Long.prototype.modulo = function(other) {
+  return this.subtract(this.div(other).multiply(other));
+};
+
+
+/** @return {!goog.math.Long} The bitwise-NOT of this value. */
+goog.math.Long.prototype.not = function() {
+  return goog.math.Long.fromBits(~this.low_, ~this.high_);
+};
+
+
+/**
+ * Returns the bitwise-AND of this Long and the given one.
+ * @param {goog.math.Long} other The Long with which to AND.
+ * @return {!goog.math.Long} The bitwise-AND of this and the other.
+ */
+goog.math.Long.prototype.and = function(other) {
+  return goog.math.Long.fromBits(this.low_ & other.low_,
+                                 this.high_ & other.high_);
+};
+
+
+/**
+ * Returns the bitwise-OR of this Long and the given one.
+ * @param {goog.math.Long} other The Long with which to OR.
+ * @return {!goog.math.Long} The bitwise-OR of this and the other.
+ */
+goog.math.Long.prototype.or = function(other) {
+  return goog.math.Long.fromBits(this.low_ | other.low_,
+                                 this.high_ | other.high_);
+};
+
+
+/**
+ * Returns the bitwise-XOR of this Long and the given one.
+ * @param {goog.math.Long} other The Long with which to XOR.
+ * @return {!goog.math.Long} The bitwise-XOR of this and the other.
+ */
+goog.math.Long.prototype.xor = function(other) {
+  return goog.math.Long.fromBits(this.low_ ^ other.low_,
+                                 this.high_ ^ other.high_);
+};
+
+
+/**
+ * Returns this Long with bits shifted to the left by the given amount.
+ * @param {number} numBits The number of bits by which to shift.
+ * @return {!goog.math.Long} This shifted to the left by the given amount.
+ */
+goog.math.Long.prototype.shiftLeft = function(numBits) {
+  numBits &= 63;
+  if (numBits == 0) {
+    return this;
+  } else {
+    var low = this.low_;
+    if (numBits < 32) {
+      var high = this.high_;
+      return goog.math.Long.fromBits(
+          low << numBits,
+          (high << numBits) | (low >>> (32 - numBits)));
+    } else {
+      return goog.math.Long.fromBits(0, low << (numBits - 32));
+    }
+  }
+};
+
+
+/**
+ * Returns this Long with bits shifted to the right by the given amount.
+ * @param {number} numBits The number of bits by which to shift.
+ * @return {!goog.math.Long} This shifted to the right by the given amount.
+ */
+goog.math.Long.prototype.shiftRight = function(numBits) {
+  numBits &= 63;
+  if (numBits == 0) {
+    return this;
+  } else {
+    var high = this.high_;
+    if (numBits < 32) {
+      var low = this.low_;
+      return goog.math.Long.fromBits(
+          (low >>> numBits) | (high << (32 - numBits)),
+          high >> numBits);
+    } else {
+      return goog.math.Long.fromBits(
+          high >> (numBits - 32),
+          high >= 0 ? 0 : -1);
+    }
+  }
+};
+
+
+/**
+ * Returns this Long with bits shifted to the right by the given amount, with
+ * zeros placed into the new leading bits.
+ * @param {number} numBits The number of bits by which to shift.
+ * @return {!goog.math.Long} This shifted to the right by the given amount, with
+ *     zeros placed into the new leading bits.
+ */
+goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
+  numBits &= 63;
+  if (numBits == 0) {
+    return this;
+  } else {
+    var high = this.high_;
+    if (numBits < 32) {
+      var low = this.low_;
+      return goog.math.Long.fromBits(
+          (low >>> numBits) | (high << (32 - numBits)),
+          high >>> numBits);
+    } else if (numBits == 32) {
+      return goog.math.Long.fromBits(high, 0);
+    } else {
+      return goog.math.Long.fromBits(high >>> (numBits - 32), 0);
+    }
+  }
+};
+
 (function() {
-  var Audio, Canvas2D, Color, EventQueue, FileData, FileSystem, Font, Graphics, Image, ImageData, ImageModule, Keyboard, MathModule, Mouse, Quad, Source, System, Timer, Touch, Window,
+  var Color,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
   this.Punchdrunk = (function() {
     function Punchdrunk(config) {
-      var conf, element, game_root;
+      var conf, element, game_code, game_root, love, vm;
       if (config == null) {
         config = {};
       }
       game_root = config["game_root"] || "lua";
+      game_code = config["game_code"];
       element = config["canvas"] || null;
-      shine.stdout.write = function() {
-        return console.log.apply(console, arguments);
-      };
       conf = {
         window: {},
         modules: {}
       };
-      new shine.FileManager().load("" + game_root + "/conf.lua.json", function(_, file) {
-        var conf_env, conf_vm, love, vm;
-        conf_env = {
-          love: {}
-        };
-        conf_vm = new shine.VM(conf_env);
-        conf_vm.execute(null, file);
-        conf_env.love.conf.call(null, conf);
+      if (game_code) {
         Love.root = game_root;
         love = new Love(element, conf.window, conf.modules);
         vm = new shine.VM({
           love: love
         });
-        vm._globals['package'].path = ("" + game_root + "/?.lua.json;" + game_root + "/?.json;") + vm._globals['package'].path;
-        return vm.load({
-          "sourceName": "@js/boot.lua",
-          "lineDefined": 0,
-          "lastLineDefined": 0,
-          "upvalueCount": 0,
-          "paramCount": 0,
-          "is_vararg": 2,
-          "maxStackSize": 2,
-          "instructions": [5, 0, 0, 0, 1, 1, 1, 0, 28, 0, 2, 1, 5, 0, 2, 0, 6, 0, 0, 259, 28, 0, 1, 1, 30, 0, 1, 0],
-          "constants": ["require", "main", "love", "run"],
-          "functions": [],
-          "linePositions": [1, 1, 1, 3, 3, 3, 3],
-          "locals": [],
-          "upvalues": [],
-          "sourcePath": "js/boot.lua"
+        vm.load(game_code);
+        love.run();
+      } else {
+        new shine.FileManager().load("" + game_root + "/conf.lua.json", function(_, file) {
+          var conf_env, conf_vm;
+          if (file) {
+            conf_env = {
+              love: {}
+            };
+            conf_vm = new shine.VM(conf_env);
+            conf_vm.execute(null, file);
+            conf_env.love.conf.call(null, conf);
+          }
+          Love.root = game_root;
+          love = new Love(element, conf.window, conf.modules);
+          vm = new shine.VM({
+            love: love
+          });
+          vm._globals['package'].path = ("" + game_root + "/?.lua.json;" + game_root + "/?.json;") + vm._globals['package'].path;
+          return vm.load({
+            "sourceName": "@js/boot.lua",
+            "lineDefined": 0,
+            "lastLineDefined": 0,
+            "upvalueCount": 0,
+            "paramCount": 0,
+            "is_vararg": 2,
+            "maxStackSize": 2,
+            "instructions": [5, 0, 0, 0, 1, 1, 1, 0, 28, 0, 2, 1, 5, 0, 2, 0, 6, 0, 0, 259, 28, 0, 1, 1, 30, 0, 1, 0],
+            "constants": ["require", "main", "love", "run"],
+            "functions": [],
+            "linePositions": [1, 1, 1, 3, 3, 3, 3],
+            "locals": [],
+            "upvalues": [],
+            "sourcePath": "js/boot.lua"
+          });
         });
-      });
+      }
     }
+
+    shine.stdout.write = function() {
+      return console.log.apply(console, arguments);
+    };
 
     return Punchdrunk;
 
   })();
 
-  Audio = (function() {
+  this.Love = (function() {
+    function Love(element, window_conf, module_conf) {
+      if (element == null) {
+        element = null;
+      }
+      if (window_conf == null) {
+        window_conf = {};
+      }
+      if (module_conf == null) {
+        module_conf = {};
+      }
+      this.run = __bind(this.run, this);
+      Love.element = element;
+      this.graphics = new Love.Graphics(window_conf.width, window_conf.height);
+      this.window = new Love.Window(this.graphics);
+      this.timer = new Love.Timer();
+      this.event = new Love.EventQueue();
+      this.keyboard = new Love.Keyboard(this.event, Love.element);
+      this.mouse = new Love.Mouse(this.event, Love.element);
+      this.touch = new Love.Touch(this.event, Love.element);
+      this.filesystem = new Love.FileSystem();
+      this.audio = new Love.Audio();
+      this.system = new Love.System();
+      this.image = new Love.ImageModule();
+      this.math = new Love.Math();
+      window.addEventListener("beforeunload", (function(_this) {
+        return function() {
+          return _this.quit.call();
+        };
+      })(this));
+    }
+
+    Love.prototype.run = function() {
+      var game_loop;
+      this.timer.step();
+      this.load.call();
+      game_loop = (function(_this) {
+        return function() {
+          var e, _i, _len, _ref;
+          _ref = _this.event.internalQueue;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            e = _ref[_i];
+            _this[e.eventType].call(null, e.arg1, e.arg2, e.arg3, e.arg4);
+          }
+          _this.event.clear();
+          _this.timer.step();
+          _this.update.call(null, _this.timer.getDelta());
+          _this.graphics.origin();
+          _this.graphics.clear();
+          _this.draw.call();
+          return _this.timer.nextFrame(game_loop);
+        };
+      })(this);
+      return this.timer.nextFrame(game_loop);
+    };
+
+    Love.prototype.load = function(args) {};
+
+    Love.prototype.update = function(dt) {};
+
+    Love.prototype.mousepressed = function(x, y, button) {};
+
+    Love.prototype.mousereleased = function(x, y, button) {};
+
+    Love.prototype.touchpressed = function(id, x, y) {};
+
+    Love.prototype.touchreleased = function(id, x, y) {};
+
+    Love.prototype.touchmoved = function(id, x, y) {};
+
+    Love.prototype.keypressed = function(key, unicode) {};
+
+    Love.prototype.keyreleased = function(key, unicode) {};
+
+    Love.prototype.draw = function() {};
+
+    Love.prototype.quit = function() {};
+
+    return Love;
+
+  })();
+
+  Love.root = "lua";
+
+  Love.element = null;
+
+  Love.Audio = (function() {
     function Audio() {
       this.stop = __bind(this.stop, this);
       this.setVolume = __bind(this.setVolume, this);
@@ -6981,7 +7917,7 @@ if (typeof module !== 'undefined') {
     Audio.prototype.getVolume = function() {};
 
     Audio.prototype.newSource = function(filename, type) {
-      return new Source(filename, type);
+      return new Love.Audio.Source(filename, type);
     };
 
     Audio.prototype.pause = function(source) {
@@ -7018,7 +7954,7 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  Color = (function() {
+  Love.Color = (function() {
     function Color(r, g, b, a) {
       this.r = r;
       this.g = g;
@@ -7027,11 +7963,17 @@ if (typeof module !== 'undefined') {
       this.html_code = "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
     }
 
+    Color.prototype.unpack = function() {
+      return [this.r, this.g, this.b, this.a];
+    };
+
     return Color;
 
   })();
 
-  EventQueue = (function() {
+  Color = Love.Color;
+
+  Love.EventQueue = (function() {
     var Event;
 
     function EventQueue() {
@@ -7063,7 +8005,9 @@ if (typeof module !== 'undefined') {
       return this.internalQueue.push(newEvent);
     };
 
-    EventQueue.prototype.quit = function() {};
+    EventQueue.prototype.quit = function() {
+      return this.internalQueue.push(new Event("quit"));
+    };
 
     EventQueue.prototype.wait = function() {};
 
@@ -7084,7 +8028,7 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  FileSystem = (function() {
+  Love.FileSystem = (function() {
     function FileSystem() {
       this.write = __bind(this.write, this);
       this.unmount = __bind(this.unmount, this);
@@ -7155,7 +8099,7 @@ if (typeof module !== 'undefined') {
     FileSystem.prototype.newFile = function() {};
 
     FileSystem.prototype.newFileData = function(contents, name, decoder) {
-      return new FileData(contents, name, decoder);
+      return new Love.FileSystem.FileData(contents, name, decoder);
     };
 
     FileSystem.prototype.read = function(filename) {
@@ -7180,10 +8124,14 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  Graphics = (function() {
+  Love.Graphics = (function() {
     function Graphics(width, height) {
-      this.width = width != null ? width : 800;
-      this.height = height != null ? height : 600;
+      if (width == null) {
+        width = 800;
+      }
+      if (height == null) {
+        height = 600;
+      }
       this.getWidth = __bind(this.getWidth, this);
       this.getHeight = __bind(this.getHeight, this);
       this.getDimensions = __bind(this.getDimensions, this);
@@ -7254,14 +8202,14 @@ if (typeof module !== 'undefined') {
       this.circle = __bind(this.circle, this);
       this.arc = __bind(this.arc, this);
       if (Love.element) {
-        this.canvas = new Canvas2D(this.width, this.height, Love.element);
+        this.canvas = new Love.Graphics.Canvas2D(width, height, Love.element);
       } else {
-        this.canvas = new Canvas2D(this.width, this.height);
+        this.canvas = new Love.Graphics.Canvas2D(width, height);
         document.body.appendChild(this.canvas.element);
         Love.element = this.canvas.element;
       }
       this.default_canvas = this.canvas;
-      this.default_font = new Font("Vera", 12);
+      this.default_font = new Love.Graphics.Font("Vera", 12);
       this.setColor(255, 255, 255);
       this.setBackgroundColor(0, 0, 0);
       this.setFont(this.default_font);
@@ -7325,18 +8273,18 @@ if (typeof module !== 'undefined') {
       if (height == null) {
         height = this.getHeight(this);
       }
-      return new Canvas2D(width, height);
+      return new Love.Graphics.Canvas2D(width, height);
     };
 
     Graphics.prototype.newFont = function(filename, size) {
       if (size == null) {
         size = 12;
       }
-      return new Font(filename, size);
+      return new Love.Graphics.Font(filename, size);
     };
 
     Graphics.prototype.newImage = function(data) {
-      return new Image(data);
+      return new Love.Graphics.Image(data);
     };
 
     Graphics.prototype.newImageFont = function() {};
@@ -7346,7 +8294,7 @@ if (typeof module !== 'undefined') {
     Graphics.prototype.newParticleSystem = function() {};
 
     Graphics.prototype.newQuad = function(x, y, width, height, sw, sh) {
-      return new Quad(x, y, width, height, sw, sh);
+      return new Love.Graphics.Quad(x, y, width, height, sw, sh);
     };
 
     Graphics.prototype.newScreenshot = function() {};
@@ -7571,7 +8519,7 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  ImageModule = (function() {
+  Love.ImageModule = (function() {
     function ImageModule() {
       this.newImageData = __bind(this.newImageData, this);
       this.newCompressedData = __bind(this.newCompressedData, this);
@@ -7583,20 +8531,22 @@ if (typeof module !== 'undefined') {
     ImageModule.prototype.newCompressedData = function() {};
 
     ImageModule.prototype.newImageData = function(filedata) {
-      return new ImageData(filedata);
+      return new Love.ImageModule.ImageData(filedata);
     };
 
     return ImageModule;
 
   })();
 
-  Keyboard = (function() {
+  Love.Keyboard = (function() {
     var getKeyFromEvent, keys, rightKeys, shiftedKeys;
 
-    function Keyboard(eventQueue) {
+    function Keyboard(eventQueue, canvas) {
       this.isDown = __bind(this.isDown, this);
+      var keydown, keyup;
       this.keysDown = {};
-      document.addEventListener("keydown", (function(_this) {
+      canvas.setAttribute("tabindex", "0");
+      keydown = (function(_this) {
         return function(evt) {
           var key;
           evt.preventDefault();
@@ -7605,8 +8555,9 @@ if (typeof module !== 'undefined') {
           _this.keysDown[key] = true;
           return eventQueue.push("keypressed", key, evt.which);
         };
-      })(this));
-      document.addEventListener("keyup", (function(_this) {
+      })(this);
+      canvas.addEventListener("keydown", keydown, true);
+      keyup = (function(_this) {
         return function(evt) {
           var key;
           evt.preventDefault();
@@ -7615,17 +8566,18 @@ if (typeof module !== 'undefined') {
           _this.keysDown[key] = false;
           return eventQueue.push("keyreleased", key, evt.which);
         };
-      })(this));
+      })(this);
+      canvas.addEventListener("keyup", keyup, true);
     }
 
     Keyboard.prototype.isDown = function() {
       var key, others;
       key = arguments[0], others = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      if (this.keysDown[key]) {
-        return true;
+      if (!this.keysDown[key]) {
+        return false;
       } else {
         if (others.length === 0) {
-          return false;
+          return true;
         } else {
           return this.isDown.apply(this, others);
         }
@@ -7759,85 +8711,8 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  this.Love = (function() {
-    function Love(element, window_conf, module_conf) {
-      this.run = __bind(this.run, this);
-      Love.element = element;
-      this.graphics = new Graphics(window_conf.width, window_conf.height);
-      this.window = new Window(this.graphics);
-      this.timer = new Timer();
-      this.event = new EventQueue();
-      this.keyboard = new Keyboard(this.event);
-      this.mouse = new Mouse(this.event, Love.element);
-      this.touch = new Touch(this.event, Love.element);
-      this.filesystem = new FileSystem();
-      this.audio = new Audio();
-      this.system = new System();
-      this.image = new ImageModule();
-      this.math = new MathModule();
-      window.addEventListener("beforeunload", (function(_this) {
-        return function() {
-          return _this.quit.call();
-        };
-      })(this));
-    }
-
-    Love.prototype.run = function() {
-      var game_loop;
-      this.timer.step();
-      this.load.call();
-      game_loop = (function(_this) {
-        return function() {
-          var e, _i, _len, _ref;
-          _ref = _this.event.internalQueue;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            e = _ref[_i];
-            _this[e.eventType].call(null, e.arg1, e.arg2, e.arg3, e.arg4);
-          }
-          _this.event.clear();
-          _this.timer.step();
-          _this.update.call(null, _this.timer.getDelta());
-          _this.graphics.origin();
-          _this.graphics.clear();
-          _this.draw.call();
-          return _this.timer.nextFrame(game_loop);
-        };
-      })(this);
-      return this.timer.nextFrame(game_loop);
-    };
-
-    Love.prototype.load = function(args) {};
-
-    Love.prototype.update = function(dt) {};
-
-    Love.prototype.mousepressed = function(x, y, button) {};
-
-    Love.prototype.mousereleased = function(x, y, button) {};
-
-    Love.prototype.touchpressed = function(id, x, y) {};
-
-    Love.prototype.touchreleased = function(id, x, y) {};
-
-    Love.prototype.touchmoved = function(id, x, y) {};
-
-    Love.prototype.keypressed = function(key, unicode) {};
-
-    Love.prototype.keyreleased = function(key, unicode) {};
-
-    Love.prototype.draw = function() {};
-
-    Love.prototype.quit = function() {};
-
-    return Love;
-
-  })();
-
-  Love.root = "lua";
-
-  Love.element = null;
-
-  MathModule = (function() {
-    function MathModule() {
+  Love.Math = (function() {
+    function Math() {
       this.triangulate = __bind(this.triangulate, this);
       this.setRandomSeed = __bind(this.setRandomSeed, this);
       this.randomNormal = __bind(this.randomNormal, this);
@@ -7849,25 +8724,32 @@ if (typeof module !== 'undefined') {
       this.isConvex = __bind(this.isConvex, this);
       this.getRandomSeed = __bind(this.getRandomSeed, this);
       this.gammaToLinear = __bind(this.gammaToLinear, this);
-      this.simplex = new SimplexNoise();
+      var simplex_r;
+      this.random_generator = new Love.Math.RandomGenerator();
+      simplex_r = new Love.Math.RandomGenerator();
+      this.simplex = new SimplexNoise(simplex_r.random.bind(simplex_r, simplex_r));
     }
 
-    MathModule.prototype.gammaToLinear = function() {};
+    Math.prototype.gammaToLinear = function() {};
 
-    MathModule.prototype.getRandomSeed = function() {};
+    Math.prototype.getRandomSeed = function() {
+      return this.random_generator.getSeed(this.random_generator);
+    };
 
-    MathModule.prototype.isConvex = function() {};
+    Math.prototype.isConvex = function() {};
 
-    MathModule.prototype.linearToGamma = function() {};
+    Math.prototype.linearToGamma = function() {};
 
-    MathModule.prototype.newBezierCurve = function() {};
+    Math.prototype.newBezierCurve = function() {};
 
-    MathModule.prototype.newRandomGenerator = function() {};
+    Math.prototype.newRandomGenerator = function() {};
 
-    MathModule.prototype.noise = function() {
+    Math.prototype.noise = function() {
       var dimensions;
       dimensions = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       switch (dimensions.length) {
+        case 1:
+          return this.simplex.noise1D(dimensions[0]);
         case 2:
           return this.simplex.noise2D(dimensions[0], dimensions[1]);
         case 3:
@@ -7877,28 +8759,31 @@ if (typeof module !== 'undefined') {
       }
     };
 
-    MathModule.prototype.random = function(min, max) {
-      if (min === void 0 && max === void 0) {
-        Math.random();
-      }
-      if (max === void 0) {
-        max = min;
-        min = 1;
-      }
-      return Math.floor(Math.random() * (max - min + 1) + min);
+    Math.prototype.random = function(min, max) {
+      return this.random_generator.random(this.random_generator, min, max);
     };
 
-    MathModule.prototype.randomNormal = function() {};
+    Math.prototype.randomNormal = function(stddev, mean) {
+      if (stddev == null) {
+        stddev = 1;
+      }
+      if (mean == null) {
+        mean = 0;
+      }
+      return this.random_generator.randomNormal(this.random_generator, stddev, mean);
+    };
 
-    MathModule.prototype.setRandomSeed = function() {};
+    Math.prototype.setRandomSeed = function(low, high) {
+      return this.random_generator.setSeed(this.random_generator, low, high);
+    };
 
-    MathModule.prototype.triangulate = function() {};
+    Math.prototype.triangulate = function() {};
 
-    return MathModule;
+    return Math;
 
   })();
 
-  Mouse = (function() {
+  Love.Mouse = (function() {
     var getButtonFromEvent, getWheelButtonFromEvent, mouseButtonNames;
 
     function Mouse(eventQueue, canvas) {
@@ -7991,11 +8876,11 @@ if (typeof module !== 'undefined') {
     Mouse.prototype.isDown = function() {
       var button, others;
       button = arguments[0], others = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      if (this.buttonsDown[button]) {
-        return true;
+      if (!this.buttonsDown[button]) {
+        return false;
       } else {
         if (others.length === 0) {
-          return false;
+          return true;
         } else {
           return this.isDown.apply(this, others);
         }
@@ -8053,9 +8938,9 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  Mouse.WHEEL_TIMEOUT = 0.02;
+  Love.Mouse.WHEEL_TIMEOUT = 0.02;
 
-  System = (function() {
+  Love.System = (function() {
     function System() {
       this.setClipboardText = __bind(this.setClipboardText, this);
       this.openURL = __bind(this.openURL, this);
@@ -8098,7 +8983,7 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  Timer = (function() {
+  Love.Timer = (function() {
     var lastTime, performance, requestAnimationFrame;
 
     function Timer() {
@@ -8165,7 +9050,7 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  Touch = (function() {
+  Love.Touch = (function() {
     var Finger;
 
     function Touch(eventQueue, canvas) {
@@ -8275,7 +9160,7 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  Window = (function() {
+  Love.Window = (function() {
     function Window(graphics) {
       this.graphics = graphics;
       this.setTitle = __bind(this.setTitle, this);
@@ -8297,17 +9182,26 @@ if (typeof module !== 'undefined') {
       this.getDisplayCount = __bind(this.getDisplayCount, this);
       this.getDimensions = __bind(this.getDimensions, this);
       this.getDesktopDimensions = __bind(this.getDesktopDimensions, this);
+      this.fullscreen = false;
     }
 
-    Window.prototype.getDesktopDimensions = function() {};
+    Window.prototype.getDesktopDimensions = function() {
+      return [window.screen.width, window.screen.height];
+    };
 
-    Window.prototype.getDimensions = function() {};
+    Window.prototype.getDimensions = function() {
+      return [this.getWidth(), this.getHeight()];
+    };
 
     Window.prototype.getDisplayCount = function() {};
 
-    Window.prototype.getFullscreen = function() {};
+    Window.prototype.getFullscreen = function() {
+      return this.fullscreen;
+    };
 
-    Window.prototype.getFullscreenModes = function() {};
+    Window.prototype.getFullscreenModes = function() {
+      return [];
+    };
 
     Window.prototype.getHeight = function() {
       return this.graphics.getHeight();
@@ -8317,15 +9211,21 @@ if (typeof module !== 'undefined') {
 
     Window.prototype.getMode = function() {};
 
-    Window.prototype.getPixelScale = function() {};
+    Window.prototype.getPixelScale = function() {
+      return window.devicePixelRatio;
+    };
 
-    Window.prototype.getTitle = function() {};
+    Window.prototype.getTitle = function() {
+      return window.document.title;
+    };
 
     Window.prototype.getWidth = function() {
       return this.graphics.getWidth();
     };
 
-    Window.prototype.hasFocus = function() {};
+    Window.prototype.hasFocus = function() {
+      return document.activeElement === Love.element;
+    };
 
     Window.prototype.hasMouseFocus = function() {};
 
@@ -8333,7 +9233,10 @@ if (typeof module !== 'undefined') {
 
     Window.prototype.isVisible = function() {};
 
-    Window.prototype.setFullscreen = function() {};
+    Window.prototype.setFullscreen = function(fullscreen) {
+      this.fullscreen = fullscreen;
+      return this.fullscreen = false;
+    };
 
     Window.prototype.setIcon = function() {};
 
@@ -8341,13 +9244,15 @@ if (typeof module !== 'undefined') {
       return this.graphics.default_canvas.setDimensions(width, height);
     };
 
-    Window.prototype.setTitle = function() {};
+    Window.prototype.setTitle = function(title) {
+      return window.document.title = title;
+    };
 
     return Window;
 
   })();
 
-  Source = (function() {
+  Love.Audio.Source = (function() {
     function Source(filename, type) {
       this.filename = filename;
       this.type = type;
@@ -8474,13 +9379,24 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  Canvas2D = (function() {
-    var drawDrawable, drawWithQuad;
+  Love.Graphics.Canvas2D = (function() {
+    Canvas2D.TRANSPARENT = new Love.Color(0, 0, 0, 0);
 
     function Canvas2D(width, height, element) {
+      var canvas_height, canvas_width;
       this.element = element;
+      this.getWidth = __bind(this.getWidth, this);
+      this.getImageData = __bind(this.getImageData, this);
+      this.getHeight = __bind(this.getHeight, this);
+      this.getDimensions = __bind(this.getDimensions, this);
       if (this.element == null) {
         this.element = document.createElement('canvas');
+      }
+      if ((canvas_width = Number(this.element.getAttribute('width'))) !== 0) {
+        width = canvas_width;
+      }
+      if ((canvas_height = Number(this.element.getAttribute('height'))) !== 0) {
+        height = canvas_height;
       }
       this.setDimensions(width, height);
       this.context = this.element.getContext('2d');
@@ -8490,7 +9406,7 @@ if (typeof module !== 'undefined') {
     Canvas2D.prototype.clear = function(self, r, g, b, a) {
       var color;
       if (r === null || r === void 0) {
-        color = Canvas2D.transparent;
+        color = this.constructor.TRANSPARENT;
       } else {
         color = new Color(r, g, b, a);
       }
@@ -8502,17 +9418,17 @@ if (typeof module !== 'undefined') {
       return self.context.restore();
     };
 
-    Canvas2D.prototype.getDimensions = function(self) {
-      return [this.getWidth(self), this.getHeight(self)];
+    Canvas2D.prototype.getDimensions = function() {
+      return [this.getWidth(), this.getHeight()];
     };
 
-    Canvas2D.prototype.getHeight = function(self) {
-      return self.height;
+    Canvas2D.prototype.getHeight = function() {
+      return this.height;
     };
 
-    Canvas2D.prototype.getImageData = function(self) {
+    Canvas2D.prototype.getImageData = function() {
       var image_data;
-      image_data = self.context.getImageData(0, 0, self.width, self.height);
+      image_data = this.context.getImageData(0, 0, this.width, this.height);
       return new ImageData(image_data);
     };
 
@@ -8522,18 +9438,25 @@ if (typeof module !== 'undefined') {
       return [data[0], data[1], data[2], data[3]];
     };
 
-    Canvas2D.prototype.getWidth = function(self) {
-      return self.width;
+    Canvas2D.prototype.getWidth = function() {
+      return this.width;
     };
 
     Canvas2D.prototype.getWrap = function(self) {};
 
     Canvas2D.prototype.setWrap = function(self) {};
 
-    Canvas2D.prototype.arc = function(mode, x, y, radius, startAngle, endAngle, segments) {
+    Canvas2D.prototype.arc = function(mode, x, y, radius, startAngle, endAngle, points) {
+      var angle_shift, i, phi, _i;
+      points || (points = radius > 10 ? radius : 10);
+      angle_shift = (endAngle - startAngle) / points;
+      phi = startAngle - angle_shift;
       this.context.beginPath();
       this.context.moveTo(x, y);
-      this.context.arc(x, y, radius, startAngle, endAngle);
+      for (i = _i = 0; 0 <= points ? _i <= points : _i >= points; i = 0 <= points ? ++_i : --_i) {
+        phi += angle_shift;
+        this.context.lineTo(x + radius * Math.cos(phi), y + radius * Math.sin(phi));
+      }
       this.context.closePath();
       switch (mode) {
         case "fill":
@@ -8544,6 +9467,9 @@ if (typeof module !== 'undefined') {
     };
 
     Canvas2D.prototype.circle = function(mode, x, y, radius, segments) {
+      if (radius < 0) {
+        return;
+      }
       this.context.beginPath();
       this.context.arc(x, y, radius, 0, 2 * Math.PI);
       this.context.closePath();
@@ -8557,10 +9483,10 @@ if (typeof module !== 'undefined') {
 
     Canvas2D.prototype.draw = function(drawable, quad) {
       switch (true) {
-        case !(quad instanceof Quad):
-          return drawDrawable.apply(this, arguments);
-        case quad instanceof Quad:
-          return drawWithQuad.apply(this, arguments);
+        case !(quad instanceof Love.Graphics.Quad):
+          return this.drawDrawable.apply(this, arguments);
+        case quad instanceof Love.Graphics.Quad:
+          return this.drawWithQuad.apply(this, arguments);
       }
     };
 
@@ -8818,7 +9744,7 @@ if (typeof module !== 'undefined') {
       return this.element.setAttribute('height', this.height);
     };
 
-    drawDrawable = function(drawable, x, y, r, sx, sy, ox, oy, kx, ky) {
+    Canvas2D.prototype.drawDrawable = function(drawable, x, y, r, sx, sy, ox, oy, kx, ky) {
       var halfHeight, halfWidth;
       if (x == null) {
         x = 0;
@@ -8859,7 +9785,7 @@ if (typeof module !== 'undefined') {
       return this.context.restore();
     };
 
-    drawWithQuad = function(drawable, quad, x, y, r, sx, sy, ox, oy, kx, ky) {
+    Canvas2D.prototype.drawWithQuad = function(drawable, quad, x, y, r, sx, sy, ox, oy, kx, ky) {
       var halfHeight, halfWidth;
       if (x == null) {
         x = 0;
@@ -8904,9 +9830,7 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  Canvas2D.transparent = new Color(0, 0, 0, 0);
-
-  Font = (function() {
+  Love.Graphics.Font = (function() {
     function Font(filename, size) {
       this.filename = filename;
       this.size = size;
@@ -8939,16 +9863,18 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  Image = (function() {
+  Love.Graphics.Image = (function() {
     function Image(data) {
-      if (data instanceof ImageData) {
+      var filename;
+      if (data instanceof Love.ImageModule.ImageData) {
         this.element = document.createElement("img");
         this.element.setAttribute("src", data.getString(data));
       } else {
-        this.element = document.getElementById(data);
+        filename = data;
+        this.element = document.getElementById(filename);
         if (this.element === null) {
           this.element = document.createElement("img");
-          this.element.setAttribute("src", Love.root + "/" + data);
+          this.element.setAttribute("src", Love.root + "/" + filename);
         }
       }
     }
@@ -8987,7 +9913,7 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  Quad = (function() {
+  Love.Graphics.Quad = (function() {
     function Quad(x, y, width, height, sw, sh) {
       this.x = x;
       this.y = y;
@@ -9012,7 +9938,7 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  FileData = (function() {
+  Love.FileSystem.FileData = (function() {
     function FileData(contents, name, decoder) {
       this.contents = contents;
       this.name = name;
@@ -9039,7 +9965,7 @@ if (typeof module !== 'undefined') {
 
   })();
 
-  ImageData = (function() {
+  Love.ImageModule.ImageData = (function() {
     function ImageData(filedata) {
       this.contents = "data:image/" + (filedata.getExtension(filedata)) + ";base64," + (filedata.getString(filedata));
     }
@@ -9065,6 +9991,98 @@ if (typeof module !== 'undefined') {
     ImageData.prototype.setPixel = function(self) {};
 
     return ImageData;
+
+  })();
+
+  Love.Math.RandomGenerator = (function() {
+    var Long, MAX_VALUE;
+
+    function RandomGenerator() {
+      var seed;
+      this.last_random_normal = Number.POSITIVE_INFINITY;
+      seed = new Long(0xCBBF7A44, 0x0139408D);
+      this.setSeed(this, seed);
+    }
+
+    RandomGenerator.prototype.rand = function() {
+      this.rng_state = this.rng_state.xor(this.rng_state.shiftLeft(13));
+      this.rng_state = this.rng_state.xor(this.rng_state.shiftRight(7));
+      return this.rng_state = this.rng_state.xor(this.rng_state.shiftLeft(17));
+    };
+
+    RandomGenerator.prototype.random = function(self, min, max) {
+      if (min === void 0 && max === void 0) {
+        return Math.abs(self.rand().toNumber() / MAX_VALUE);
+      }
+      if (max === void 0) {
+        max = min;
+        return self.random(self) * max;
+      }
+      return self.random(self) * (max - min) + min;
+    };
+
+    RandomGenerator.prototype.randomNormal = function(self, stddev, mean) {
+      var phi, r;
+      if (stddev == null) {
+        stddev = 1;
+      }
+      if (mean == null) {
+        mean = 0;
+      }
+      if (self.last_random_normal !== Number.POSITIVE_INFINITY) {
+        r = self.last_random_normal;
+        self.last_random_normal = Number.POSITIVE_INFINITY;
+        return r * stddev + mean;
+      }
+      r = Math.sqrt(-2.0 * Math.log(1 - self.random(self)));
+      phi = 2 * Math.PI * (1 - self.random(self));
+      self.last_random_normal = r * Math.cos(phi);
+      return r * Math.sin(phi) * stddev + mean;
+    };
+
+    RandomGenerator.prototype.setSeed = function(self, low, high) {
+      var i, _i, _results;
+      if (high) {
+        self.seed = new Long(low, high);
+      } else {
+        self.seed = low;
+      }
+      self.rng_state = self.seed;
+      _results = [];
+      for (i = _i = 0; _i <= 2; i = ++_i) {
+        _results.push(self.rand());
+      }
+      return _results;
+    };
+
+    RandomGenerator.prototype.getSeed = function(self) {
+      return [self.seed.getLowBits(), self.seed.getHighBits()];
+    };
+
+    RandomGenerator.prototype.getState = function(self) {
+      var high, high_string, low, low_string, padding, ss, _ref;
+      _ref = self.getSeed(), low = _ref[0], high = _ref[1];
+      padding = '00000000';
+      ss = '0x';
+      low_string = low.toString(16);
+      high_string = high.toString(16);
+      ss += padding.substring(0, padding.length - low_string.length) + low_string;
+      ss += padding.substring(0, padding.length - high_string.length) + high_string;
+      return ss;
+    };
+
+    RandomGenerator.prototype.setState = function(self, state_string) {
+      var high, low;
+      low = parseInt(state_string.substring(2, 10), 16);
+      high = parseInt(state_string.substring(10, 18), 16);
+      return self.rng_state = new Long(low, high);
+    };
+
+    Long = goog.math.Long;
+
+    MAX_VALUE = Long.fromNumber(Number.MAX_VALUE).toNumber();
+
+    return RandomGenerator;
 
   })();
 
