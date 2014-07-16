@@ -20,6 +20,8 @@ class Love.Math
   random: (min, max) =>
     @random_generator.random(min, max)
 
-  randomNormal: =>
   setRandomSeed: =>
+  randomNormal: (stddev = 1, mean = 0) =>
+    @random_generator.randomNormal(stddev) + mean
+
   triangulate: =>
