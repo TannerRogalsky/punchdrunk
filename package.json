@@ -1,14 +1,14 @@
 {
   "name": "punchdrunk",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "author": "Tanner Rogalsky",
   "description": "An attempt to replicate the Love API in JavaScript",
   "homepage": "https://github.com/TannerRogalsky/punchdrunk",
   "bugs": "https://github.com/TannerRogalsky/punchdrunk/issues",
   "scripts": {
-    "test": "mocha-phantomjs test/page.html"
+    "test": "grunt test"
   },
-  "main": "./amore.js",
+  "main": "./js/punchdrunk.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/TannerRogalsky/punchdrunk"
@@ -20,13 +20,13 @@
   "dependencies": {},
   "devDependencies": {
     "coffee-script": "1.7.x",
-    "moonshine": "0.0.11",
+    "moonshine": "git+https://github.com/TannerRogalsky/moonshine.git#0c897b793",
     "grunt": "0.4.x",
-    "grunt-shell": "0.7.x",
     "grunt-contrib-concat": "0.1.x",
     "grunt-contrib-watch": "~0.2.x",
     "grunt-contrib-coffee": "0.10.x",
-    "grunt-contrib-connect": "v0.7.x"
+    "grunt-contrib-connect": "v0.7.x",
+    "grunt-mocha-phantomjs": "v0.4.x"
   },
   "license": "MIT"
 }

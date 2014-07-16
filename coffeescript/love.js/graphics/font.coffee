@@ -1,4 +1,4 @@
-class Font
+class Love.Graphics.Font
   constructor: (@filename, @size) ->
     @html_code = "#{@size}px #{@filename}"
 

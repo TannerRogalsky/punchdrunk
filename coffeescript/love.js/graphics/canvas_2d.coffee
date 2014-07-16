@@ -1,14 +1,20 @@
-class Canvas2D
+class Love.Graphics.Canvas2D
+  @TRANSPARENT = new Love.Color(0, 0, 0, 0)
+
   constructor: (width, height, @element) ->
     @element ?= document.createElement('canvas')
-    this.setDimensions(width, height)
+    if (canvas_width = Number(@element.getAttribute('width'))) != 0
+      width = canvas_width
+    if (canvas_height = Number(@element.getAttribute('height'))) != 0
+      height = canvas_height
+    @setDimensions(width, height)
     @context = @element.getContext('2d')
 
     @current_transform = Matrix.I(3)
 
   clear: (self, r, g, b, a) ->
     if r == null or r == undefined
-      color = Canvas2D.transparent
+      color = @constructor.TRANSPARENT
     else
       color = new Color(r, g, b, a)
 
@@ -19,22 +25,22 @@ class Canvas2D
     self.context.fillRect(0, 0, self.width, self.height)
     self.context.restore()
 
-  getDimensions: (self) ->
-    [@getWidth(self), @getHeight(self)]
+  getDimensions: =>
+    [@getWidth(), @getHeight()]
 
-  getHeight: (self) ->
-    self.height
+  getHeight: =>
+    @height
 
-  getImageData: (self) ->
-    image_data = self.context.getImageData(0, 0, self.width, self.height)
+  getImageData: =>
+    image_data = @context.getImageData(0, 0, @width, @height)
     new ImageData(image_data)
 
   getPixel: (self, x, y) ->
     data = self.context.getImageData(x, y, 1, 1).data
     [data[0], data[1], data[2], data[3]]
 
-  getWidth: (self) ->
-    self.width
+  getWidth: =>
+    @width
 
   # TODO: wrapping also applies to textures and quads
   getWrap: (self) ->
@@ -42,16 +48,27 @@ class Canvas2D
   setWrap: (self) ->
 
   # PRIVATE
-  arc: (mode, x, y, radius, startAngle, endAngle, segments) ->
+  arc: (mode, x, y, radius, startAngle, endAngle, points) ->
+    points ||= if radius > 10 then radius else 10
+    angle_shift = (endAngle - startAngle) / points
+    phi = startAngle - angle_shift
+
     @context.beginPath()
     @context.moveTo(x, y)
-    @context.arc(x, y, radius, startAngle, endAngle)
+    for i in [0..points]
+      phi += angle_shift
+      @context.lineTo(x + radius * Math.cos(phi), y + radius * Math.sin(phi))
     @context.closePath()
+
     switch mode
       when "fill" then @context.fill()
       when "line" then @context.stroke()
 
   circle: (mode, x, y, radius, segments) ->
+    if radius < 0
+      # don't try to draw a circle with negative radius
+      return
+
     @context.beginPath()
     @context.arc(x, y, radius, 0, 2 * Math.PI)
     @context.closePath()
@@ -61,8 +78,8 @@ class Canvas2D
 
   draw: (drawable, quad) ->
     switch true
-      when quad not instanceof Quad then drawDrawable.apply(this, arguments)
-      when quad instanceof Quad then drawWithQuad.apply(this, arguments)
+      when quad not instanceof Love.Graphics.Quad then @drawDrawable.apply(this, arguments)
+      when quad instanceof Love.Graphics.Quad then @drawWithQuad.apply(this, arguments)
 
   line: (points...) ->
     if points.length == 1
@@ -231,7 +248,7 @@ class Canvas2D
     @element.setAttribute('height', @height)
 
   # INTERNAL
-  drawDrawable = (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
+  drawDrawable: (drawable, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
     halfWidth = drawable.element.width / 2
     halfHeight = drawable.element.height / 2
 
@@ -244,7 +261,7 @@ class Canvas2D
     @context.drawImage(drawable.element, 0, 0)
     @context.restore()
 
-  drawWithQuad = (drawable, quad, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
+  drawWithQuad: (drawable, quad, x = 0, y = 0, r = 0, sx = 1, sy = sx, ox = 0, oy = 0, kx = 0, ky = 0) ->
     halfWidth = drawable.element.width / 2
     halfHeight = drawable.element.height / 2
 
@@ -256,5 +273,3 @@ class Canvas2D
     @context.translate(-ox, -oy)
     @context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, 0, 0, quad.width, quad.height)
     @context.restore()
-
-Canvas2D.transparent = new Color(0, 0, 0, 0)

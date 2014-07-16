@@ -1,4 +1,4 @@
-class FileSystem
+class Love.FileSystem
   constructor: () ->
 
   append: () =>
@@ -41,7 +41,7 @@ class FileSystem
   newFile: () =>
 
   newFileData: (contents, name, decoder) =>
-    new FileData(contents, name, decoder)
+    new Love.FileSystem.FileData(contents, name, decoder)
 
   read: (filename) =>
     localStorage.getItem(filename)

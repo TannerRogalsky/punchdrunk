@@ -1,4 +1,4 @@
-class Touch
+class Love.Touch
   constructor: (eventQueue, canvas) ->
     @fingers = {}
 

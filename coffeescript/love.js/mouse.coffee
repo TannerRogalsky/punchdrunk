@@ -1,4 +1,4 @@
-class Mouse
+class Love.Mouse
   constructor: (eventQueue, canvas) ->
     @x = 0
     @y = 0
@@ -54,11 +54,11 @@ class Mouse
     @y
 
   isDown: (button, others...) =>
-    if @buttonsDown[button]
-      return true
+    if !@buttonsDown[button]
+      return false
     else
       if others.length == 0
-        return false
+        return true
       else
         return @isDown(others...)
 
@@ -97,4 +97,4 @@ class Mouse
     delta = Math.max(-1, Math.min(1, (evt.wheelDelta or -evt.detail)))
     if delta == 1 then 'wu' else 'wd'
 
-Mouse.WHEEL_TIMEOUT = 0.02
+Love.Mouse.WHEEL_TIMEOUT = 0.02

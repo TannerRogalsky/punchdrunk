@@ -1,15 +1,20 @@
-class Window
+class Love.Window
   constructor: (@graphics) ->
+    @fullscreen = false
 
-  getDesktopDimensions: () =>
+  getDesktopDimensions: =>
+    [window.screen.width, window.screen.height]
 
-  getDimensions: () =>
+  getDimensions: =>
+    [@getWidth(), @getHeight()]
 
   getDisplayCount: () =>
 
-  getFullscreen: () =>
+  getFullscreen: =>
+    @fullscreen
 
   getFullscreenModes: () =>
+    []
 
   getHeight: =>
     @graphics.getHeight()
@@ -18,14 +23,17 @@ class Window
 
   getMode: () =>
 
-  getPixelScale: () =>
+  getPixelScale: =>
+    window.devicePixelRatio
 
-  getTitle: () =>
+  getTitle: =>
+    window.document.title
 
   getWidth: =>
     @graphics.getWidth()
 
-  hasFocus: () =>
+  hasFocus: =>
+    document.activeElement == Love.element
 
   hasMouseFocus: () =>
 
@@ -33,12 +41,15 @@ class Window
 
   isVisible: () =>
 
-  setFullscreen: () =>
+  setFullscreen: (@fullscreen) =>
+    @fullscreen = false
 
   setIcon: () =>
 
   setMode: (width, height, flags) =>
     @graphics.default_canvas.setDimensions(width, height)
 
-  setTitle: () =>
+  setTitle: (title) =>
+    window.document.title = title
+
 

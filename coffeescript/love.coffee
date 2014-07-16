@@ -1,18 +1,18 @@
 class @Love
-  constructor: (element, window_conf, module_conf) ->
+  constructor: (element = null, window_conf = {}, module_conf = {}) ->
     Love.element = element
-    @graphics = new Graphics(window_conf.width, window_conf.height)
-    @window = new Window(@graphics)
-    @timer = new Timer()
-    @event = new EventQueue()
-    @keyboard = new Keyboard(@event)
-    @mouse = new Mouse(@event, Love.element)
-    @touch = new Touch(@event, Love.element)
-    @filesystem = new FileSystem()
-    @audio = new Audio()
-    @system = new System()
-    @image = new ImageModule()
-    @math = new MathModule()
+    @graphics = new Love.Graphics(window_conf.width, window_conf.height)
+    @window = new Love.Window(@graphics)
+    @timer = new Love.Timer()
+    @event = new Love.EventQueue()
+    @keyboard = new Love.Keyboard(@event, Love.element)
+    @mouse = new Love.Mouse(@event, Love.element)
+    @touch = new Love.Touch(@event, Love.element)
+    @filesystem = new Love.FileSystem()
+    @audio = new Love.Audio()
+    @system = new Love.System()
+    @image = new Love.ImageModule()
+    @math = new Love.Math()
 
     window.addEventListener "beforeunload", () =>
       @quit.call()
