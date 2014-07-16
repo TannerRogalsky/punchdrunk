@@ -134,3 +134,20 @@ describe 'love.math', ->
       [seed_low, seed_high] = [100, 200]
       math.setRandomSeed(seed_low, seed_high)
       expect(math.getRandomSeed()).to.eql([seed_low, seed_high])
+      random()
+      expect(math.getRandomSeed()).to.eql([seed_low, seed_high])
+
+  describe '.gammaToLinear', ->
+    it ''
+  describe '.isConvex', ->
+    it ''
+  describe '.linearToGamma', ->
+    it ''
+  describe '.newBezierCurve', ->
+    it ''
+  describe '.newRandomGenerator', ->
+    it ''
+  describe '.randomNormal', ->
+    it ''
+  describe '.triangulate', ->
+    it ''
