@@ -1,7 +1,8 @@
 class Love.Math
   constructor: () ->
     @random_generator = new Love.Math.RandomGenerator()
-    @simplex = new SimplexNoise(@random_generator.random.bind(@random_generator))
+    simplex_r = new Love.Math.RandomGenerator()
+    @simplex = new SimplexNoise(simplex_r.random.bind(simplex_r))
 
   gammaToLinear: =>
   getRandomSeed: =>
