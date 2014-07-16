@@ -19,7 +19,6 @@ class Love.Math.RandomGenerator
 
     @random() * (max - min) + min
 
-  setSeed: (@seed) ->
   randomNormal: (stddev) ->
     if @last_random_normal != Number.POSITIVE_INFINITY
       r = @last_random_normal
@@ -31,6 +30,12 @@ class Love.Math.RandomGenerator
 
     @last_random_normal = r * Math.cos(phi)
     r * Math.sin(phi) * stddev
+
+  setSeed: (low, high) ->
+    if high
+      @seed = new Long(low, high)
+    else
+      @seed = low
 
     @rng_state = @seed
     for i in [0..2]

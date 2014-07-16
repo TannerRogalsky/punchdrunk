@@ -104,3 +104,33 @@ describe 'love.math', ->
     describe 'when called with two arguments', ->
       it 'should return a value between the two arguments, inclusively', ->
         expect(random(5, 10)).to.be.within(5, 10 + 1)
+
+  describe '.setRandomSeed', ->
+    [math, random] = []
+    beforeEach ->
+      math = new Love.Math()
+      random = math.random
+
+    it 'should result in the same random numbers when passed the same args', ->
+      [seed_low, seed_high] = [100, 200]
+
+      math.setRandomSeed(seed_low, seed_high)
+      result_set_a = for i in [1..5]
+        random()
+
+      math.setRandomSeed(seed_low, seed_high)
+      result_set_b = for i in [1..5]
+        random()
+
+      expect(result_set_a).to.eql(result_set_b)
+
+  describe '.getRandomSeed', ->
+    [math, random] = []
+    beforeEach ->
+      math = new Love.Math()
+      random = math.random
+
+    it 'should return the same numbers passed to setRandomSeed', ->
+      [seed_low, seed_high] = [100, 200]
+      math.setRandomSeed(seed_low, seed_high)
+      expect(math.getRandomSeed()).to.eql([seed_low, seed_high])

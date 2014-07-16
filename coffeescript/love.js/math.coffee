@@ -6,6 +6,9 @@ class Love.Math
 
   gammaToLinear: =>
   getRandomSeed: =>
+    seed = @random_generator.seed
+    [seed.getLowBits(), seed.getHighBits()]
+
   isConvex: =>
   linearToGamma: =>
   newBezierCurve: =>
@@ -20,8 +23,10 @@ class Love.Math
   random: (min, max) =>
     @random_generator.random(min, max)
 
-  setRandomSeed: =>
   randomNormal: (stddev = 1, mean = 0) =>
     @random_generator.randomNormal(stddev) + mean
+
+  setRandomSeed: (low, high) =>
+    @random_generator.setSeed(low, high)
 
   triangulate: =>
