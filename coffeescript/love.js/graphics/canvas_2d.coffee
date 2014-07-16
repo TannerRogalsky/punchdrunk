@@ -1,4 +1,6 @@
 class Love.Graphics.Canvas2D
+  @TRANSPARENT = new Love.Color(0, 0, 0, 0)
+
   constructor: (width, height, @element) ->
     @element ?= document.createElement('canvas')
     if (canvas_width = Number(@element.getAttribute('width'))) != 0
@@ -12,7 +14,7 @@ class Love.Graphics.Canvas2D
 
   clear: (self, r, g, b, a) ->
     if r == null or r == undefined
-      color = Love.Graphics.Canvas2D.transparent
+      color = @constructor.TRANSPARENT
     else
       color = new Color(r, g, b, a)
 
@@ -271,5 +273,3 @@ class Love.Graphics.Canvas2D
     @context.translate(-ox, -oy)
     @context.drawImage(drawable.element, quad.x, quad.y, quad.width, quad.height, 0, 0, quad.width, quad.height)
     @context.restore()
-
-Love.Graphics.Canvas2D.transparent = new Love.Color(0, 0, 0, 0)
