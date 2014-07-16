@@ -19,6 +19,7 @@ module.exports = (grunt) ->
             'coffeescript/love.js/graphics/*.coffee',
             'coffeescript/love.js/filesystem/*.coffee',
             'coffeescript/love.js/image/*.coffee',
+            'coffeescript/love.js/math/*.coffee',
           ]
       tests:
         files:
@@ -30,7 +31,7 @@ module.exports = (grunt) ->
       punchdrunk:
         options:
           banner: '<%= banner %>'
-        src: ['js/moonshine.js', 'js/sylvester.src.js', 'js/simplex-noise.js', 'js/love.js']
+        src: ['js/moonshine.js', 'js/sylvester.src.js', 'js/simplex-noise.js', 'js/long.js', 'js/love.js']
         dest: 'js/punchdrunk.js'
     watch:
       coffeescript:

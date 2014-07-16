@@ -58,12 +58,61 @@ describe "love.graphics.canvas_2d", ->
         canvas.draw(image, 100, 100)
         expect(drawDrawable).to.be.calledOnce
 
+      describe 'drawDrawable', ->
+        [save,translate,rotate,scale,transform,drawImage,restore] = []
+        beforeEach ->
+          save = sinon.spy(canvas.context, 'save')
+          translate = sinon.spy(canvas.context, 'translate')
+          rotate = sinon.spy(canvas.context, 'rotate')
+          scale = sinon.spy(canvas.context, 'scale')
+          transform = sinon.spy(canvas.context, 'transform')
+          drawImage = sinon.spy(canvas.context, 'drawImage')
+          restore = sinon.spy(canvas.context, 'restore')
+
+        it 'should call the appropriate 2D context functions', ->
+          image = new Love.Graphics.Image("sprites.png")
+          [x,y,r,sx,sy,ox,oy,kx,ky] = [100, 100, Math.PI, 2, 5, 50, 50, 3, 4]
+          canvas.draw(image, x, y, r, sx, sy, ox, oy, kx, y)
+
+          expect(drawImage).to.be.calledWith(image.element, 0, 0)
+          expect(save).to.be.called
+          expect(restore).to.be.called
+          expect(translate).to.be.calledWith(x, y)
+          expect(translate).to.be.calledWith(-ox, -oy)
+          expect(rotate).to.be.calledWith(r)
+          expect(scale).to.be.calledWith(sx, sy)
+
       it 'calls drawWithQuad if you pass it a quad', ->
         image = new Love.Graphics.Image("sprites.png")
-        quad = new Love.Graphics.Quad(25, 25, 50, 50)
+        quad = new Love.Graphics.Quad(3, 3, 1, 1)
         drawWithQuad = sinon.spy(canvas, 'drawWithQuad')
         canvas.draw(image, quad, 100, 100)
         expect(drawWithQuad).to.be.calledOnce
+
+      describe 'drawWithQuad', ->
+        [save,translate,rotate,scale,transform,drawImage,restore] = []
+        beforeEach ->
+          save = sinon.spy(canvas.context, 'save')
+          translate = sinon.spy(canvas.context, 'translate')
+          rotate = sinon.spy(canvas.context, 'rotate')
+          scale = sinon.spy(canvas.context, 'scale')
+          transform = sinon.spy(canvas.context, 'transform')
+          drawImage = sinon.spy(canvas.context, 'drawImage')
+          restore = sinon.spy(canvas.context, 'restore')
+
+        it 'should call the appropriate 2D context functions', ->
+          image = new Love.Graphics.Image("sprites.png")
+          quad = new Love.Graphics.Quad(3, 3, 1, 1)
+          [x,y,r,sx,sy,ox,oy,kx,ky] = [100, 100, Math.PI, 2, 5, 50, 50, 3, 4]
+          canvas.draw(image, quad, x, y, r, sx, sy, ox, oy, kx, y)
+
+          expect(drawImage).to.be.calledWith(image.element, quad.x, quad.y, quad.width, quad.height, 0, 0, quad.width, quad.height)
+          expect(save).to.be.called
+          expect(restore).to.be.called
+          expect(translate).to.be.calledWith(x, y)
+          expect(translate).to.be.calledWith(-ox, -oy)
+          expect(rotate).to.be.calledWith(r)
+          expect(scale).to.be.calledWith(sx, sy)
 
     describe 'line', ->
       it ''

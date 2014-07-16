@@ -1,12 +1,12 @@
 describe 'love.math', ->
   it 'exists', ->
-    expect(Love.MathModule).to.be.a("function")
+    expect(Love.Math).to.be.a("function")
 
   describe '.noise', ->
     noise = null
     math = null
     beforeEach ->
-      math = new Love().math
+      math = new Love.Math()
       noise = math.noise
 
     describe 'when called with one argument', ->
@@ -91,7 +91,7 @@ describe 'love.math', ->
   describe '.random', ->
     random = null
     beforeEach ->
-      random = new Love().math.random
+      random = new Love.Math().random
 
     describe 'when called with no arguments', ->
       it 'should return a value between 0 and 1', ->
@@ -104,3 +104,50 @@ describe 'love.math', ->
     describe 'when called with two arguments', ->
       it 'should return a value between the two arguments, inclusively', ->
         expect(random(5, 10)).to.be.within(5, 10 + 1)
+
+  describe '.setRandomSeed', ->
+    [math, random] = []
+    beforeEach ->
+      math = new Love.Math()
+      random = math.random
+
+    it 'should result in the same random numbers when passed the same args', ->
+      [seed_low, seed_high] = [100, 200]
+
+      math.setRandomSeed(seed_low, seed_high)
+      result_set_a = for i in [1..5]
+        random()
+
+      math.setRandomSeed(seed_low, seed_high)
+      result_set_b = for i in [1..5]
+        random()
+
+      expect(result_set_a).to.eql(result_set_b)
+
+  describe '.getRandomSeed', ->
+    [math, random] = []
+    beforeEach ->
+      math = new Love.Math()
+      random = math.random
+
+    it 'should return the same numbers passed to setRandomSeed', ->
+      [seed_low, seed_high] = [100, 200]
+      math.setRandomSeed(seed_low, seed_high)
+      expect(math.getRandomSeed()).to.eql([seed_low, seed_high])
+      random()
+      expect(math.getRandomSeed()).to.eql([seed_low, seed_high])
+
+  describe '.gammaToLinear', ->
+    it ''
+  describe '.isConvex', ->
+    it ''
+  describe '.linearToGamma', ->
+    it ''
+  describe '.newBezierCurve', ->
+    it ''
+  describe '.newRandomGenerator', ->
+    it ''
+  describe '.randomNormal', ->
+    it ''
+  describe '.triangulate', ->
+    it ''

@@ -1,9 +1,13 @@
-class Love.MathModule
+class Love.Math
   constructor: () ->
-    @simplex = new SimplexNoise()
+    @random_generator = new Love.Math.RandomGenerator()
+    simplex_r = new Love.Math.RandomGenerator()
+    @simplex = new SimplexNoise(simplex_r.random.bind(simplex_r, simplex_r))
 
   gammaToLinear: =>
   getRandomSeed: =>
+    @random_generator.getSeed(@random_generator)
+
   isConvex: =>
   linearToGamma: =>
   newBezierCurve: =>
@@ -16,15 +20,12 @@ class Love.MathModule
       when 4 then @simplex.noise4D(dimensions[0], dimensions[1], dimensions[2], dimensions[3])
 
   random: (min, max) =>
-    if min == undefined && max == undefined
-      return Math.random()
+    @random_generator.random(@random_generator, min, max)
 
-    if max == undefined
-      max = min
-      min = 1
+  randomNormal: (stddev = 1, mean = 0) =>
+    @random_generator.randomNormal(@random_generator, stddev, mean)
 
-    Math.floor(Math.random() * (max - min + 1) + min)
+  setRandomSeed: (low, high) =>
+    @random_generator.setSeed(@random_generator, low, high)
 
-  randomNormal: =>
-  setRandomSeed: =>
   triangulate: =>
