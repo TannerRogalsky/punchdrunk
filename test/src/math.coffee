@@ -6,7 +6,7 @@ describe 'love.math', ->
     noise = null
     math = null
     beforeEach ->
-      math = new Love().math
+      math = new Love.Math()
       noise = math.noise
 
     describe 'when called with one argument', ->
@@ -91,7 +91,7 @@ describe 'love.math', ->
   describe '.random', ->
     random = null
     beforeEach ->
-      random = new Love().math.random
+      random = new Love.Math().random
 
     describe 'when called with no arguments', ->
       it 'should return a value between 0 and 1', ->
