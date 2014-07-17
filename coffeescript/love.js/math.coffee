@@ -22,7 +22,45 @@ class Love.Math
   getRandomSeed: =>
     @random_generator.getSeed(@random_generator)
 
-  isConvex: =>
+  isConvex: (vertices...) =>
+    if vertices.length == 1
+      vertices = if vertices[0].__shine
+          # make up for lua being one-indexed with the slice
+          vertices[0].__shine.numValues.slice(1, vertices[0].__shine.numValues.length)
+        else
+          vertices[0]
+
+    polygon = []
+    for i in [0...vertices.length] by 2
+      polygon.push
+        x: vertices[i]
+        y: vertices[i + 1]
+
+    i = polygon.length - 2
+    j = polygon.length - 1
+    k = 0
+
+    p =
+      x: polygon[j].x - polygon[i].x
+      y: polygon[j].y - polygon[i].y
+    q =
+      x: polygon[k].x - polygon[j].x
+      y: polygon[k].y - polygon[j].y
+    winding = p.x * q.y - p.y * q.x
+
+    while k + 1 < polygon.length
+      i = j
+      j = k
+      k++
+      p.x = polygon[j].x - polygon[i].x
+      p.y = polygon[j].y - polygon[i].y
+      q.x = polygon[k].x - polygon[j].x
+      q.y = polygon[k].y - polygon[j].y
+
+      if (p.x * q.y - p.y * q.x) * winding < 0
+        return false
+    return true
+
 
   linearToGamma: (linear_colors...) =>
     linear_colors = getGammaArgs(linear_colors)

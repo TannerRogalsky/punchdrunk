@@ -176,7 +176,17 @@ describe 'love.math', ->
         expect(lb).to.be.ok
 
   describe '.isConvex', ->
-    it ''
+    [math] = []
+    beforeEach ->
+      math = new Love.Math()
+
+    it 'returns true for a convex polygon', ->
+      vertices = [0,0, 0,100, 100,100, 100,0]
+      expect(math.isConvex(vertices)).to.be.true
+
+    it 'returns false for a non-convex polygon', ->
+      vertices = [0,0, 0,100, -100,-100, 100,0]
+      expect(math.isConvex(vertices)).to.be.false
 
   describe '.linearToGamma', ->
     [math] = []
