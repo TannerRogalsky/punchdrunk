@@ -138,16 +138,91 @@ describe 'love.math', ->
       expect(math.getRandomSeed()).to.eql([seed_low, seed_high])
 
   describe '.gammaToLinear', ->
-    it ''
+    [math] = []
+    beforeEach ->
+      math = new Love.Math()
+
+    it 'should be reversed by linearToGamma', ->
+      rounding_error_margin = 0.1
+      [gr, gg, gb] = [120, 50, 100]
+      [lr, lg, lb] = math.gammaToLinear(gr, gg, gb)
+      [rr, rg, rb] = math.linearToGamma(lr, lg, lb)
+      expect(rr).to.be.closeTo(gr, rounding_error_margin)
+      expect(rg).to.be.closeTo(gg, rounding_error_margin)
+      expect(rb).to.be.closeTo(gb, rounding_error_margin)
+
+    describe 'when called with three separate color components', ->
+      it 'should return three linear-space color components', ->
+        [gr, gg, gb] = [120, 50, 100]
+        [lr, lg, lb] = math.gammaToLinear(gr, gg, gb)
+        expect(lr).to.be.ok
+        expect(lg).to.be.ok
+        expect(lb).to.be.ok
+
+    describe 'when called with a sequence of color components', ->
+      it 'should return three linear-space color components', ->
+        [gr, gg, gb] = [120, 50, 100]
+        [lr, lg, lb] = math.gammaToLinear(gr, gg, gb)
+        expect(lr).to.be.ok
+        expect(lg).to.be.ok
+        expect(lb).to.be.ok
+
+    describe 'when called with one color component', ->
+      it 'should return three linear-space color components', ->
+        [gr, gg, gb] = [120, 50, 100]
+        [lr, lg, lb] = math.gammaToLinear(gr, gg, gb)
+        expect(lr).to.be.ok
+        expect(lg).to.be.ok
+        expect(lb).to.be.ok
+
   describe '.isConvex', ->
     it ''
+
   describe '.linearToGamma', ->
-    it ''
+    [math] = []
+    beforeEach ->
+      math = new Love.Math()
+
+    it 'should be reversed by gammaToLinear', ->
+      rounding_error_margin = 0.1
+      [lr, lg, lb] = [120, 50, 100]
+      [gr, gg, gb] = math.linearToGamma(lr, lg, lb)
+      [rr, rg, rb] = math.gammaToLinear(gr, gg, gb)
+      expect(rr).to.be.closeTo(lr, rounding_error_margin)
+      expect(rg).to.be.closeTo(lg, rounding_error_margin)
+      expect(rb).to.be.closeTo(lb, rounding_error_margin)
+
+    describe 'when called with three separate color components', ->
+      it 'should return three gamma-space color components', ->
+        [lr, lg, lb] = [120, 50, 100]
+        [gr, gg, gb] = math.linearToGamma(lr, lg, lb)
+        expect(gr).to.be.ok
+        expect(gg).to.be.ok
+        expect(gb).to.be.ok
+
+    describe 'when called with a sequence of color components', ->
+      it 'should return three gamma-space color components', ->
+        linear_colors = [120, 50, 100]
+        [gr, gg, gb] = math.linearToGamma(linear_colors)
+        expect(gr).to.be.ok
+        expect(gg).to.be.ok
+        expect(gb).to.be.ok
+
+    describe 'when called with one color component', ->
+      it 'should return one gamma-space color component', ->
+        linear_color = 120
+        [gr, gg, gb] = math.linearToGamma(linear_color)
+        expect(gr).to.be.ok
+        expect(gg).to.be.undefined
+        expect(gb).to.be.undefined
+
   describe '.newBezierCurve', ->
     it ''
+
   describe '.newRandomGenerator', ->
     it ''
   describe '.randomNormal', ->
     it ''
+
   describe '.triangulate', ->
     it ''
