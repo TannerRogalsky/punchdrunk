@@ -2,11 +2,13 @@ describe 'love.math', ->
   it 'exists', ->
     expect(Love.Math).to.be.a("function")
 
+  math = null
+  beforeEach ->
+    math = new Love.Math()
+
   describe '.noise', ->
     noise = null
-    math = null
     beforeEach ->
-      math = new Love.Math()
       noise = math.noise
 
     describe 'when called with one argument', ->
@@ -91,7 +93,7 @@ describe 'love.math', ->
   describe '.random', ->
     random = null
     beforeEach ->
-      random = new Love.Math().random
+      random = math.random
 
     describe 'when called with no arguments', ->
       it 'should return a value between 0 and 1', ->
@@ -106,9 +108,8 @@ describe 'love.math', ->
         expect(random(5, 10)).to.be.within(5, 10 + 1)
 
   describe '.setRandomSeed', ->
-    [math, random] = []
+    random = null
     beforeEach ->
-      math = new Love.Math()
       random = math.random
 
     it 'should result in the same random numbers when passed the same args', ->
@@ -125,9 +126,8 @@ describe 'love.math', ->
       expect(result_set_a).to.eql(result_set_b)
 
   describe '.getRandomSeed', ->
-    [math, random] = []
+    random = null
     beforeEach ->
-      math = new Love.Math()
       random = math.random
 
     it 'should return the same numbers passed to setRandomSeed', ->
@@ -138,10 +138,6 @@ describe 'love.math', ->
       expect(math.getRandomSeed()).to.eql([seed_low, seed_high])
 
   describe '.gammaToLinear', ->
-    [math] = []
-    beforeEach ->
-      math = new Love.Math()
-
     it 'should be reversed by linearToGamma', ->
       rounding_error_margin = 0.1
       [gr, gg, gb] = [120, 50, 100]
@@ -176,10 +172,6 @@ describe 'love.math', ->
         expect(lb).to.be.ok
 
   describe '.isConvex', ->
-    [math] = []
-    beforeEach ->
-      math = new Love.Math()
-
     it 'returns true for a convex polygon', ->
       vertices = [0,0, 0,100, 100,100, 100,0]
       expect(math.isConvex(vertices)).to.be.true
@@ -189,10 +181,6 @@ describe 'love.math', ->
       expect(math.isConvex(vertices)).to.be.false
 
   describe '.linearToGamma', ->
-    [math] = []
-    beforeEach ->
-      math = new Love.Math()
-
     it 'should be reversed by gammaToLinear', ->
       rounding_error_margin = 0.1
       [lr, lg, lb] = [120, 50, 100]
@@ -230,10 +218,6 @@ describe 'love.math', ->
     it ''
 
   describe '.newRandomGenerator', ->
-    [math] = []
-    beforeEach ->
-      math = new Love.Math()
-
     it 'should return a new RandomGenerator object', ->
       expect(math.newRandomGenerator()).to.be.an.instanceof(Love.Math.RandomGenerator)
 
@@ -248,10 +232,6 @@ describe 'love.math', ->
     it ''
 
   describe '.triangulate', ->
-    [math] = []
-    beforeEach ->
-      math = new Love.Math()
-
     it 'should return two triangles when you pass it a rectangular polygon', ->
       vertices = [0,0, 0,100, 100,100, 100,0]
       triangles = math.triangulate(vertices)
