@@ -23,18 +23,7 @@ class Love.Math
     @random_generator.getSeed(@random_generator)
 
   isConvex: (vertices...) =>
-    if vertices.length == 1
-      vertices = if vertices[0].__shine
-          # make up for lua being one-indexed with the slice
-          vertices[0].__shine.numValues.slice(1, vertices[0].__shine.numValues.length)
-        else
-          vertices[0]
-
-    polygon = []
-    for i in [0...vertices.length] by 2
-      polygon.push
-        x: vertices[i]
-        y: vertices[i + 1]
+    polygon = toPolygon(vertices)
 
     i = polygon.length - 2
     j = polygon.length - 1
@@ -112,3 +101,15 @@ class Love.Math
           colors[0]
     else
       colors
+
+  toPolygon = (vertices) ->
+    if vertices.length == 1
+      vertices = if vertices[0].__shine
+          # make up for lua being one-indexed with the slice
+          vertices[0].__shine.numValues.slice(1, vertices[0].__shine.numValues.length)
+        else
+          vertices[0]
+
+    for i in [0...vertices.length] by 2
+      x: vertices[i]
+      y: vertices[i + 1]
