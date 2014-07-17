@@ -40,7 +40,13 @@ class Love.Math
       c *= 255
 
   newBezierCurve: =>
-  newRandomGenerator: =>
+
+  newRandomGenerator: (low, high) =>
+    r = new Love.Math.RandomGenerator()
+    if low
+      r.setSeed(r, low, high)
+    return r
+
   noise: (dimensions...) =>
     switch dimensions.length
       when 1 then @simplex.noise1D(dimensions[0])

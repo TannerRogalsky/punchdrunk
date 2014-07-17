@@ -220,7 +220,20 @@ describe 'love.math', ->
     it ''
 
   describe '.newRandomGenerator', ->
-    it ''
+    [math] = []
+    beforeEach ->
+      math = new Love.Math()
+
+    it 'should return a new RandomGenerator object', ->
+      expect(math.newRandomGenerator()).to.be.an.instanceof(Love.Math.RandomGenerator)
+
+    it 'should use the seed passed to it', ->
+      [low_s, high_s] = [100, 200]
+      r = math.newRandomGenerator(low_s, high_s)
+      [low, high] = r.getSeed(r)
+      expect(low_s).to.equal(low)
+      expect(high_s).to.equal(high)
+
   describe '.randomNormal', ->
     it ''
 
