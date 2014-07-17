@@ -248,4 +248,22 @@ describe 'love.math', ->
     it ''
 
   describe '.triangulate', ->
-    it ''
+    [math] = []
+    beforeEach ->
+      math = new Love.Math()
+
+    it 'should return two triangles when you pass it a rectangular polygon', ->
+      vertices = [0,0, 0,100, 100,100, 100,0]
+      triangles = math.triangulate(vertices)
+      expect(triangles.length).to.equal(2)
+
+    it 'should handle concave polygons', ->
+      vertices = [0,0, 0,100, -100,-100, 100,0]
+      triangles = math.triangulate(vertices)
+      expect(triangles.length).to.equal(2)
+
+    it 'should handle clockwise vertices', ->
+      vertices = [0,0, 100,0, 100,100, 0,100]
+      triangles = math.triangulate(vertices)
+      expect(triangles.length).to.equal(2)
+
