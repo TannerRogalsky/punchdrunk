@@ -4,6 +4,7 @@ punchdrunk.js
 Punchdrunk = [Moonshine](http://moonshinejs.org/) + [LÖVE](http://love2d.org/)
 
 Demo: http://tannerrogalsky.com/punchdrunk/
+
 Tests: http://tannerrogalsky.com/punchdrunk/test/
 
 [![Build Status](https://travis-ci.org/TannerRogalsky/punchdrunk.svg?branch=tests)](https://travis-ci.org/TannerRogalsky/punchdrunk)
