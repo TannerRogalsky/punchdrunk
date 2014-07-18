@@ -1,6 +1,6 @@
 {
   "name": "punchdrunk",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "Tanner Rogalsky",
   "description": "An attempt to replicate the Love API in JavaScript",
   "homepage": "https://github.com/TannerRogalsky/punchdrunk",
