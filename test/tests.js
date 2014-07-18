@@ -359,15 +359,18 @@
 
 (function() {
   describe('love.math', function() {
+    var math;
     it('exists', function() {
       return expect(Love.Math).to.be.a("function");
     });
+    math = null;
+    beforeEach(function() {
+      return math = new Love.Math();
+    });
     describe('.noise', function() {
-      var math, noise;
+      var noise;
       noise = null;
-      math = null;
       beforeEach(function() {
-        math = new Love.Math();
         return noise = math.noise;
       });
       describe('when called with one argument', function() {
@@ -496,7 +499,7 @@
       var random;
       random = null;
       beforeEach(function() {
-        return random = new Love.Math().random;
+        return random = math.random;
       });
       describe('when called with no arguments', function() {
         return it('should return a value between 0 and 1', function() {
@@ -515,15 +518,14 @@
       });
     });
     describe('.setRandomSeed', function() {
-      var math, random, _ref;
-      _ref = [], math = _ref[0], random = _ref[1];
+      var random;
+      random = null;
       beforeEach(function() {
-        math = new Love.Math();
         return random = math.random;
       });
-      return it('should result in the same random numbers when passed the same args', function() {
-        var i, result_set_a, result_set_b, seed_high, seed_low, _ref1;
-        _ref1 = [100, 200], seed_low = _ref1[0], seed_high = _ref1[1];
+      it('should result in the same random numbers when passed the same args', function() {
+        var i, result_set_a, result_set_b, seed_high, seed_low, _ref;
+        _ref = [100, 200], seed_low = _ref[0], seed_high = _ref[1];
         math.setRandomSeed(seed_low, seed_high);
         result_set_a = (function() {
           var _i, _results;
@@ -544,17 +546,23 @@
         })();
         return expect(result_set_a).to.eql(result_set_b);
       });
+      return it('should accept a single argument', function() {
+        var high, low, _ref;
+        math.setRandomSeed(100);
+        _ref = math.getRandomSeed(), low = _ref[0], high = _ref[1];
+        expect(low).to.equal(100);
+        return expect(high).to.equal(0);
+      });
     });
     describe('.getRandomSeed', function() {
-      var math, random, _ref;
-      _ref = [], math = _ref[0], random = _ref[1];
+      var random;
+      random = null;
       beforeEach(function() {
-        math = new Love.Math();
         return random = math.random;
       });
       return it('should return the same numbers passed to setRandomSeed', function() {
-        var seed_high, seed_low, _ref1;
-        _ref1 = [100, 200], seed_low = _ref1[0], seed_high = _ref1[1];
+        var seed_high, seed_low, _ref;
+        _ref = [100, 200], seed_low = _ref[0], seed_high = _ref[1];
         math.setRandomSeed(seed_low, seed_high);
         expect(math.getRandomSeed()).to.eql([seed_low, seed_high]);
         random();
@@ -562,25 +570,150 @@
       });
     });
     describe('.gammaToLinear', function() {
-      return it('');
+      it('should be reversed by linearToGamma', function() {
+        var gb, gg, gr, lb, lg, lr, rb, rg, rounding_error_margin, rr, _ref, _ref1, _ref2;
+        rounding_error_margin = 0.1;
+        _ref = [120, 50, 100], gr = _ref[0], gg = _ref[1], gb = _ref[2];
+        _ref1 = math.gammaToLinear(gr, gg, gb), lr = _ref1[0], lg = _ref1[1], lb = _ref1[2];
+        _ref2 = math.linearToGamma(lr, lg, lb), rr = _ref2[0], rg = _ref2[1], rb = _ref2[2];
+        expect(rr).to.be.closeTo(gr, rounding_error_margin);
+        expect(rg).to.be.closeTo(gg, rounding_error_margin);
+        return expect(rb).to.be.closeTo(gb, rounding_error_margin);
+      });
+      describe('when called with three separate color components', function() {
+        return it('should return three linear-space color components', function() {
+          var gb, gg, gr, lb, lg, lr, _ref, _ref1;
+          _ref = [120, 50, 100], gr = _ref[0], gg = _ref[1], gb = _ref[2];
+          _ref1 = math.gammaToLinear(gr, gg, gb), lr = _ref1[0], lg = _ref1[1], lb = _ref1[2];
+          expect(lr).to.be.ok;
+          expect(lg).to.be.ok;
+          return expect(lb).to.be.ok;
+        });
+      });
+      describe('when called with a sequence of color components', function() {
+        return it('should return three linear-space color components', function() {
+          var gb, gg, gr, lb, lg, lr, _ref, _ref1;
+          _ref = [120, 50, 100], gr = _ref[0], gg = _ref[1], gb = _ref[2];
+          _ref1 = math.gammaToLinear(gr, gg, gb), lr = _ref1[0], lg = _ref1[1], lb = _ref1[2];
+          expect(lr).to.be.ok;
+          expect(lg).to.be.ok;
+          return expect(lb).to.be.ok;
+        });
+      });
+      return describe('when called with one color component', function() {
+        return it('should return three linear-space color components', function() {
+          var gb, gg, gr, lb, lg, lr, _ref, _ref1;
+          _ref = [120, 50, 100], gr = _ref[0], gg = _ref[1], gb = _ref[2];
+          _ref1 = math.gammaToLinear(gr, gg, gb), lr = _ref1[0], lg = _ref1[1], lb = _ref1[2];
+          expect(lr).to.be.ok;
+          expect(lg).to.be.ok;
+          return expect(lb).to.be.ok;
+        });
+      });
     });
     describe('.isConvex', function() {
-      return it('');
+      it('returns true for a convex polygon', function() {
+        var vertices;
+        vertices = [0, 0, 0, 100, 100, 100, 100, 0];
+        return expect(math.isConvex(vertices)).to.be["true"];
+      });
+      return it('returns false for a non-convex polygon', function() {
+        var vertices;
+        vertices = [0, 0, 0, 100, -100, -100, 100, 0];
+        return expect(math.isConvex(vertices)).to.be["false"];
+      });
     });
     describe('.linearToGamma', function() {
-      return it('');
+      it('should be reversed by gammaToLinear', function() {
+        var gb, gg, gr, lb, lg, lr, rb, rg, rounding_error_margin, rr, _ref, _ref1, _ref2;
+        rounding_error_margin = 0.1;
+        _ref = [120, 50, 100], lr = _ref[0], lg = _ref[1], lb = _ref[2];
+        _ref1 = math.linearToGamma(lr, lg, lb), gr = _ref1[0], gg = _ref1[1], gb = _ref1[2];
+        _ref2 = math.gammaToLinear(gr, gg, gb), rr = _ref2[0], rg = _ref2[1], rb = _ref2[2];
+        expect(rr).to.be.closeTo(lr, rounding_error_margin);
+        expect(rg).to.be.closeTo(lg, rounding_error_margin);
+        return expect(rb).to.be.closeTo(lb, rounding_error_margin);
+      });
+      describe('when called with three separate color components', function() {
+        return it('should return three gamma-space color components', function() {
+          var gb, gg, gr, lb, lg, lr, _ref, _ref1;
+          _ref = [120, 50, 100], lr = _ref[0], lg = _ref[1], lb = _ref[2];
+          _ref1 = math.linearToGamma(lr, lg, lb), gr = _ref1[0], gg = _ref1[1], gb = _ref1[2];
+          expect(gr).to.be.ok;
+          expect(gg).to.be.ok;
+          return expect(gb).to.be.ok;
+        });
+      });
+      describe('when called with a sequence of color components', function() {
+        return it('should return three gamma-space color components', function() {
+          var gb, gg, gr, linear_colors, _ref;
+          linear_colors = [120, 50, 100];
+          _ref = math.linearToGamma(linear_colors), gr = _ref[0], gg = _ref[1], gb = _ref[2];
+          expect(gr).to.be.ok;
+          expect(gg).to.be.ok;
+          return expect(gb).to.be.ok;
+        });
+      });
+      return describe('when called with one color component', function() {
+        return it('should return one gamma-space color component', function() {
+          var gb, gg, gr, linear_color, _ref;
+          linear_color = 120;
+          _ref = math.linearToGamma(linear_color), gr = _ref[0], gg = _ref[1], gb = _ref[2];
+          expect(gr).to.be.ok;
+          expect(gg).to.be.undefined;
+          return expect(gb).to.be.undefined;
+        });
+      });
     });
     describe('.newBezierCurve', function() {
-      return it('');
+      return it('should return a new bezier curve comprised of the vertices that were passed', function() {
+        var bezier, controls_points, i, x, y, _i, _ref, _results;
+        controls_points = [100, 100, 125, 125, 100, 125];
+        bezier = math.newBezierCurve(controls_points);
+        _results = [];
+        for (i = _i = 0; _i < 3; i = ++_i) {
+          _ref = bezier.getControlPoint(bezier, i), x = _ref[0], y = _ref[1];
+          expect(x).to.equal(controls_points[i * 2]);
+          _results.push(expect(y).to.equal(controls_points[i * 2 + 1]));
+        }
+        return _results;
+      });
     });
     describe('.newRandomGenerator', function() {
-      return it('');
+      it('should return a new RandomGenerator object', function() {
+        return expect(math.newRandomGenerator()).to.be.an["instanceof"](Love.Math.RandomGenerator);
+      });
+      return it('should use the seed passed to it', function() {
+        var high, high_s, low, low_s, r, _ref, _ref1;
+        _ref = [100, 200], low_s = _ref[0], high_s = _ref[1];
+        r = math.newRandomGenerator(low_s, high_s);
+        _ref1 = r.getSeed(r), low = _ref1[0], high = _ref1[1];
+        expect(low_s).to.equal(low);
+        return expect(high_s).to.equal(high);
+      });
     });
     describe('.randomNormal', function() {
       return it('');
     });
     return describe('.triangulate', function() {
-      return it('');
+      it('should return two triangles when you pass it a rectangular polygon', function() {
+        var triangles, vertices;
+        vertices = [0, 0, 0, 100, 100, 100, 100, 0];
+        triangles = math.triangulate(vertices);
+        return expect(triangles.length).to.equal(2);
+      });
+      it('should handle concave polygons', function() {
+        var triangles, vertices;
+        vertices = [0, 0, 0, 100, -100, -100, 100, 0];
+        triangles = math.triangulate(vertices);
+        return expect(triangles.length).to.equal(2);
+      });
+      return it('should handle clockwise vertices', function() {
+        var triangles, vertices;
+        vertices = [0, 0, 100, 0, 100, 100, 0, 100];
+        triangles = math.triangulate(vertices);
+        return expect(triangles.length).to.equal(2);
+      });
     });
   });
 
@@ -832,6 +965,159 @@
   describe("love.image.image_data", function() {
     return it('exists', function() {
       return expect(Love.ImageModule.ImageData).to.be.a("function");
+    });
+  });
+
+}).call(this);
+
+(function() {
+  describe("love.math.bezier_curve", function() {
+    var bezier, controls_points, _ref;
+    it('exists', function() {
+      return expect(Love.Math.BezierCurve).to.be.a("function");
+    });
+    _ref = [], controls_points = _ref[0], bezier = _ref[1];
+    beforeEach(function() {
+      controls_points = [
+        {
+          x: 100,
+          y: 100
+        }, {
+          x: 125,
+          y: 125
+        }, {
+          x: 100,
+          y: 125
+        }
+      ];
+      return bezier = new Love.Math.BezierCurve(controls_points);
+    });
+    describe('constructor', function() {
+      return it('should return a BezierCurve object with the control points that were passed to it', function() {
+        var i, x, y, _i, _ref1, _results;
+        expect(bezier).to.be.an["instanceof"](Love.Math.BezierCurve);
+        _results = [];
+        for (i = _i = 0; _i < 3; i = ++_i) {
+          _ref1 = bezier.getControlPoint(bezier, i), x = _ref1[0], y = _ref1[1];
+          expect(x).to.equal(controls_points[i].x);
+          _results.push(expect(y).to.equal(controls_points[i].y));
+        }
+        return _results;
+      });
+    });
+    describe('evaluate', function() {
+      it('should return the first control point when passed 0', function() {
+        var first_point, x, y, _ref1;
+        _ref1 = bezier.evaluate(bezier, 0), x = _ref1[0], y = _ref1[1];
+        first_point = controls_points[0];
+        expect(x).to.equal(first_point.x);
+        return expect(y).to.equal(first_point.y);
+      });
+      return it('should return the last control point when passed 1', function() {
+        var last_point, x, y, _ref1;
+        _ref1 = bezier.evaluate(bezier, 1), x = _ref1[0], y = _ref1[1];
+        last_point = controls_points[controls_points.length - 1];
+        expect(x).to.equal(last_point.x);
+        return expect(y).to.equal(last_point.y);
+      });
+    });
+    describe('getControlPoint', function() {
+      it('should return the x and y components of the requested control point', function() {
+        var i, x, y, _i, _ref1, _ref2, _results;
+        _results = [];
+        for (i = _i = 0, _ref1 = bezier.getControlPointCount(bezier); 0 <= _ref1 ? _i < _ref1 : _i > _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
+          _ref2 = bezier.getControlPoint(bezier, i), x = _ref2[0], y = _ref2[1];
+          expect(x).to.equal(controls_points[i].x);
+          _results.push(expect(y).to.equal(controls_points[i].y));
+        }
+        return _results;
+      });
+      return it('should throw an exception if the control point is out of range', function() {
+        var fn;
+        fn = bezier.getControlPoint.bind(bezier, bezier, 100);
+        expect(fn).to["throw"](Love.Exception);
+        fn = bezier.getControlPoint.bind(bezier, bezier, -100);
+        return expect(fn).to["throw"](Love.Exception);
+      });
+    });
+    describe('getControlPointCount', function() {
+      return it('should return the number of control points passed to it', function() {
+        return expect(bezier.getControlPointCount(bezier)).to.equal(controls_points.length);
+      });
+    });
+    describe('getDegree', function() {
+      return it('should return the number of control points passed to it less one', function() {
+        return expect(bezier.getDegree(bezier)).to.equal(controls_points.length - 1);
+      });
+    });
+    describe('getDerivative', function() {
+      return it('should return a new BezierCurve', function() {
+        var derivative;
+        derivative = bezier.getDerivative(bezier);
+        return expect(derivative).to.be.an["instanceof"](Love.Math.BezierCurve);
+      });
+    });
+    describe('insertControlPoint', function() {
+      return it('should increase the number of control points by one', function() {
+        var count, index, newx, newy, x, y, _ref1, _ref2;
+        count = controls_points.length;
+        _ref1 = [5, 6], newx = _ref1[0], newy = _ref1[1];
+        index = 1;
+        expect(bezier.getControlPointCount(bezier)).to.equal(controls_points.length);
+        bezier.insertControlPoint(bezier, newx, newy, index);
+        expect(bezier.getControlPointCount(bezier)).to.equal(count + 1);
+        _ref2 = bezier.getControlPoint(bezier, index), x = _ref2[0], y = _ref2[1];
+        expect(x).to.equal(newx);
+        return expect(y).to.equal(newy);
+      });
+    });
+    describe('render', function() {
+      it('should return a sequence of vertices starting and stopping at the first and last control point', function() {
+        var render_points;
+        render_points = bezier.render(bezier, 1);
+        expect(render_points[0]).to.equal(controls_points[0].x);
+        expect(render_points[1]).to.equal(controls_points[0].y);
+        expect(render_points[render_points.length - 2]).to.equal(controls_points[controls_points.length - 1].x);
+        return expect(render_points[render_points.length - 1]).to.equal(controls_points[controls_points.length - 1].y);
+      });
+      return it('should return more points when passed a greater depth', function() {
+        var fewer_points, more_points;
+        fewer_points = bezier.render(bezier, 1);
+        more_points = bezier.render(bezier, 5);
+        return expect(fewer_points.length).to.be.lessThan(more_points.length);
+      });
+    });
+    describe('rotate', function() {
+      return it('');
+    });
+    describe('scale', function() {
+      return it('');
+    });
+    describe('setControlPoint', function() {
+      return it('should replace the specified control point with a new one', function() {
+        var count, index, newx, newy, oldx, oldy, x, y, _ref1, _ref2, _ref3;
+        count = controls_points.length;
+        _ref1 = [5, 6], newx = _ref1[0], newy = _ref1[1];
+        index = 1;
+        _ref2 = bezier.getControlPoint(bezier, index), oldx = _ref2[0], oldy = _ref2[1];
+        bezier.setControlPoint(bezier, index, newx, newy);
+        expect(bezier.getControlPointCount(bezier)).to.equal(count);
+        _ref3 = bezier.getControlPoint(bezier, index), x = _ref3[0], y = _ref3[1];
+        expect(x).to.equal(newx);
+        return expect(y).to.equal(newy);
+      });
+    });
+    return describe('translate', function() {
+      return it('should alter the results of .evaluate by the offsets provided', function() {
+        var newx, newy, oldx, oldy, ox, oy, t, _ref1, _ref2, _ref3;
+        t = 0.5;
+        _ref1 = [100, 200], ox = _ref1[0], oy = _ref1[1];
+        _ref2 = bezier.evaluate(bezier, t), oldx = _ref2[0], oldy = _ref2[1];
+        bezier.translate(bezier, ox, oy);
+        _ref3 = bezier.evaluate(bezier, t), newx = _ref3[0], newy = _ref3[1];
+        expect(newx).to.equal(oldx + ox);
+        return expect(newy).to.equal(oldy + oy);
+      });
     });
   });
 

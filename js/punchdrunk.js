@@ -1,4 +1,4 @@
-/*! punchdrunk 0.0.3 (2014-07-16) - https://github.com/TannerRogalsky/punchdrunk */
+/*! punchdrunk 0.0.3 (2014-07-18) - https://github.com/TannerRogalsky/punchdrunk */
 /*! An attempt to replicate the Love API in JavaScript */
 /*! Tanner Rogalsky *//*
  * Moonshine - a Lua virtual machine.
@@ -8028,6 +8028,16 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
 
   })();
 
+  Love.Exception = (function() {
+    function Exception(message) {
+      this.message = message;
+      this.name = "Love Error";
+    }
+
+    return Exception;
+
+  })();
+
   Love.FileSystem = (function() {
     function FileSystem() {
       this.write = __bind(this.write, this);
@@ -8712,6 +8722,8 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
   })();
 
   Love.Math = (function() {
+    var any_point_in_triangle, getGammaArgs, is_ear, is_oriented_ccw, on_same_side, point_in_triangle, toPolygon;
+
     function Math() {
       this.triangulate = __bind(this.triangulate, this);
       this.setRandomSeed = __bind(this.setRandomSeed, this);
@@ -8730,19 +8742,113 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
       this.simplex = new SimplexNoise(simplex_r.random.bind(simplex_r, simplex_r));
     }
 
-    Math.prototype.gammaToLinear = function() {};
+    Math.prototype.gammaToLinear = function() {
+      var c, gamma_colors, _i, _len, _results;
+      gamma_colors = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      gamma_colors = getGammaArgs(gamma_colors);
+      _results = [];
+      for (_i = 0, _len = gamma_colors.length; _i < _len; _i++) {
+        c = gamma_colors[_i];
+        c /= 255;
+        if (c > 1) {
+          c = 1;
+        } else if (c < 0) {
+          c = 0;
+        } else if (c < 0.0031308) {
+          c *= 12.92;
+        } else {
+          c = 1.055 * window.Math.pow(c, 0.41666) - 0.055;
+        }
+        _results.push(c *= 255);
+      }
+      return _results;
+    };
 
     Math.prototype.getRandomSeed = function() {
       return this.random_generator.getSeed(this.random_generator);
     };
 
-    Math.prototype.isConvex = function() {};
+    Math.prototype.isConvex = function() {
+      var i, j, k, p, polygon, q, vertices, winding;
+      vertices = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      polygon = toPolygon(vertices);
+      i = polygon.length - 2;
+      j = polygon.length - 1;
+      k = 0;
+      p = {
+        x: polygon[j].x - polygon[i].x,
+        y: polygon[j].y - polygon[i].y
+      };
+      q = {
+        x: polygon[k].x - polygon[j].x,
+        y: polygon[k].y - polygon[j].y
+      };
+      winding = p.x * q.y - p.y * q.x;
+      while (k + 1 < polygon.length) {
+        i = j;
+        j = k;
+        k++;
+        p.x = polygon[j].x - polygon[i].x;
+        p.y = polygon[j].y - polygon[i].y;
+        q.x = polygon[k].x - polygon[j].x;
+        q.y = polygon[k].y - polygon[j].y;
+        if ((p.x * q.y - p.y * q.x) * winding < 0) {
+          return false;
+        }
+      }
+      return true;
+    };
 
-    Math.prototype.linearToGamma = function() {};
+    Math.prototype.linearToGamma = function() {
+      var c, linear_colors, _i, _len, _results;
+      linear_colors = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      linear_colors = getGammaArgs(linear_colors);
+      _results = [];
+      for (_i = 0, _len = linear_colors.length; _i < _len; _i++) {
+        c = linear_colors[_i];
+        c /= 255;
+        if (c > 1) {
+          c = 1;
+        } else if (c < 0) {
+          c = 0;
+        } else if (c <= 0.04045) {
+          c /= 12.92;
+        } else {
+          c = window.Math.pow((c + 0.055) / 1.055, 2.4);
+        }
+        _results.push(c *= 255);
+      }
+      return _results;
+    };
 
-    Math.prototype.newBezierCurve = function() {};
+    Math.prototype.newBezierCurve = function() {
+      var controlPoints, i, vertices;
+      vertices = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      if (vertices.length === 1) {
+        vertices = vertices[0].__shine ? vertices[0].__shine.numValues.slice(1, vertices[0].__shine.numValues.length) : vertices[0];
+      }
+      controlPoints = (function() {
+        var _i, _ref, _results;
+        _results = [];
+        for (i = _i = 0, _ref = vertices.length; _i < _ref; i = _i += 2) {
+          _results.push({
+            x: vertices[i],
+            y: vertices[i + 1]
+          });
+        }
+        return _results;
+      })();
+      return new this.constructor.BezierCurve(controlPoints);
+    };
 
-    Math.prototype.newRandomGenerator = function() {};
+    Math.prototype.newRandomGenerator = function(low, high) {
+      var r;
+      r = new Love.Math.RandomGenerator();
+      if (low) {
+        r.setSeed(r, low, high);
+      }
+      return r;
+    };
 
     Math.prototype.noise = function() {
       var dimensions;
@@ -8777,7 +8883,114 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
       return this.random_generator.setSeed(this.random_generator, low, high);
     };
 
-    Math.prototype.triangulate = function() {};
+    Math.prototype.triangulate = function() {
+      var a, b, c, concave_vertices, current, i, idx_lm, lm, n_vertices, next, next_idx, p, polygon, prev, prev_idx, skipped, triangles, vertices, _i, _j, _ref, _ref1, _ref2, _ref3;
+      vertices = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      polygon = toPolygon(vertices);
+      next_idx = new Array(polygon.length);
+      prev_idx = new Array(polygon.length);
+      idx_lm = 0;
+      for (i = _i = 0, _ref = polygon.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+        lm = polygon[idx_lm];
+        p = polygon[i];
+        if (p.x < lm.x || (p.x === lm.x && p.y < lm.y)) {
+          idx_lm = i;
+        }
+        next_idx[i] = i + 1;
+        prev_idx[i] = i - 1;
+      }
+      next_idx[next_idx.length - 1] = 0;
+      prev_idx[0] = prev_idx.length - 1;
+      if (!is_oriented_ccw(polygon[prev_idx[idx_lm]], polygon[idx_lm], polygon[next_idx[idx_lm]])) {
+        _ref1 = [prev_idx, next_idx], next_idx = _ref1[0], prev_idx = _ref1[1];
+      }
+      concave_vertices = [];
+      for (i = _j = 0, _ref2 = polygon.length; 0 <= _ref2 ? _j < _ref2 : _j > _ref2; i = 0 <= _ref2 ? ++_j : --_j) {
+        if (!is_oriented_ccw(polygon[prev_idx[i]], polygon[i], polygon[next_idx[i]])) {
+          concave_vertices.push(polygon[i]);
+        }
+      }
+      triangles = [];
+      n_vertices = polygon.length;
+      _ref3 = [1, 0], current = _ref3[0], skipped = _ref3[1], next = _ref3[2], prev = _ref3[3];
+      while (n_vertices > 3) {
+        next = next_idx[current];
+        prev = prev_idx[current];
+        a = polygon[prev];
+        b = polygon[current];
+        c = polygon[next];
+        if (is_ear(a, b, c, concave_vertices)) {
+          triangles.push([a, b, c]);
+          next_idx[prev] = next;
+          prev_idx[next] = prev;
+          concave_vertices.splice(concave_vertices.indexOf(b), 1);
+          --n_vertices;
+          skipped = 0;
+        } else if (++skipped > n_vertices) {
+          console.log("Cannot triangulate polygon.");
+        }
+        current = next;
+      }
+      next = next_idx[current];
+      prev = prev_idx[current];
+      triangles.push([polygon[prev], polygon[current], polygon[next]]);
+      return triangles;
+    };
+
+    getGammaArgs = function(colors) {
+      if (colors.length === 1 && colors[0] instanceof Object) {
+        return colors = colors[0].__shine ? colors[0].__shine.numValues.slice(1, colors[0].__shine.numValues.length) : colors[0];
+      } else {
+        return colors;
+      }
+    };
+
+    toPolygon = function(vertices) {
+      var i, _i, _ref, _results;
+      if (vertices.length === 1) {
+        vertices = vertices[0].__shine ? vertices[0].__shine.numValues.slice(1, vertices[0].__shine.numValues.length) : vertices[0];
+      }
+      _results = [];
+      for (i = _i = 0, _ref = vertices.length; _i < _ref; i = _i += 2) {
+        _results.push({
+          x: vertices[i],
+          y: vertices[i + 1]
+        });
+      }
+      return _results;
+    };
+
+    is_oriented_ccw = function(a, b, c) {
+      return ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) >= 0;
+    };
+
+    on_same_side = function(a, b, c, d) {
+      var l, m, px, py;
+      px = d.x - c.x;
+      py = d.y - c.y;
+      l = px * (a.y - c.y) - py * (a.x - c.x);
+      m = px * (b.y - c.y) - py * (b.x - c.x);
+      return l * m >= 0;
+    };
+
+    point_in_triangle = function(p, a, b, c) {
+      return on_same_side(p, a, b, c) && on_same_side(p, b, a, c) && on_same_side(p, c, a, b);
+    };
+
+    any_point_in_triangle = function(vertices, a, b, c) {
+      var p, _i, _len;
+      for (_i = 0, _len = vertices.length; _i < _len; _i++) {
+        p = vertices[_i];
+        if ((p.x !== a.x && p.y !== a.y) && (p.x !== b.x && p.y !== a.y) && (p.x !== c.x && p.y !== a.y) && point_in_triangle(p, a, b, c)) {
+          true;
+        }
+      }
+      return false;
+    };
+
+    is_ear = function(a, b, c, vertices) {
+      return is_oriented_ccw(a, b, c) && !any_point_in_triangle(vertices, a, b, c);
+    };
 
     return Math;
 
@@ -9994,6 +10207,200 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
 
   })();
 
+  Love.Math.BezierCurve = (function() {
+    var subdivide;
+
+    function BezierCurve(controlPoints) {
+      this.controlPoints = controlPoints;
+    }
+
+    BezierCurve.prototype.evaluate = function(self, t) {
+      var i, points, step, _i, _j, _ref, _ref1;
+      if (t < 0 || t > 1) {
+        throw new Love.Exception("Invalid evaluation parameter: must be between 0 and 1");
+      }
+      if (self.controlPoints.length < 2) {
+        throw new Love.Exception("Invalid Bezier curve: Not enough control points.");
+      }
+      points = self.controlPoints.slice(0);
+      for (step = _i = 1, _ref = self.controlPoints.length; 1 <= _ref ? _i < _ref : _i > _ref; step = 1 <= _ref ? ++_i : --_i) {
+        for (i = _j = 0, _ref1 = self.controlPoints.length - step; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
+          points[i] = {
+            x: points[i].x * (1 - t) + points[i + 1].x * t,
+            y: points[i].y * (1 - t) + points[i + 1].y * t
+          };
+        }
+      }
+      return [points[0].x, points[0].y];
+    };
+
+    BezierCurve.prototype.getControlPoint = function(self, i) {
+      if (i < 0) {
+        i += self.controlPoints.length;
+      }
+      if (i < 0 || i >= self.controlPoints.length) {
+        throw new Love.Exception("Invalid control point index");
+      }
+      return [self.controlPoints[i].x, self.controlPoints[i].y];
+    };
+
+    BezierCurve.prototype.getControlPointCount = function(self) {
+      return self.controlPoints.length;
+    };
+
+    BezierCurve.prototype.getDegree = function(self) {
+      return self.controlPoints.length - 1;
+    };
+
+    BezierCurve.prototype.getDerivative = function(self) {
+      var degree, forward_differences, i, _i, _ref;
+      if (self.getDegree(self) < 1) {
+        throw new Love.Exception("Cannot derive a curve of degree < 1.");
+      }
+      forward_differences = new Array();
+      degree = self.getDegree(self);
+      for (i = _i = 0, _ref = self.controlPoints.length - 1; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+        forward_differences.push({
+          x: (self.controlPoints[i + 1].x - self.controlPoints[i].x) * degree,
+          y: (self.controlPoints[i + 1].y - self.controlPoints[i].y) * degree
+        });
+      }
+      return new self.constructor(forward_differences);
+    };
+
+    BezierCurve.prototype.insertControlPoint = function(self, x, y, pos) {
+      if (pos == null) {
+        pos = -1;
+      }
+      if (pos < 0) {
+        pos += self.controlPoints.length + 1;
+      }
+      if (pos < 0 || pos > self.controlPoints.length) {
+        throw new Love.Exception("Invalid control point index");
+      }
+      return self.controlPoints.splice(pos, 0, {
+        x: x,
+        y: y
+      });
+    };
+
+    BezierCurve.prototype.render = function(self, depth) {
+      var results, vertice, vertices, _i, _len;
+      if (depth == null) {
+        depth = 5;
+      }
+      if (self.controlPoints.length < 2) {
+        throw new Love.Exception("Invalid Bezier curve: Not enough control points.");
+      }
+      vertices = self.controlPoints.slice(0);
+      subdivide(vertices, depth);
+      results = [];
+      for (_i = 0, _len = vertices.length; _i < _len; _i++) {
+        vertice = vertices[_i];
+        results.push(vertice.x);
+        results.push(vertice.y);
+      }
+      return results;
+    };
+
+    BezierCurve.prototype.rotate = function(self, angle, ox, oy) {
+      var c, controlPoint, s, v, _i, _len, _ref, _results;
+      if (ox == null) {
+        ox = 0;
+      }
+      if (oy == null) {
+        oy = 0;
+      }
+      c = Math.cos(angle);
+      s = Math.sin(angle);
+      _ref = self.controlPoints;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        controlPoint = _ref[_i];
+        v = {
+          x: controlPoint.x - ox,
+          y: controlPoint.y - oy
+        };
+        controlPoint.x = c * v.x - s * v.y + ox;
+        _results.push(controlPoint.y = s * v.x + c * v.y + oy);
+      }
+      return _results;
+    };
+
+    BezierCurve.prototype.scale = function(self, s, ox, oy) {
+      var controlPoint, _i, _len, _ref, _results;
+      if (ox == null) {
+        ox = 0;
+      }
+      if (oy == null) {
+        oy = 0;
+      }
+      _ref = self.controlPoints;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        controlPoint = _ref[_i];
+        controlPoint.x = (controlPoint.x - ox) * s + ox;
+        _results.push(controlPoint.y = (controlPoint.y - oy) * s + oy);
+      }
+      return _results;
+    };
+
+    BezierCurve.prototype.setControlPoint = function(self, i, x, y) {
+      if (i < 0) {
+        i += self.controlPoints.length;
+      }
+      if (i < 0 || i >= self.controlPoints.length) {
+        throw new Love.Exception("Invalid control point index");
+      }
+      return self.controlPoints[i] = {
+        x: x,
+        y: y
+      };
+    };
+
+    BezierCurve.prototype.translate = function(self, dx, dy) {
+      var controlPoint, _i, _len, _ref, _results;
+      _ref = self.controlPoints;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        controlPoint = _ref[_i];
+        controlPoint.x += dx;
+        _results.push(controlPoint.y += dy);
+      }
+      return _results;
+    };
+
+    subdivide = function(points, k) {
+      var i, left, right, step, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
+      if (k <= 0) {
+        return;
+      }
+      left = [];
+      right = [];
+      for (step = _i = 1, _ref = points.length; 1 <= _ref ? _i < _ref : _i > _ref; step = 1 <= _ref ? ++_i : --_i) {
+        left.push(points[0]);
+        right.push(points[points.length - step]);
+        for (i = _j = 0, _ref1 = points.length - step; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
+          points[i] = (points[i] + points[i + 1]) * .5;
+        }
+      }
+      left.push(points[0]);
+      right.push(points[0]);
+      subdivide(left, k - 1);
+      subdivide(right, k - 1);
+      for (i = _k = 0, _ref2 = left.length; 0 <= _ref2 ? _k < _ref2 : _k > _ref2; i = 0 <= _ref2 ? ++_k : --_k) {
+        points[i] = left[i];
+      }
+      for (i = _l = 0, _ref3 = right.length; 0 <= _ref3 ? _l < _ref3 : _l > _ref3; i = 0 <= _ref3 ? ++_l : --_l) {
+        points[i - 1 + left.length] = right[right.length - i - 1];
+      }
+      return points;
+    };
+
+    return BezierCurve;
+
+  })();
+
   Love.Math.RandomGenerator = (function() {
     var Long, MAX_VALUE;
 
@@ -10045,7 +10452,7 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
       if (high) {
         self.seed = new Long(low, high);
       } else {
-        self.seed = low;
+        self.seed = Long.fromNumber(low);
       }
       self.rng_state = self.seed;
       _results = [];
