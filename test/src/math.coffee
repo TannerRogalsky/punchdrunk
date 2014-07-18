@@ -2,11 +2,13 @@ describe 'love.math', ->
   it 'exists', ->
     expect(Love.Math).to.be.a("function")
 
+  math = null
+  beforeEach ->
+    math = new Love.Math()
+
   describe '.noise', ->
     noise = null
-    math = null
     beforeEach ->
-      math = new Love.Math()
       noise = math.noise
 
     describe 'when called with one argument', ->
@@ -91,7 +93,7 @@ describe 'love.math', ->
   describe '.random', ->
     random = null
     beforeEach ->
-      random = new Love.Math().random
+      random = math.random
 
     describe 'when called with no arguments', ->
       it 'should return a value between 0 and 1', ->
@@ -106,9 +108,8 @@ describe 'love.math', ->
         expect(random(5, 10)).to.be.within(5, 10 + 1)
 
   describe '.setRandomSeed', ->
-    [math, random] = []
+    random = null
     beforeEach ->
-      math = new Love.Math()
       random = math.random
 
     it 'should result in the same random numbers when passed the same args', ->
@@ -124,10 +125,15 @@ describe 'love.math', ->
 
       expect(result_set_a).to.eql(result_set_b)
 
+    it 'should accept a single argument', ->
+      math.setRandomSeed(100)
+      [low, high] = math.getRandomSeed()
+      expect(low).to.equal(100)
+      expect(high).to.equal(0)
+
   describe '.getRandomSeed', ->
-    [math, random] = []
+    random = null
     beforeEach ->
-      math = new Love.Math()
       random = math.random
 
     it 'should return the same numbers passed to setRandomSeed', ->
@@ -138,16 +144,118 @@ describe 'love.math', ->
       expect(math.getRandomSeed()).to.eql([seed_low, seed_high])
 
   describe '.gammaToLinear', ->
-    it ''
+    it 'should be reversed by linearToGamma', ->
+      rounding_error_margin = 0.1
+      [gr, gg, gb] = [120, 50, 100]
+      [lr, lg, lb] = math.gammaToLinear(gr, gg, gb)
+      [rr, rg, rb] = math.linearToGamma(lr, lg, lb)
+      expect(rr).to.be.closeTo(gr, rounding_error_margin)
+      expect(rg).to.be.closeTo(gg, rounding_error_margin)
+      expect(rb).to.be.closeTo(gb, rounding_error_margin)
+
+    describe 'when called with three separate color components', ->
+      it 'should return three linear-space color components', ->
+        [gr, gg, gb] = [120, 50, 100]
+        [lr, lg, lb] = math.gammaToLinear(gr, gg, gb)
+        expect(lr).to.be.ok
+        expect(lg).to.be.ok
+        expect(lb).to.be.ok
+
+    describe 'when called with a sequence of color components', ->
+      it 'should return three linear-space color components', ->
+        [gr, gg, gb] = [120, 50, 100]
+        [lr, lg, lb] = math.gammaToLinear(gr, gg, gb)
+        expect(lr).to.be.ok
+        expect(lg).to.be.ok
+        expect(lb).to.be.ok
+
+    describe 'when called with one color component', ->
+      it 'should return three linear-space color components', ->
+        [gr, gg, gb] = [120, 50, 100]
+        [lr, lg, lb] = math.gammaToLinear(gr, gg, gb)
+        expect(lr).to.be.ok
+        expect(lg).to.be.ok
+        expect(lb).to.be.ok
+
   describe '.isConvex', ->
-    it ''
+    it 'returns true for a convex polygon', ->
+      vertices = [0,0, 0,100, 100,100, 100,0]
+      expect(math.isConvex(vertices)).to.be.true
+
+    it 'returns false for a non-convex polygon', ->
+      vertices = [0,0, 0,100, -100,-100, 100,0]
+      expect(math.isConvex(vertices)).to.be.false
+
   describe '.linearToGamma', ->
-    it ''
+    it 'should be reversed by gammaToLinear', ->
+      rounding_error_margin = 0.1
+      [lr, lg, lb] = [120, 50, 100]
+      [gr, gg, gb] = math.linearToGamma(lr, lg, lb)
+      [rr, rg, rb] = math.gammaToLinear(gr, gg, gb)
+      expect(rr).to.be.closeTo(lr, rounding_error_margin)
+      expect(rg).to.be.closeTo(lg, rounding_error_margin)
+      expect(rb).to.be.closeTo(lb, rounding_error_margin)
+
+    describe 'when called with three separate color components', ->
+      it 'should return three gamma-space color components', ->
+        [lr, lg, lb] = [120, 50, 100]
+        [gr, gg, gb] = math.linearToGamma(lr, lg, lb)
+        expect(gr).to.be.ok
+        expect(gg).to.be.ok
+        expect(gb).to.be.ok
+
+    describe 'when called with a sequence of color components', ->
+      it 'should return three gamma-space color components', ->
+        linear_colors = [120, 50, 100]
+        [gr, gg, gb] = math.linearToGamma(linear_colors)
+        expect(gr).to.be.ok
+        expect(gg).to.be.ok
+        expect(gb).to.be.ok
+
+    describe 'when called with one color component', ->
+      it 'should return one gamma-space color component', ->
+        linear_color = 120
+        [gr, gg, gb] = math.linearToGamma(linear_color)
+        expect(gr).to.be.ok
+        expect(gg).to.be.undefined
+        expect(gb).to.be.undefined
+
   describe '.newBezierCurve', ->
-    it ''
+    it 'should return a new bezier curve comprised of the vertices that were passed', ->
+      controls_points = [100,100, 125,125, 100,125]
+      bezier = math.newBezierCurve(controls_points)
+      for i in [0...3]
+        [x, y] = bezier.getControlPoint(bezier, i)
+        expect(x).to.equal(controls_points[i * 2])
+        expect(y).to.equal(controls_points[i * 2 + 1])
+
   describe '.newRandomGenerator', ->
-    it ''
+    it 'should return a new RandomGenerator object', ->
+      expect(math.newRandomGenerator()).to.be.an.instanceof(Love.Math.RandomGenerator)
+
+    it 'should use the seed passed to it', ->
+      [low_s, high_s] = [100, 200]
+      r = math.newRandomGenerator(low_s, high_s)
+      [low, high] = r.getSeed(r)
+      expect(low_s).to.equal(low)
+      expect(high_s).to.equal(high)
+
   describe '.randomNormal', ->
     it ''
+
   describe '.triangulate', ->
-    it ''
+    it 'should return two triangles when you pass it a rectangular polygon', ->
+      vertices = [0,0, 0,100, 100,100, 100,0]
+      triangles = math.triangulate(vertices)
+      expect(triangles.length).to.equal(2)
+
+    it 'should handle concave polygons', ->
+      vertices = [0,0, 0,100, -100,-100, 100,0]
+      triangles = math.triangulate(vertices)
+      expect(triangles.length).to.equal(2)
+
+    it 'should handle clockwise vertices', ->
+      vertices = [0,0, 100,0, 100,100, 0,100]
+      triangles = math.triangulate(vertices)
+      expect(triangles.length).to.equal(2)
+

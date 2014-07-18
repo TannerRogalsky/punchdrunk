@@ -4,6 +4,7 @@ punchdrunk.js
 Punchdrunk = [Moonshine](http://moonshinejs.org/) + [LÖVE](http://love2d.org/)
 
 Demo: http://tannerrogalsky.com/punchdrunk/
+Tests: http://tannerrogalsky.com/punchdrunk/test/
 
 [![Build Status](https://travis-ci.org/TannerRogalsky/punchdrunk.svg?branch=tests)](https://travis-ci.org/TannerRogalsky/punchdrunk)
 
@@ -21,7 +22,6 @@ Demo: http://tannerrogalsky.com/punchdrunk/
 Some things don't work (and some may never work):
 - love.image
 - love.joystick
-- love.math
 - love.physics
 - love.thread
 - love.filesystem

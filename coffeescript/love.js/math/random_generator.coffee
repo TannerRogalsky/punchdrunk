@@ -35,7 +35,7 @@ class Love.Math.RandomGenerator
     if high
       self.seed = new Long(low, high)
     else
-      self.seed = low
+      self.seed = Long.fromNumber(low)
 
     self.rng_state = self.seed
     for i in [0..2]
