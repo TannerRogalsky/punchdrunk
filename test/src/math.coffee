@@ -215,7 +215,13 @@ describe 'love.math', ->
         expect(gb).to.be.undefined
 
   describe '.newBezierCurve', ->
-    it ''
+    it 'should return a new bezier curve comprised of the vertices that were passed', ->
+      controls_points = [100,100, 125,125, 100,125]
+      bezier = math.newBezierCurve(controls_points)
+      for i in [0...3]
+        [x, y] = bezier.getControlPoint(bezier, i)
+        expect(x).to.equal(controls_points[i * 2])
+        expect(y).to.equal(controls_points[i * 2 + 1])
 
   describe '.newRandomGenerator', ->
     it 'should return a new RandomGenerator object', ->

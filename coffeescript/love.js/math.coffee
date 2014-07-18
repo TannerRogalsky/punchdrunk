@@ -66,7 +66,19 @@ class Love.Math
         c = window.Math.pow((c + 0.055) / 1.055, 2.4)
       c *= 255
 
-  newBezierCurve: =>
+  newBezierCurve: (vertices...) =>
+    if vertices.length == 1
+      vertices = if vertices[0].__shine
+          # make up for lua being one-indexed with the slice
+          vertices[0].__shine.numValues.slice(1, vertices[0].__shine.numValues.length)
+        else
+          vertices[0]
+
+    controlPoints = for i in [0...vertices.length] by 2
+      x: vertices[i]
+      y: vertices[i + 1]
+
+    new @constructor.BezierCurve(controlPoints)
 
   newRandomGenerator: (low, high) =>
     r = new Love.Math.RandomGenerator()
