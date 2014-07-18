@@ -11,9 +11,11 @@ class Love.Math.BezierCurve
     points = self.controlPoints.slice(0)
     for step in [1...self.controlPoints.length]
       for i in [0...(self.controlPoints.length - step)]
-        points[i] = points[i] * (1-t) + points[i+1] * t
+        points[i] =
+          x: points[i].x * (1-t) + points[i+1].x * t
+          y: points[i].y * (1-t) + points[i+1].y * t
 
-    return points[0]
+    [points[0].x, points[0].y]
 
   getControlPoint: (self, i) ->
     if i < 0
@@ -41,10 +43,10 @@ class Love.Math.BezierCurve
         x: (self.controlPoints[i+1].x - self.controlPoints[i].x) * degree
         y: (self.controlPoints[i+1].y - self.controlPoints[i].y) * degree
 
-    self.constructor.BezierCurve(forward_differences)
+    new self.constructor(forward_differences)
 
 
-  insertControlPoint: (self, x, y, i = -1) ->
+  insertControlPoint: (self, x, y, pos = -1) ->
     if pos < 0
       pos += self.controlPoints.length + 1
 
@@ -59,7 +61,12 @@ class Love.Math.BezierCurve
     if self.controlPoints.length < 2
       throw new Love.Exception("Invalid Bezier curve: Not enough control points.")
     vertices = self.controlPoints.slice(0)
-    subdivide(vertices, accuracy)
+    subdivide(vertices, depth)
+    results = []
+    for vertice in vertices
+      results.push(vertice.x)
+      results.push(vertice.y)
+    return results
 
   rotate: (self, angle, ox = 0, oy = 0) ->
     c = Math.cos(angle)
@@ -83,7 +90,9 @@ class Love.Math.BezierCurve
     if i < 0 or i >= self.controlPoints.length
       throw new Love.Exception("Invalid control point index")
 
-    self.controlPoints[i] = point
+    self.controlPoints[i] =
+      x: x
+      y: y
 
   translate: (self, dx, dy) ->
     for controlPoint in self.controlPoints
@@ -108,7 +117,6 @@ class Love.Math.BezierCurve
     subdivide(left, k - 1)
     subdivide(right, k - 1)
 
-    points.resize(left.length + right.length - 1)
     for i in [0...left.length]
       points[i] = left[i]
     for i in [0...right.length]
