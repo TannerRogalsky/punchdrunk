@@ -125,6 +125,12 @@ describe 'love.math', ->
 
       expect(result_set_a).to.eql(result_set_b)
 
+    it 'should accept a single argument', ->
+      math.setRandomSeed(100)
+      [low, high] = math.getRandomSeed()
+      expect(low).to.equal(100)
+      expect(high).to.equal(0)
+
   describe '.getRandomSeed', ->
     random = null
     beforeEach ->
