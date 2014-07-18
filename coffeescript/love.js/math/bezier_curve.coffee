@@ -3,9 +3,9 @@ class Love.Math.BezierCurve
 
   evaluate: (self, t) ->
     if t < 0 or t > 1
-      console.log "Invalid evaluation parameter: must be between 0 and 1"
+      throw new Love.Exception("Invalid evaluation parameter: must be between 0 and 1")
     if self.controlPoints.length < 2
-      console.log "Invalid Bezier curve: Not enough control points."
+      throw new Love.Exception("Invalid Bezier curve: Not enough control points.")
 
     # de casteljau
     points = self.controlPoints.slice(0)
@@ -20,7 +20,7 @@ class Love.Math.BezierCurve
       i += self.controlPoints.length
 
     if i < 0 or i >= self.controlPoints.length
-      console.log "Invalid control point index"
+      throw new Love.Exception("Invalid control point index")
 
     [self.controlPoints[i].x, self.controlPoints[i].y]
 
@@ -32,7 +32,7 @@ class Love.Math.BezierCurve
 
   getDerivative: (self) ->
     if self.getDegree(self) < 1
-      console.log "Cannot derive a curve of degree < 1."
+      throw new Love.Exception("Cannot derive a curve of degree < 1.")
 
     forward_differences = new Array()
     degree = self.getDegree(self)
@@ -49,7 +49,7 @@ class Love.Math.BezierCurve
       pos += self.controlPoints.length + 1
 
     if pos < 0 or pos > self.controlPoints.length
-      console.log "Invalid control point index"
+      throw new Love.Exception("Invalid control point index")
 
     self.controlPoints.splice pos, 0,
       x: x
@@ -57,7 +57,7 @@ class Love.Math.BezierCurve
 
   render: (self, depth = 5) ->
     if self.controlPoints.length < 2
-      console.log "Invalid Bezier curve: Not enough control points."
+      throw new Love.Exception("Invalid Bezier curve: Not enough control points.")
     vertices = self.controlPoints.slice(0)
     subdivide(vertices, accuracy)
 
@@ -81,7 +81,7 @@ class Love.Math.BezierCurve
       i += self.controlPoints.length
 
     if i < 0 or i >= self.controlPoints.length
-      console.log "Invalid control point index"
+      throw new Love.Exception("Invalid control point index")
 
     self.controlPoints[i] = point
 
