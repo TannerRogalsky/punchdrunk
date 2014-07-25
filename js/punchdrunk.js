@@ -1,4 +1,4 @@
-/*! punchdrunk 0.0.3 (2014-07-18) - https://github.com/TannerRogalsky/punchdrunk */
+/*! punchdrunk 0.0.4 (2014-07-25) - https://github.com/TannerRogalsky/punchdrunk */
 /*! An attempt to replicate the Love API in JavaScript */
 /*! Tanner Rogalsky *//*
  * Moonshine - a Lua virtual machine.
@@ -8999,6 +8999,8 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
   Love.Mouse = (function() {
     var getButtonFromEvent, getWheelButtonFromEvent, mouseButtonNames;
 
+    Mouse.WHEEL_TIMEOUT = 0.02;
+
     function Mouse(eventQueue, canvas) {
       this.setY = __bind(this.setY, this);
       this.setX = __bind(this.setX, this);
@@ -9040,7 +9042,7 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
           clearTimeout(_this.wheelTimeOuts[button]);
           _this.wheelTimeOuts[button] = setTimeout(function() {
             return handleRelease(button);
-          }, Mouse.WHEEL_TIMEOUT * 1000);
+          }, _this.constructor.WHEEL_TIMEOUT * 1000);
           return handlePress(button);
         };
       })(this);
@@ -9150,8 +9152,6 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
     return Mouse;
 
   })();
-
-  Love.Mouse.WHEEL_TIMEOUT = 0.02;
 
   Love.System = (function() {
     function System() {
@@ -9264,13 +9264,13 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
   })();
 
   Love.Touch = (function() {
-    var Finger;
+    var Finger, getFingerIndex;
 
     function Touch(eventQueue, canvas) {
       this.getTouchCount = __bind(this.getTouchCount, this);
       this.getTouch = __bind(this.getTouch, this);
       var preventDefault, touchend;
-      this.fingers = {};
+      this.fingers = [];
       preventDefault = function(evt) {
         evt.preventDefault();
         return evt.stopPropagation();
@@ -9280,17 +9280,17 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
       canvas.addEventListener('gestureend', preventDefault);
       canvas.addEventListener('touchstart', (function(_this) {
         return function(evt) {
-          var finger, rect, t, _i, _len, _ref, _results;
+          var finger, index, rect, t, _i, _len, _ref, _results;
           preventDefault(evt);
           _ref = evt.targetTouches;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             t = _ref[_i];
-            finger = _this.fingers[t.identifier];
-            if (!finger) {
+            index = getFingerIndex(_this.fingers, t.identifier);
+            if (index === -1) {
               rect = Love.element.getBoundingClientRect();
               finger = new Finger(t.identifier, t.pageX - rect.left, t.pageY - rect.top);
-              _this.fingers[finger.identifier] = finger;
+              _this.fingers.push(finger);
               _results.push(eventQueue.push('touchpressed', finger.identifier, finger.x, finger.y));
             } else {
               _results.push(void 0);
@@ -9301,15 +9301,16 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
       })(this));
       touchend = (function(_this) {
         return function(evt) {
-          var finger, t, _i, _len, _ref, _results;
+          var finger, index, t, _i, _len, _ref, _results;
           preventDefault(evt);
           _ref = evt.changedTouches;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             t = _ref[_i];
-            finger = _this.fingers[t.identifier];
-            if (finger) {
-              delete _this.fingers[t.identifier];
+            index = getFingerIndex(_this.fingers, t.identifier);
+            if (index >= 0) {
+              finger = _this.fingers[index];
+              _this.fingers.splice(index, 1);
               _results.push(eventQueue.push('touchreleased', finger.identifier, finger.x, finger.y));
             } else {
               _results.push(void 0);
@@ -9323,14 +9324,15 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
       canvas.addEventListener('touchcancel', touchend);
       canvas.addEventListener('touchmove', (function(_this) {
         return function(evt) {
-          var finger, rect, t, _i, _len, _ref, _results;
+          var finger, index, rect, t, _i, _len, _ref, _results;
           preventDefault(evt);
           _ref = evt.targetTouches;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             t = _ref[_i];
-            finger = _this.fingers[t.identifier];
-            if (finger) {
+            index = getFingerIndex(_this.fingers, t.identifier);
+            if (index >= 0) {
+              finger = _this.fingers[index];
               rect = Love.element.getBoundingClientRect();
               finger.x = t.pageX - rect.left;
               finger.y = t.pageY - rect.top;
@@ -9348,14 +9350,25 @@ goog.math.Long.prototype.shiftRightUnsigned = function(numBits) {
       var finger;
       finger = this.fingers[id];
       if (finger) {
-        return [finger.x, finger.y];
+        return [finger.identifier, finger.x, finger.y, 1];
       } else {
-        return [null, null];
+        return null;
       }
     };
 
     Touch.prototype.getTouchCount = function() {
       return Object.keys(this.fingers).length;
+    };
+
+    getFingerIndex = function(fingers, id) {
+      var finger, index, _i, _ref;
+      for (index = _i = 0, _ref = fingers.length; 0 <= _ref ? _i < _ref : _i > _ref; index = 0 <= _ref ? ++_i : --_i) {
+        finger = fingers[index];
+        if (finger.identifier === id) {
+          return index;
+        }
+      }
+      return -1;
     };
 
     Finger = (function() {
