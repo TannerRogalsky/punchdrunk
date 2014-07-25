@@ -1,53 +1,53 @@
+local g = love.graphics
+
 function love.load()
-  love.graphics.setLineWidth(3)
-  circles = {}
+  canvas = g.newCanvas()
+  color_index = 1
+  colors = {
+    {255, 255, 255},
+    {255, 0, 0},
+    {0, 255, 0},
+    {0, 0, 255},
+  }
 end
 
 function love.draw()
-  for _,circle in pairs(circles) do
-    love.graphics.setColor(circle.color)
-    love.graphics.circle("fill", circle.x, circle.y, circle.radius)
-  end
+  g.setColor(255, 255, 255)
+  g.draw(canvas, 0, 0)
 end
 
 function love.update(dt)
-  for id,circle in pairs(circles) do
-    if love.touch then
-      local x, y = love.touch.getTouch(id - 1)
-      circle.x, circle.y = x, y
-    else
-      local x, y = love.mouse.getPosition()
-      circle.x, circle.y = x, y
+  g.setCanvas(canvas)
+  g.setColor(colors[color_index])
+  if love.touch then
+    for i=0,love.touch.getTouchCount() do
+      local id, x, y, pressure = love.touch.getTouch(i)
+      g.circle("fill", x, y, 20)
     end
   end
+  if love.mouse then
+    if love.mouse.isDown("l") then
+      local x, y = love.mouse.getPosition()
+      g.circle("fill", x, y, 20)
+    end
+  end
+  g.setCanvas()
 end
 
 function love.touchpressed(id, x, y)
-  local circle = {
-    x = x,
-    y = y,
-    radius = 50,
-    color = {255, 0, 0, 255}
-  }
-  -- incrementing the id is because of a bug in moonshine
-  -- https://github.com/gamesys/moonshine/issues/15
-  circles[id + 1] = circle
+  print("touchpressed", id, x, y)
 end
 
 function love.touchreleased(id, x, y)
-  circles[id + 1] = nil
+  print("touchreleased", id, x, y)
+  color_index = color_index % #colors + 1
 end
 
 function love.mousepressed(x, y, button)
-  local circle = {
-    x = x,
-    y = y,
-    radius = 50,
-    color = {255, 0, 0, 255}
-  }
-  table.insert(circles, circle)
+  print("mousepressed", button, x, y)
 end
 
 function love.mousereleased(x, y, button)
-  table.remove(circles)
+  print("mousereleased", button, x, y)
+  color_index = color_index % #colors + 1
 end

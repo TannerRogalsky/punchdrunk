@@ -1,4 +1,6 @@
 class Love.Mouse
+  @WHEEL_TIMEOUT = 0.02
+
   constructor: (eventQueue, canvas) ->
     @x = 0
     @y = 0
@@ -19,9 +21,9 @@ class Love.Mouse
       # The 'wheel has stopped scrolling' event is triggered via setTimeout, since
       # browsers don't provide a native 'stopped scrolling' event
       clearTimeout(@wheelTimeOuts[button])
-      @wheelTimeOuts[button] = setTimeout ->
+      @wheelTimeOuts[button] = setTimeout =>
         handleRelease(button)
-      , Mouse.WHEEL_TIMEOUT * 1000
+      , @constructor.WHEEL_TIMEOUT * 1000
       handlePress(button)
 
     canvas.addEventListener 'mousemove', (evt) =>
@@ -96,5 +98,3 @@ class Love.Mouse
   getWheelButtonFromEvent = (evt) ->
     delta = Math.max(-1, Math.min(1, (evt.wheelDelta or -evt.detail)))
     if delta == 1 then 'wu' else 'wd'
-
-Love.Mouse.WHEEL_TIMEOUT = 0.02

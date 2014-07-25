@@ -1,6 +1,6 @@
 class Love.Touch
   constructor: (eventQueue, canvas) ->
-    @fingers = {}
+    @fingers = []
 
     preventDefault = (evt) ->
       evt.preventDefault()
@@ -14,19 +14,20 @@ class Love.Touch
       preventDefault(evt);
 
       for t in evt.targetTouches
-        finger = @fingers[t.identifier]
-        if not finger
+        index = getFingerIndex(@fingers, t.identifier)
+        if index == -1
           rect = Love.element.getBoundingClientRect()
           finger = new Finger(t.identifier, t.pageX - rect.left, t.pageY - rect.top)
-          @fingers[finger.identifier] = finger
+          @fingers.push finger
           eventQueue.push('touchpressed', finger.identifier, finger.x, finger.y)
 
     touchend = (evt) =>
       preventDefault(evt)
       for t in evt.changedTouches
-        finger = @fingers[t.identifier]
-        if finger
-          delete(@fingers[t.identifier])
+        index = getFingerIndex(@fingers, t.identifier)
+        if index >= 0
+          finger = @fingers[index]
+          @fingers.splice(index, 1)
           eventQueue.push('touchreleased', finger.identifier, finger.x, finger.y)
     canvas.addEventListener('touchend',    touchend)
     canvas.addEventListener('touchleave',  touchend)
@@ -36,8 +37,9 @@ class Love.Touch
       preventDefault(evt)
 
       for t in evt.targetTouches
-        finger = @fingers[t.identifier]
-        if finger
+        index = getFingerIndex(@fingers, t.identifier)
+        if index >= 0
+          finger = @fingers[index]
           rect = Love.element.getBoundingClientRect()
           finger.x = t.pageX - rect.left
           finger.y = t.pageY - rect.top
@@ -47,12 +49,19 @@ class Love.Touch
   getTouch: (id) =>
     finger = @fingers[id]
     if finger
-      [finger.x, finger.y]
+      [finger.identifier, finger.x, finger.y, 1]
     else
-      [null, null]
+      null
 
   getTouchCount: =>
     Object.keys(@fingers).length
+
+  getFingerIndex = (fingers, id) ->
+    for index in [0...fingers.length]
+      finger = fingers[index]
+      if finger.identifier == id
+        return index
+    return -1
 
   class Finger
     constructor: (@identifier, @x, @y) ->
