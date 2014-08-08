@@ -12,6 +12,7 @@ class Love.Graphics.Canvas2D
 
     @current_transform = Matrix.I(3)
 
+    @context.textBaseline = "top"
   clear: (self, r, g, b, a) ->
     if r == null or r == undefined
       color = @constructor.TRANSPARENT
