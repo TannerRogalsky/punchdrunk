@@ -37,20 +37,27 @@ class Love.Graphics.Font
     for lineN in linesN
       words = lineN.split(' ')
       line = ''
-      
 
       for n in [0..(words.length-1)] 
-        testLine = line + words[n] + ' '
-        metrics = ctx.measureText(testLine)
-        testWidth = metrics.width
+        if line == '' # Print first word even if its longer than limit
+          line = words[n] 
+          testLine = words[n]
+          continue
+        else
+          testLine = line + ' ' + words[n]
+          metrics = ctx.measureText(testLine)
+          testWidth = metrics.width
         if testWidth > width && n > 0
           linewidth = ctx.measureText(line).width
           maxwidth = Math.max(maxwidth, linewidth)
           numlines += 1
-          line = words[n] + ' '
+          line = words[n]
         else
           line = testLine
+      linewidth = ctx.measureText(line).width
+      maxwidth = Math.max(maxwidth, linewidth)
       numlines += 1
+
     ctx.font = oldfont
     return [maxwidth, numlines]
       

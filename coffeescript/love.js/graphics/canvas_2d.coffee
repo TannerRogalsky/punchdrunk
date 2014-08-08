@@ -113,18 +113,63 @@ class Love.Graphics.Canvas2D
   print: (text, x, y) ->
     @context.fillText(text, x, y)
 
-  # TODO: word wrap? UGH
   printf: (text, x, y, limit, align = "left") ->
-    @context.save()
-    @context.translate(x + limit / 2, y)
-    switch align
-      when "center" then @context.textAlign = "center"
-      when "left" then @context.textAlign = "left"
-      when "right" then @context.textAlign = "right"
-    @context.fillText(text, 0, 0)
-    @context.restore()
 
-    @context.textBaseline = "top"
+    # get lines
+    lines = []
+    linesN = text.split('\n')
+    for lineN in linesN
+      words = lineN.split(' ')
+      line = ''
+
+      for n in [0..(words.length-1)] 
+        if line == '' # Print first word even if its longer than limit
+          line = words[n] 
+          testLine = words[n]
+          continue
+        else
+          testLine = line + ' ' + words[n]
+          metrics = @context.measureText(testLine)
+          testWidth = metrics.width
+        if testWidth > limit && n > 0
+          lines.push(line)
+          line = words[n]
+        else
+          line = testLine
+      lines.push(line)
+
+
+
+
+    textx = 0
+    switch align
+       when "center"
+        @context.textAlign = "center"
+        textx = x + (limit/2)
+       when "left"
+        @context.textAlign = "left"
+        textx = x
+       when "right"
+        @context.textAlign = "right"
+        textx = x + limit
+
+    texty = y
+    for line in lines 
+      @context.fillText(line, textx, texty)
+      texty += @current_font.getHeight(@current_font)
+
+
+    @context.textAlign = "left"
+    # @context.save()
+    # @context.translate(x + limit / 2, y)
+    # switch align
+    #   when "center" then @context.textAlign = "center"
+    #   when "left" then @context.textAlign = "left"
+    #   when "right" then @context.textAlign = "right"
+    # @context.fillText(text, 0, 0)
+    # @context.restore()
+
+    # @context.textBaseline = "top"
 
   rectangle: (mode, x, y, width, height) ->
     switch mode
