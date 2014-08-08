@@ -7,9 +7,8 @@ li = love.image
 lg = love.graphics
 
 
-font = lg.newFont("GeosansLight", 50)
-font_big = lg.newFont("agency", 80)
-font_bigger = lg.newFont("GeosansLight", 80)
+font = lg.newFont("fonts/GeosansLight.ttf", 50)
+
 
 
 
@@ -77,5 +76,5 @@ sit amet biltong meatloaf andouille, turducken bresaola pork belly beef ribs ham
 
 
 	-- Controls
-	lg.printf("Use arrow keys to change align.", 20, 250, 500)
+	lg.printf("Use arrow keys to change align.", 20, 250, 400)
 end

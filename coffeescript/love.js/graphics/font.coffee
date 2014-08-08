@@ -1,8 +1,28 @@
 class Love.Graphics.Font
-  constructor: (@filename, @size) ->
+  constructor: (@filepath, @size) ->
+
+    if typeof @filepath == "number" # newFont(size): Use standard font
+      @size = @filepath
+      @filename = "Vera"
+      @filepath = "Vera"
+      
+    if typeof @filepath != "string" # newFont(): Use standard font and standard size 
+      @size = 12
+      @filename = "Vera"
+      @filepath = "Vera"
+
+    if not @filename      # newFont(filepath, size): Use given font and size
+      @filename = @filepath.replace( /\\ /g, '/' )
+      @filename = @filename.substring(@filename.lastIndexOf('/')+1, @filename.lastIndexOf('.'))
+      # Load font by adding CSS 
+      styleElement = document.createElement("style");
+      styleElement.textContent = '@font-face{font-family: "'+@filename+'"; src: url("'+Love.root+'/'+@filepath+'");}'
+      document.head.appendChild(styleElement)
     @html_code = "#{@size}px #{@filename}"
 
-    #Get font height
+    
+
+    # Get font height
     body = document.getElementsByTagName("body")[0]
     dummy = document.createElement("div")
     dummyText = document.createTextNode("x")
