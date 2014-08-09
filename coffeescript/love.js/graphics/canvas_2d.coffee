@@ -160,16 +160,6 @@ class Love.Graphics.Canvas2D
 
 
     @context.textAlign = "left"
-    # @context.save()
-    # @context.translate(x + limit / 2, y)
-    # switch align
-    #   when "center" then @context.textAlign = "center"
-    #   when "left" then @context.textAlign = "left"
-    #   when "right" then @context.textAlign = "right"
-    # @context.fillText(text, 0, 0)
-    # @context.restore()
-
-    # @context.textBaseline = "top"
 
   rectangle: (mode, x, y, width, height) ->
     switch mode
