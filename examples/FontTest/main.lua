@@ -19,6 +19,7 @@ function love.load()
 		lg.newFont("fonts/agency.ttf", 50),
 		lg.newFont("fonts/GeosansLight.ttf", 20),
 		lg.newFont("fonts/agency.ttf", 20),
+		lg.newFont(20),
 	}
 	currentfont = 1
 end

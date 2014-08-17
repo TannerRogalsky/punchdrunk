@@ -14,11 +14,12 @@ class Love.Graphics.Font
     if not @filename      # newFont(filepath, size): Use given font and size
       @filename = @filepath.replace( /\\ /g, '/' )
       @filename = @filename.substring(@filename.lastIndexOf('/')+1, @filename.lastIndexOf('.'))
+      @filename = '"'+@filename+'"'
       # Load font by adding CSS 
       styleElement = document.createElement("style");
-      styleElement.textContent = '@font-face{font-family: "'+@filename+'"; src: url("'+Love.root+'/'+@filepath+'");}'
+      styleElement.textContent = '@font-face{font-family: '+@filename+'; src: url("'+Love.root+'/'+@filepath+'");}'
       document.head.appendChild(styleElement)
-    @html_code = "#{@size}px #{@filename}"
+    @html_code = "#{@size}px #{@filename}, Verdana, Arial, Sans-serif"
 
     
 
