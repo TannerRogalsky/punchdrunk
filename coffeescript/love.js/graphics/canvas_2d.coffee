@@ -111,7 +111,16 @@ class Love.Graphics.Canvas2D
       when "line" then @context.stroke()
 
   print: (text, x, y) ->
-    @context.fillText(text, x, y)
+    linesN = text.split('\n')
+    if linesN.length > 1
+      starty = y
+      lineHeight = @current_font.getHeight(@current_font)
+      for line in linesN
+        @context.fillText(line, x, starty)
+        starty += lineHeight
+
+    else
+      @context.fillText(text, x, y)
 
   printf: (text, x, y, limit, align = "left") ->
 
