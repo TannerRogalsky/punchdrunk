@@ -40,6 +40,7 @@ class Love.Graphics.Font
     return self.height
   getLineHeight: (self) ->
   getWidth: (self, text) ->
+    text = shine.lib.tostring(text)
     canvas = document.getElementsByTagName("canvas")[0]
     ctx = canvas.getContext("2d");
     oldfont = ctx.font
@@ -48,6 +49,7 @@ class Love.Graphics.Font
     ctx.font = oldfont
     return width
   getWrap: (self, text, width) ->
+    text = shine.lib.tostring(text)
     canvas = document.getElementsByTagName("canvas")[0]
     ctx = canvas.getContext("2d");
     oldfont = ctx.font

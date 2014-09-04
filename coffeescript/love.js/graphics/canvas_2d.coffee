@@ -111,6 +111,7 @@ class Love.Graphics.Canvas2D
       when "line" then @context.stroke()
 
   print: (text, x, y) ->
+    text = shine.lib.tostring(text)
     linesN = text.split('\n')
     if linesN.length > 1
       starty = y
@@ -123,6 +124,7 @@ class Love.Graphics.Canvas2D
       @context.fillText(text, x, y)
 
   printf: (text, x, y, limit, align = "left") ->
+    text = shine.lib.tostring(text)
 
     # get lines
     lines = []
