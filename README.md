@@ -1,6 +1,9 @@
 punchdrunk.js
 ================
 
+#DEPRECATED
+This project has been replaced by [Love.js](https://github.com/TannerRogalsky/love.js). It is a direct port of LÖVE and is more feature-complete and performant.
+
 Punchdrunk = [Moonshine](http://moonshinejs.org/) + [LÖVE](http://love2d.org/)
 
 Demo: http://tannerrogalsky.com/punchdrunk/
