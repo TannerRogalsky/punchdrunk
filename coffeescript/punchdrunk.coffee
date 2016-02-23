@@ -34,7 +34,7 @@ class @Punchdrunk
           love: love
         })
 
-        vm._globals['package'].path = "#{game_root}/?.lua.json;#{game_root}/?.json;" + vm._globals['package'].path
+        vm._globals['package'].path = "#{game_root}/?.lua.json;#{game_root}/?.json;#{game_root}/?/init.lua.json;" + vm._globals['package'].path
 
         # this is boot.lua.json
         # it's convenient to have it embeded here because then we don't need to know its path

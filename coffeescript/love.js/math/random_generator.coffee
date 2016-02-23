@@ -15,9 +15,9 @@ class Love.Math.RandomGenerator
 
     if max == undefined
       max = min
-      return self.random(self) * max
-
-    self.random(self) * (max - min) + min
+      min = 1
+    max += 1
+    return Math.floor(self.random(self) * (max - min) + min)
 
   randomNormal: (self, stddev = 1, mean = 0) ->
     if self.last_random_normal != Number.POSITIVE_INFINITY

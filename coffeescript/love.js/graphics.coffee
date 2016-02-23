@@ -8,7 +8,7 @@ class Love.Graphics
       Love.element = @canvas.element
 
     @default_canvas = @canvas
-    @default_font = new Love.Graphics.Font("Vera", 12)
+    @default_font = new Love.Graphics.Font(12)
 
     @setColor(255, 255, 255)
     @setBackgroundColor(0, 0, 0)
